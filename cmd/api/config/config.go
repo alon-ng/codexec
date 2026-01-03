@@ -1,11 +1,10 @@
 package config
 
 import (
-	"codim/internal/rabbitmq"
+	"codim/internal/api/v1"
+	"codim/internal/db"
 	"codim/internal/utils/logger"
-	"codim/internal/worker"
 	"sync"
-	"time"
 
 	"github.com/caarlos0/env/v11"
 )
@@ -17,12 +16,9 @@ var (
 )
 
 type Config struct {
-	Logger           logger.Config
-	RabbitMQ         rabbitmq.Config
-	Workers          []worker.Config
-	CmdPrefix        string        `env:"CMD_PREFIX"`
-	ExecutionTimeout time.Duration `env:"EXECUTION_TIMEOUT" envDefault:"10s"`
-	ShutdownTimeout  time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"30s"`
+	Logger logger.Config
+	API    api.Config
+	DB     db.Config
 }
 
 func Load() (Config, error) {
@@ -34,19 +30,19 @@ func Load() (Config, error) {
 		}
 		config.Logger = loggerCfg
 
-		rmqConfig, err := rabbitmq.LoadConfig()
+		apiCfg, err := api.LoadConfig()
 		if err != nil {
 			loadErr = err
 			return
 		}
-		config.RabbitMQ = rmqConfig
+		config.API = apiCfg
 
-		workers, err := worker.LoadConfig()
+		dbCfg, err := db.LoadConfig()
 		if err != nil {
 			loadErr = err
 			return
 		}
-		config.Workers = workers
+		config.DB = dbCfg
 
 		// Parse the remaining fields using caarlos0/env
 		if err := env.Parse(&config); err != nil {

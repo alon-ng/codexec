@@ -8,7 +8,7 @@ type Config struct {
 	Level string `env:"LOGGER_LEVEL" envDefault:"info"`
 }
 
-func Load() (Config, error) {
+func LoadConfig() (Config, error) {
 	var cfg Config
 	if err := env.Parse(&cfg); err != nil {
 		return Config{}, err

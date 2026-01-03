@@ -18,10 +18,10 @@ type workersConfig struct {
 	WorkersJSON string `env:"WORKERS,required"`
 }
 
-// Load loads worker configurations from a JSON environment variable
+// LoadConfig loads worker configurations from a JSON environment variable
 // Workers are configured via the WORKERS environment variable as a JSON array.
 // Example: WORKERS='[{"driver":"node","queue":"codexec.node","concurrency":10},{"driver":"python","queue":"codexec.python","concurrency":10}]'
-func Load() ([]Config, error) {
+func LoadConfig() ([]Config, error) {
 	var cfg workersConfig
 	if err := env.Parse(&cfg); err != nil {
 		return nil, fmt.Errorf("WORKERS environment variable is required: %w", err)
