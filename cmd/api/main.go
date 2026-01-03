@@ -31,6 +31,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
@@ -45,12 +46,11 @@ func main() {
 		logrus.Fatalf("Failed to initialize logger: %v", err)
 	}
 
-	log.Info("Logger initialized successfully")
-
 	queries, pool := initializeQueries(cfg, log)
 	defer pool.Close()
 
-	log.Info("Database initialized successfully")
+	redisClient := initializeRedis(cfg, log)
+	defer redisClient.Close()
 
 	authProvider := auth.NewProvider(
 		cfg.API.PasswordSalt,
@@ -59,9 +59,7 @@ func main() {
 		cfg.API.JwtRenewalThreshold,
 	)
 
-	router := api.NewRouter(queries, log, authProvider)
-
-	log.Infof("Router initialized successfully")
+	router := api.NewRouter(queries, log, authProvider, redisClient)
 
 	addr := fmt.Sprintf(":%d", cfg.API.Port)
 	log.Infof("Starting server on %s", addr)
@@ -77,6 +75,9 @@ func initializeLogger(cfg config.Config) (*logger.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Info("Logger initialized successfully")
+
 	return log, nil
 }
 
@@ -90,5 +91,27 @@ func initializeQueries(cfg config.Config, log *logger.Logger) (*db.Queries, *pgx
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
+	log.Info("Database initialized successfully")
+
 	return db.New(pool), pool
+}
+
+func initializeRedis(cfg config.Config, log *logger.Logger) *redis.Client {
+	addr := fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port)
+	redisClient := redis.NewClient(
+		&redis.Options{
+			Addr:       addr,
+			Password:   cfg.Redis.Password,
+			DB:         cfg.Redis.DB,
+			MaxRetries: cfg.Redis.MaxRetries,
+		},
+	)
+
+	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("Failed to ping Redis: %v", err)
+	}
+
+	log.Info("Redis initialized successfully")
+
+	return redisClient
 }

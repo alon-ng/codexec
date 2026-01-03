@@ -3,6 +3,7 @@ package config
 import (
 	"codim/internal/api/v1"
 	"codim/internal/db"
+	"codim/internal/redis"
 	"codim/internal/utils/logger"
 	"sync"
 
@@ -19,6 +20,7 @@ type Config struct {
 	Logger logger.Config
 	API    api.Config
 	DB     db.Config
+	Redis  redis.Config
 }
 
 func Load() (Config, error) {
@@ -43,6 +45,13 @@ func Load() (Config, error) {
 			return
 		}
 		config.DB = dbCfg
+
+		redisCfg, err := redis.LoadConfig()
+		if err != nil {
+			loadErr = err
+			return
+		}
+		config.Redis = redisCfg
 
 		// Parse the remaining fields using caarlos0/env
 		if err := env.Parse(&config); err != nil {
