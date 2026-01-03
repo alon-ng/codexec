@@ -1,5 +1,37 @@
 basePath: /api/v1
 definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        example: john.doe@example.com
+        type: string
+      password:
+        example: password
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SignupRequest:
+    properties:
+      email:
+        example: john.doe@example.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      last_name:
+        example: Doe
+        type: string
+      password:
+        example: password
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
   db.User:
     properties:
       created_at:
@@ -53,10 +85,14 @@ definitions:
       last_name:
         example: Doe
         type: string
+      password:
+        example: password
+        type: string
     required:
     - email
     - first_name
     - last_name
+    - password
     type: object
   users.IDRequest:
     properties:
@@ -70,12 +106,6 @@ definitions:
       first_name:
         example: John
         type: string
-      is_admin:
-        example: false
-        type: boolean
-      is_verified:
-        example: false
-        type: boolean
       last_name:
         example: Doe
         type: string
@@ -98,6 +128,89 @@ info:
   title: Codim API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user. The authentication cookie (auth_token) is automatically
+        set in the response.
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      summary: Login a user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout a user by clearing the authentication cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout a user
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Signup a new user. The authentication cookie (auth_token) is automatically
+        set in the response.
+      parameters:
+      - description: Signup request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      summary: Signup a new user
+      tags:
+      - auth
   /users:
     get:
       consumes:
@@ -127,10 +240,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: List users
       tags:
       - users
@@ -156,6 +275,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -164,6 +287,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: Get a user by UUID
       tags:
       - users
@@ -190,10 +315,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: Create a new user
       tags:
       - users
@@ -219,41 +350,17 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: Delete a user
-      tags:
-      - users
-  /users/register:
-    post:
-      consumes:
-      - application/json
-      description: Register a new user (public registration, sets is_admin to false)
-      parameters:
-      - description: User registration data
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/users.CreateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/db.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Register a new user
       tags:
       - users
   /users/restore:
@@ -279,10 +386,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: Restore a deleted user
       tags:
       - users
@@ -309,14 +422,28 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: Update a user
       tags:
       - users
 schemes:
 - http
 - https
+securityDefinitions:
+  CookieAuth:
+    description: Authentication is performed via HTTP-only cookie named "auth_token"
+      containing a JWT token. The cookie is automatically set on successful signup/login
+      and cleared on logout.
+    in: cookie
+    name: auth_token
+    type: apiKey
 swagger: "2.0"

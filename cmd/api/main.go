@@ -14,10 +14,16 @@
 // @BasePath  /api/v1
 
 // @schemes   http https
+
+// @securityDefinitions.apikey CookieAuth
+// @in cookie
+// @name auth_token
+// @description Authentication is performed via HTTP-only cookie named "auth_token" containing a JWT token. The cookie is automatically set on successful signup/login and cleared on logout.
 package main
 
 import (
 	"codim/cmd/api/config"
+	"codim/internal/api/auth"
 	"codim/internal/api/v1"
 	"codim/internal/db"
 	"codim/internal/utils/logger"
@@ -46,7 +52,14 @@ func main() {
 
 	log.Info("Database initialized successfully")
 
-	router := api.NewRouter(queries, log)
+	authProvider := auth.NewProvider(
+		cfg.API.PasswordSalt,
+		[]byte(cfg.API.JwtSecret),
+		cfg.API.JwtTTL,
+		cfg.API.JwtRenewalThreshold,
+	)
+
+	router := api.NewRouter(queries, log, authProvider)
 
 	log.Infof("Router initialized successfully")
 

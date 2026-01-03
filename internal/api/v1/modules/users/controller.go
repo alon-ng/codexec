@@ -25,9 +25,11 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Param        user  body      CreateUserRequest  true  "User creation data"
 // @Success      201   {object}  db.User
 // @Failure      400   {object}  errors.ErrorResponse
+// @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
 // @Router       /users/create [post]
 func (c *Controller) Create(ctx *gin.Context) {
@@ -52,9 +54,11 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Param        user  body      UpdateRequest  true  "User update data"
 // @Success      200   {object}  db.User
 // @Failure      400   {object}  errors.ErrorResponse
+// @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
 // @Router       /users/update [put]
 func (c *Controller) Update(ctx *gin.Context) {
@@ -83,9 +87,11 @@ type IDRequest struct {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Param        uuid  path      string  true  "User UUID"
 // @Success      200   {string}  string  "OK"
 // @Failure      400   {object}  errors.ErrorResponse
+// @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
 // @Router       /users/delete/{uuid} [delete]
 func (c *Controller) Delete(ctx *gin.Context) {
@@ -115,9 +121,11 @@ func (c *Controller) Delete(ctx *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Param        user  body      IDRequest  true  "User UUID"
 // @Success      200   {string}  string     "OK"
 // @Failure      400   {object}  errors.ErrorResponse
+// @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
 // @Router       /users/restore [post]
 func (c *Controller) Restore(ctx *gin.Context) {
@@ -141,10 +149,12 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Param        limit   query     int     false  "Limit (default: 10)"  default(10)
 // @Param        offset  query     int     false  "Offset (default: 0)"  default(0)
 // @Success      200     {array}   db.User
 // @Failure      400     {object}  errors.ErrorResponse
+// @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
 // @Router       /users [get]
 func (c *Controller) List(ctx *gin.Context) {
@@ -169,9 +179,11 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Param        uuid  path      string  true  "User UUID"
 // @Success      200   {object}  db.User
 // @Failure      400   {object}  errors.ErrorResponse
+// @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
 // @Router       /users/{uuid} [get]
