@@ -1,21 +1,17 @@
 package rabbitmq
 
 import (
-	"codim/internal/utils/env"
-	"fmt"
+	"github.com/caarlos0/env/v11"
 )
 
 type Config struct {
-	URL string `yaml:"url"`
+	URL string `env:"RABBITMQ_URL,required"`
 }
 
 func Load() (Config, error) {
-	url := env.Get("RABBITMQ_URL", "")
-	if url == "" {
-		return Config{}, fmt.Errorf("RABBITMQ_URL environment variable is required")
+	var cfg Config
+	if err := env.Parse(&cfg); err != nil {
+		return Config{}, err
 	}
-
-	return Config{
-		URL: url,
-	}, nil
+	return cfg, nil
 }

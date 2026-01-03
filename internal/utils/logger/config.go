@@ -1,13 +1,17 @@
 package logger
 
-import "codim/internal/utils/env"
+import (
+	"github.com/caarlos0/env/v11"
+)
 
 type Config struct {
-	Level string `yaml:"level" validate:"omitempty,oneof=debug info warn error"`
+	Level string `env:"LOGGER_LEVEL" envDefault:"info"`
 }
 
-func Load() Config {
-	return Config{
-		Level: env.Get("LOGGER_LEVEL", "info"),
+func Load() (Config, error) {
+	var cfg Config
+	if err := env.Parse(&cfg); err != nil {
+		return Config{}, err
 	}
+	return cfg, nil
 }
