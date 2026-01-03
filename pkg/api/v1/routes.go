@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -26,7 +27,13 @@ func init() {
 }
 
 func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Provider, redisClient *redis.Client) *gin.Engine {
-	r := gin.Default()
+	// Disable Gin's default logger output
+	gin.DefaultWriter = log.Writer()
+	gin.DefaultErrorWriter = log.WriterLevel(logrus.ErrorLevel)
+
+	r := gin.New()
+	r.Use(middleware.GinLogger(log))
+	r.Use(gin.Recovery())
 
 	// Swagger documentation endpoint
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
