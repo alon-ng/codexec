@@ -1,9 +1,9 @@
 package config
 
 import (
-	"codim/internal/rabbitmq"
-	"codim/internal/utils/logger"
-	"codim/internal/worker"
+	"codim/pkg/rabbitmq"
+	"codim/pkg/utils/logger"
+	"codim/pkg/worker"
 	"sync"
 	"time"
 

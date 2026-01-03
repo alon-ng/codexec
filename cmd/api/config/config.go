@@ -1,10 +1,10 @@
 package config
 
 import (
-	"codim/internal/api/v1"
-	"codim/internal/db"
-	"codim/internal/redis"
-	"codim/internal/utils/logger"
+	"codim/pkg/api/v1"
+	"codim/pkg/db"
+	"codim/pkg/redis"
+	"codim/pkg/utils/logger"
 	"sync"
 
 	"github.com/caarlos0/env/v11"

@@ -23,10 +23,10 @@ package main
 
 import (
 	"codim/cmd/api/config"
-	"codim/internal/api/auth"
-	"codim/internal/api/v1"
-	"codim/internal/db"
-	"codim/internal/utils/logger"
+	"codim/pkg/api/auth"
+	"codim/pkg/api/v1"
+	"codim/pkg/db"
+	"codim/pkg/utils/logger"
 	"context"
 	"fmt"
 

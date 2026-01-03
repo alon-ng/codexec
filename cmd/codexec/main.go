@@ -2,11 +2,11 @@ package main
 
 import (
 	"codim/cmd/codexec/config"
-	"codim/internal/executors"
-	"codim/internal/executors/drivers"
-	"codim/internal/rabbitmq"
-	"codim/internal/utils/logger"
-	"codim/internal/worker"
+	"codim/pkg/executors"
+	"codim/pkg/executors/drivers"
+	"codim/pkg/rabbitmq"
+	"codim/pkg/utils/logger"
+	"codim/pkg/worker"
 	"context"
 	"os"
 	"os/signal"
