@@ -32,6 +32,217 @@ definitions:
     - last_name
     - password
     type: object
+  courses.CreateCourseRequest:
+    properties:
+      bullets:
+        example: |-
+          Learn basics
+          Practice exercises
+        type: string
+      description:
+        example: Learn Python basics
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Introduction to Python
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+    required:
+    - description
+    - name
+    - price
+    - subject
+    type: object
+  courses.IDRequest:
+    properties:
+      uuid:
+        type: string
+    required:
+    - uuid
+    type: object
+  courses.UpdateRequest:
+    properties:
+      bullets:
+        example: |-
+          Learn basics
+          Practice exercises
+        type: string
+      description:
+        example: Learn Python basics
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Introduction to Python
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+      uuid:
+        type: string
+    required:
+    - uuid
+    type: object
+  db.Course:
+    properties:
+      bullets:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      difficulty:
+        type: integer
+      discount:
+        type: integer
+      is_active:
+        type: boolean
+      modified_at:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      subject:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.CourseFull:
+    properties:
+      bullets:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      difficulty:
+        type: integer
+      discount:
+        type: integer
+      is_active:
+        type: boolean
+      lessons:
+        items:
+          $ref: '#/definitions/db.LessonFull'
+        type: array
+      modified_at:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      subject:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.Exercise:
+    properties:
+      created_at:
+        type: string
+      data:
+        type: object
+      deleted_at:
+        type: string
+      description:
+        type: string
+      lesson_uuid:
+        type: string
+      modified_at:
+        type: string
+      name:
+        type: string
+      order_index:
+        type: integer
+      reward:
+        type: integer
+      type:
+        $ref: '#/definitions/db.ExerciseType'
+      uuid:
+        type: string
+    type: object
+  db.ExerciseType:
+    enum:
+    - quiz
+    - code
+    type: string
+    x-enum-varnames:
+    - ExerciseTypeQuiz
+    - ExerciseTypeCode
+  db.Lesson:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      is_public:
+        type: boolean
+      modified_at:
+        type: string
+      name:
+        type: string
+      order_index:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  db.LessonFull:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/db.Exercise'
+        type: array
+      is_public:
+        type: boolean
+      modified_at:
+        type: string
+      name:
+        type: string
+      order_index:
+        type: integer
+      uuid:
+        type: string
+    type: object
   db.User:
     properties:
       created_at:
@@ -67,6 +278,116 @@ definitions:
       error:
         example: Error message describing what went wrong
         type: string
+    type: object
+  exercises.CreateExerciseRequest:
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      description:
+        example: Print Hello World
+        type: string
+      lesson_uuid:
+        type: string
+      name:
+        example: Hello World
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      reward:
+        example: 10
+        type: integer
+    required:
+    - data
+    - description
+    - lesson_uuid
+    - name
+    - order_index
+    - reward
+    type: object
+  exercises.IDRequest:
+    properties:
+      uuid:
+        type: string
+    required:
+    - uuid
+    type: object
+  exercises.UpdateRequest:
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      description:
+        example: Print Hello World
+        type: string
+      lesson_uuid:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      name:
+        example: Hello World
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      reward:
+        example: 10
+        type: integer
+      uuid:
+        type: string
+    required:
+    - uuid
+    type: object
+  lessons.CreateLessonRequest:
+    properties:
+      course_uuid:
+        type: string
+      description:
+        example: Learn Python fundamentals
+        type: string
+      is_public:
+        example: false
+        type: boolean
+      name:
+        example: Python Basics
+        type: string
+      order_index:
+        example: 1
+        type: integer
+    required:
+    - course_uuid
+    - description
+    - name
+    - order_index
+    type: object
+  lessons.IDRequest:
+    properties:
+      uuid:
+        type: string
+    required:
+    - uuid
+    type: object
+  lessons.UpdateRequest:
+    properties:
+      course_uuid:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      description:
+        example: Learn Python fundamentals
+        type: string
+      is_public:
+        example: false
+        type: boolean
+      name:
+        example: Python Basics
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      uuid:
+        type: string
+    required:
+    - uuid
     type: object
   users.CreateUserRequest:
     properties:
@@ -211,6 +532,704 @@ paths:
       summary: Signup a new user
       tags:
       - auth
+  /courses:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of courses, optionally filtered by subject
+      parameters:
+      - default: 10
+        description: 'Limit (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: 'Offset (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      - description: Filter by subject
+        in: query
+        name: subject
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Course'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: List courses
+      tags:
+      - courses
+  /courses/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single course by UUID
+      parameters:
+      - description: Course UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.CourseFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Get a course by UUID
+      tags:
+      - courses
+  /courses/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new course
+      parameters:
+      - description: Course creation data
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/courses.CreateCourseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Course'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Create a new course
+      tags:
+      - courses
+  /courses/delete/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a course by UUID (sets deleted_at timestamp)
+      parameters:
+      - description: Course UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Delete a course
+      tags:
+      - courses
+  /courses/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore a soft-deleted course by UUID (sets deleted_at to NULL)
+      parameters:
+      - description: Course UUID
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/courses.IDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Restore a deleted course
+      tags:
+      - courses
+  /courses/update:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing course by UUID
+      parameters:
+      - description: Course update data
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/courses.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Course'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Update a course
+      tags:
+      - courses
+  /exercises:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of exercises, optionally filtered by lesson
+        UUID
+      parameters:
+      - default: 10
+        description: 'Limit (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: 'Offset (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      - description: Filter by lesson UUID
+        in: query
+        name: lesson_uuid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Exercise'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: List exercises
+      tags:
+      - exercises
+  /exercises/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single exercise by UUID
+      parameters:
+      - description: Exercise UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Exercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Get an exercise by UUID
+      tags:
+      - exercises
+  /exercises/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new exercise
+      parameters:
+      - description: Exercise creation data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.CreateExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Exercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Create a new exercise
+      tags:
+      - exercises
+  /exercises/delete/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an exercise by UUID (sets deleted_at timestamp)
+      parameters:
+      - description: Exercise UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Delete an exercise
+      tags:
+      - exercises
+  /exercises/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore a soft-deleted exercise by UUID (sets deleted_at to NULL)
+      parameters:
+      - description: Exercise UUID
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.IDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Restore a deleted exercise
+      tags:
+      - exercises
+  /exercises/update:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing exercise by UUID
+      parameters:
+      - description: Exercise update data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Exercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Update an exercise
+      tags:
+      - exercises
+  /lessons:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of lessons, optionally filtered by course
+        UUID
+      parameters:
+      - default: 10
+        description: 'Limit (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: 'Offset (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      - description: Filter by course UUID
+        in: query
+        name: course_uuid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Lesson'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: List lessons
+      tags:
+      - lessons
+  /lessons/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single lesson by UUID
+      parameters:
+      - description: Lesson UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Lesson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Get a lesson by UUID
+      tags:
+      - lessons
+  /lessons/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new lesson
+      parameters:
+      - description: Lesson creation data
+        in: body
+        name: lesson
+        required: true
+        schema:
+          $ref: '#/definitions/lessons.CreateLessonRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Lesson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Create a new lesson
+      tags:
+      - lessons
+  /lessons/delete/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a lesson by UUID (sets deleted_at timestamp)
+      parameters:
+      - description: Lesson UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Delete a lesson
+      tags:
+      - lessons
+  /lessons/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore a soft-deleted lesson by UUID (sets deleted_at to NULL)
+      parameters:
+      - description: Lesson UUID
+        in: body
+        name: lesson
+        required: true
+        schema:
+          $ref: '#/definitions/lessons.IDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Restore a deleted lesson
+      tags:
+      - lessons
+  /lessons/update:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing lesson by UUID
+      parameters:
+      - description: Lesson update data
+        in: body
+        name: lesson
+        required: true
+        schema:
+          $ref: '#/definitions/lessons.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Lesson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Update a lesson
+      tags:
+      - lessons
   /users:
     get:
       consumes:

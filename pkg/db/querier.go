@@ -11,16 +11,43 @@ import (
 )
 
 type Querier interface {
+	CountCourses(ctx context.Context) (int64, error)
+	CountExercises(ctx context.Context) (int64, error)
+	CountLessons(ctx context.Context) (int64, error)
+	CountLessonsByCourse(ctx context.Context, courseUuid uuid.UUID) (int64, error)
 	CountUsers(ctx context.Context) (int64, error)
+	CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error)
+	CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error)
+	CreateLesson(ctx context.Context, arg CreateLessonParams) (Lesson, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteCourse(ctx context.Context, argUuid uuid.UUID) error
+	DeleteExercise(ctx context.Context, argUuid uuid.UUID) error
+	DeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUser(ctx context.Context, argUuid uuid.UUID) error
+	GetCourse(ctx context.Context, argUuid uuid.UUID) (Course, error)
+	GetCourseByName(ctx context.Context, name string) (Course, error)
+	GetExercise(ctx context.Context, argUuid uuid.UUID) (Exercise, error)
+	GetLesson(ctx context.Context, argUuid uuid.UUID) (Lesson, error)
 	GetUser(ctx context.Context, argUuid uuid.UUID) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	HardDeleteCourse(ctx context.Context, argUuid uuid.UUID) error
+	HardDeleteExercise(ctx context.Context, argUuid uuid.UUID) error
+	HardDeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	HardDeleteUser(ctx context.Context, argUuid uuid.UUID) error
+	ListCourses(ctx context.Context, arg ListCoursesParams) ([]Course, error)
+	ListExercises(ctx context.Context, arg ListExercisesParams) ([]Exercise, error)
+	ListLessons(ctx context.Context, arg ListLessonsParams) ([]Lesson, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	UndeleteCourse(ctx context.Context, argUuid uuid.UUID) error
+	UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error
+	UndeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteUser(ctx context.Context, argUuid uuid.UUID) error
+	UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Course, error)
+	UpdateExercise(ctx context.Context, arg UpdateExerciseParams) (Exercise, error)
+	UpdateLesson(ctx context.Context, arg UpdateLessonParams) (Lesson, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)
+	getCourseFull(ctx context.Context, argUuid uuid.UUID) ([]getCourseFullRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

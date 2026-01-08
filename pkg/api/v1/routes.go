@@ -6,6 +6,9 @@ import (
 	"codim/pkg/api/v1/cache"
 	"codim/pkg/api/v1/middleware"
 	"codim/pkg/api/v1/modules/auth"
+	"codim/pkg/api/v1/modules/courses"
+	"codim/pkg/api/v1/modules/exercises"
+	"codim/pkg/api/v1/modules/lessons"
 	"codim/pkg/api/v1/modules/users"
 	"codim/pkg/db"
 	"codim/pkg/utils/logger"
@@ -51,6 +54,9 @@ func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Pro
 			admin.Use(middleware.AdminMiddleware(log))
 			{
 				users.RegisterRoutes(admin, q, log)
+				courses.RegisterRoutes(admin, q, log)
+				lessons.RegisterRoutes(admin, q, log)
+				exercises.RegisterRoutes(admin, q, log)
 			}
 		}
 	}

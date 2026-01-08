@@ -5,10 +5,55 @@
 package db
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type ExerciseType string
+
+const (
+	ExerciseTypeQuiz ExerciseType = "quiz"
+	ExerciseTypeCode ExerciseType = "code"
+)
+
+func (e *ExerciseType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ExerciseType(s)
+	case string:
+		*e = ExerciseType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ExerciseType: %T", src)
+	}
+	return nil
+}
+
+type NullExerciseType struct {
+	ExerciseType ExerciseType `json:"exercise_type"`
+	Valid        bool         `json:"valid"` // Valid is true if ExerciseType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullExerciseType) Scan(value interface{}) error {
+	if value == nil {
+		ns.ExerciseType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ExerciseType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullExerciseType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ExerciseType), nil
+}
 
 type Course struct {
 	Uuid        uuid.UUID  `json:"uuid"`
@@ -26,16 +71,17 @@ type Course struct {
 }
 
 type Exercise struct {
-	Uuid        uuid.UUID  `json:"uuid"`
-	CreatedAt   time.Time  `json:"created_at"`
-	ModifiedAt  time.Time  `json:"modified_at"`
-	DeletedAt   *time.Time `json:"deleted_at"`
-	LessonUuid  uuid.UUID  `json:"lesson_uuid"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	OrderIndex  int16      `json:"order_index"`
-	Reward      int16      `json:"reward"`
-	Data        []byte     `json:"data"`
+	Uuid        uuid.UUID       `json:"uuid"`
+	CreatedAt   time.Time       `json:"created_at"`
+	ModifiedAt  time.Time       `json:"modified_at"`
+	DeletedAt   *time.Time      `json:"deleted_at"`
+	LessonUuid  uuid.UUID       `json:"lesson_uuid"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	OrderIndex  int16           `json:"order_index"`
+	Reward      int16           `json:"reward"`
+	Type        ExerciseType    `json:"type"`
+	Data        json.RawMessage `json:"data"`
 }
 
 type Lesson struct {

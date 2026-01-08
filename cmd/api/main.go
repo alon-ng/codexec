@@ -19,6 +19,8 @@
 // @in cookie
 // @name auth_token
 // @description Authentication is performed via HTTP-only cookie named "auth_token" containing a JWT token. The cookie is automatically set on successful signup/login and cleared on logout.
+
+// @typeAlias json.RawMessage object
 package main
 
 import (

@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS "courses" (
 	"discount"	    SMALLINT		NOT NULL    DEFAULT 0,
 	"is_active"	    BOOLEAN			NOT NULL	DEFAULT FALSE,
 	"difficulty"    SMALLINT		NOT NULL	DEFAULT 0,
-	"bullets"		TEXT			NOT NULL	DEFAULT ''
+	"bullets"		TEXT        	NOT NULL	DEFAULT ''
 );
 
 CREATE          INDEX idx_courses_deleted_at  ON "courses" ("deleted_at");
@@ -57,7 +57,9 @@ CREATE          INDEX idx_lessons_created_at  ON "lessons" ("created_at");
 CREATE          INDEX idx_lessons_course_uuid ON "lessons" ("course_uuid");
 CREATE          INDEX idx_lessons_order_index ON "lessons" ("order_index");
 
--- lessons_users
+CREATE TYPE exercise_type AS ENUM ('quiz', 'code');
+
+-- exercises
 CREATE TABLE IF NOT EXISTS "exercises" (
     "uuid"          UUID            PRIMARY KEY DEFAULT uuidv7(),
     "created_at"    TIMESTAMP       NOT NULL    DEFAULT NOW(),
@@ -68,6 +70,7 @@ CREATE TABLE IF NOT EXISTS "exercises" (
     "description"	TEXT	    	NOT NULL,
     "order_index"	SMALLINT		NOT NULL,
     "reward"	    SMALLINT		NOT NULL,
+    "type"          exercise_type   NOT NULL,
     "data"		    JSONB			NOT NULL,
     CONSTRAINT fk_exercises_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid")
 );
