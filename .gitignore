@@ -149,8 +149,8 @@ requirements.lock
 
 .DS_Store
 *.ignore.*
+.vscode/settings.json
+.vscode/tasks.json
 
 # Go debug
 __debug_bin*
-
-.creds

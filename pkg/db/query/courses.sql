@@ -39,6 +39,7 @@ SELECT  courses.uuid            AS "course_uuid",
         exercises.description   AS "exercise_description", 
         exercises.order_index   AS "exercise_order_index", 
         exercises.reward        AS "exercise_reward", 
+        exercises.type          AS "exercise_type",
         exercises.data          AS "exercise_data" 
 FROM "courses"
 LEFT JOIN "lessons"   ON "courses"."uuid" = "lessons"."course_uuid"   AND "lessons"."deleted_at" IS NULL

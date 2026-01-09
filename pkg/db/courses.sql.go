@@ -306,6 +306,7 @@ SELECT  courses.uuid            AS "course_uuid",
         exercises.description   AS "exercise_description", 
         exercises.order_index   AS "exercise_order_index", 
         exercises.reward        AS "exercise_reward", 
+        exercises.type          AS "exercise_type",
         exercises.data          AS "exercise_data" 
 FROM "courses"
 LEFT JOIN "lessons"   ON "courses"."uuid" = "lessons"."course_uuid"   AND "lessons"."deleted_at" IS NULL
@@ -315,37 +316,38 @@ ORDER BY "lessons"."order_index" ASC, "exercises"."order_index" ASC
 `
 
 type getCourseFullRow struct {
-	CourseUuid          uuid.UUID  `json:"course_uuid"`
-	CourseCreatedAt     time.Time  `json:"course_created_at"`
-	CourseModifiedAt    time.Time  `json:"course_modified_at"`
-	CourseDeletedAt     *time.Time `json:"course_deleted_at"`
-	CourseName          string     `json:"course_name"`
-	CourseDescription   string     `json:"course_description"`
-	CourseSubject       string     `json:"course_subject"`
-	CoursePrice         int16      `json:"course_price"`
-	CourseDiscount      int16      `json:"course_discount"`
-	CourseIsActive      bool       `json:"course_is_active"`
-	CourseDifficulty    int16      `json:"course_difficulty"`
-	CourseBullets       string     `json:"course_bullets"`
-	LessonUuid          *uuid.UUID `json:"lesson_uuid"`
-	LessonCreatedAt     *time.Time `json:"lesson_created_at"`
-	LessonModifiedAt    *time.Time `json:"lesson_modified_at"`
-	LessonDeletedAt     *time.Time `json:"lesson_deleted_at"`
-	LessonCourseUuid    *uuid.UUID `json:"lesson_course_uuid"`
-	LessonName          *string    `json:"lesson_name"`
-	LessonDescription   *string    `json:"lesson_description"`
-	LessonOrderIndex    *int16     `json:"lesson_order_index"`
-	LessonIsPublic      *bool      `json:"lesson_is_public"`
-	ExerciseUuid        *uuid.UUID `json:"exercise_uuid"`
-	ExerciseCreatedAt   *time.Time `json:"exercise_created_at"`
-	ExerciseModifiedAt  *time.Time `json:"exercise_modified_at"`
-	ExerciseDeletedAt   *time.Time `json:"exercise_deleted_at"`
-	ExerciseLessonUuid  *uuid.UUID `json:"exercise_lesson_uuid"`
-	ExerciseName        *string    `json:"exercise_name"`
-	ExerciseDescription *string    `json:"exercise_description"`
-	ExerciseOrderIndex  *int16     `json:"exercise_order_index"`
-	ExerciseReward      *int16     `json:"exercise_reward"`
-	ExerciseData        []byte     `json:"exercise_data"`
+	CourseUuid          uuid.UUID     `json:"course_uuid"`
+	CourseCreatedAt     time.Time     `json:"course_created_at"`
+	CourseModifiedAt    time.Time     `json:"course_modified_at"`
+	CourseDeletedAt     *time.Time    `json:"course_deleted_at"`
+	CourseName          string        `json:"course_name"`
+	CourseDescription   string        `json:"course_description"`
+	CourseSubject       string        `json:"course_subject"`
+	CoursePrice         int16         `json:"course_price"`
+	CourseDiscount      int16         `json:"course_discount"`
+	CourseIsActive      bool          `json:"course_is_active"`
+	CourseDifficulty    int16         `json:"course_difficulty"`
+	CourseBullets       string        `json:"course_bullets"`
+	LessonUuid          *uuid.UUID    `json:"lesson_uuid"`
+	LessonCreatedAt     *time.Time    `json:"lesson_created_at"`
+	LessonModifiedAt    *time.Time    `json:"lesson_modified_at"`
+	LessonDeletedAt     *time.Time    `json:"lesson_deleted_at"`
+	LessonCourseUuid    *uuid.UUID    `json:"lesson_course_uuid"`
+	LessonName          *string       `json:"lesson_name"`
+	LessonDescription   *string       `json:"lesson_description"`
+	LessonOrderIndex    *int16        `json:"lesson_order_index"`
+	LessonIsPublic      *bool         `json:"lesson_is_public"`
+	ExerciseUuid        *uuid.UUID    `json:"exercise_uuid"`
+	ExerciseCreatedAt   *time.Time    `json:"exercise_created_at"`
+	ExerciseModifiedAt  *time.Time    `json:"exercise_modified_at"`
+	ExerciseDeletedAt   *time.Time    `json:"exercise_deleted_at"`
+	ExerciseLessonUuid  *uuid.UUID    `json:"exercise_lesson_uuid"`
+	ExerciseName        *string       `json:"exercise_name"`
+	ExerciseDescription *string       `json:"exercise_description"`
+	ExerciseOrderIndex  *int16        `json:"exercise_order_index"`
+	ExerciseReward      *int16        `json:"exercise_reward"`
+	ExerciseType        *ExerciseType `json:"exercise_type"`
+	ExerciseData        []byte        `json:"exercise_data"`
 }
 
 func (q *Queries) getCourseFull(ctx context.Context, argUuid uuid.UUID) ([]getCourseFullRow, error) {
@@ -388,6 +390,7 @@ func (q *Queries) getCourseFull(ctx context.Context, argUuid uuid.UUID) ([]getCo
 			&i.ExerciseDescription,
 			&i.ExerciseOrderIndex,
 			&i.ExerciseReward,
+			&i.ExerciseType,
 			&i.ExerciseData,
 		); err != nil {
 			return nil, err

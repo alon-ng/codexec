@@ -12,6 +12,7 @@ DROP INDEX IF EXISTS idx_exercises_lesson_uuid;
 DROP INDEX IF EXISTS idx_exercises_order_index;
 
 DROP TABLE IF EXISTS exercises;
+DROP TYPE IF EXISTS exercise_type;
 
 -- lessons
 DROP INDEX IF EXISTS idx_lessons_deleted_at;

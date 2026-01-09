@@ -1,14 +1,13 @@
 package db
 
 import (
-	"codim/pkg/utils/logger"
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPool(ctx context.Context, cfg Config, logger *logger.Logger) (*pgxpool.Pool, error) {
-	dbConfig, err := pgxpool.ParseConfig(cfg.URL)
+func NewPool(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
+	dbConfig, err := pgxpool.ParseConfig(cfg.ConnectionString)
 	if err != nil {
 		return nil, err
 	}

@@ -84,7 +84,7 @@ func initializeLogger(cfg config.Config) (*logger.Logger, error) {
 }
 
 func initializeQueries(cfg config.Config, log *logger.Logger) (*db.Queries, *pgxpool.Pool) {
-	pool, err := db.NewPool(context.Background(), cfg.DB, log)
+	pool, err := db.NewPool(context.Background(), cfg.DB)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
