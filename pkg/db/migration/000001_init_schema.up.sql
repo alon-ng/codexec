@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS "courses" (
 	"bullets"		TEXT        	NOT NULL	DEFAULT ''
 );
 
-CREATE          INDEX idx_courses_deleted_at  ON "courses" ("deleted_at");
-CREATE          INDEX idx_courses_created_at  ON "courses" ("created_at");
-CREATE          INDEX idx_courses_difficulty  ON "courses" ("difficulty");
+CREATE INDEX idx_courses_deleted_at  ON "courses" ("deleted_at");
+CREATE INDEX idx_courses_created_at  ON "courses" ("created_at");
+CREATE INDEX idx_courses_difficulty  ON "courses" ("difficulty");
 
 -- lessons
 CREATE TABLE IF NOT EXISTS "lessons" (
@@ -49,13 +49,13 @@ CREATE TABLE IF NOT EXISTS "lessons" (
     "description"	TEXT	    	NOT NULL,
     "order_index"	SMALLINT		NOT NULL,
     "is_public"	    BOOLEAN			NOT NULL	DEFAULT FALSE,
-    CONSTRAINT fk_lessons_course FOREIGN KEY ("course_uuid") REFERENCES "courses"("uuid")
+    CONSTRAINT fk_lessons_course FOREIGN KEY ("course_uuid") REFERENCES "courses"("uuid") ON DELETE CASCADE
 );
 
-CREATE          INDEX idx_lessons_deleted_at  ON "lessons" ("deleted_at");
-CREATE          INDEX idx_lessons_created_at  ON "lessons" ("created_at");
-CREATE          INDEX idx_lessons_course_uuid ON "lessons" ("course_uuid");
-CREATE          INDEX idx_lessons_order_index ON "lessons" ("order_index");
+CREATE INDEX idx_lessons_deleted_at  ON "lessons" ("deleted_at");
+CREATE INDEX idx_lessons_created_at  ON "lessons" ("created_at");
+CREATE INDEX idx_lessons_course_uuid ON "lessons" ("course_uuid");
+CREATE INDEX idx_lessons_order_index ON "lessons" ("order_index");
 
 CREATE TYPE exercise_type AS ENUM ('quiz', 'code');
 
@@ -72,10 +72,63 @@ CREATE TABLE IF NOT EXISTS "exercises" (
     "reward"	    SMALLINT		NOT NULL,
     "type"          exercise_type   NOT NULL,
     "data"		    JSONB			NOT NULL,
-    CONSTRAINT fk_exercises_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid")
+    CONSTRAINT fk_exercises_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE
 );
 
-CREATE          INDEX idx_exercises_deleted_at  ON "exercises" ("deleted_at");
-CREATE          INDEX idx_exercises_created_at  ON "exercises" ("created_at");
-CREATE          INDEX idx_exercises_lesson_uuid ON "exercises" ("lesson_uuid");
-CREATE          INDEX idx_exercises_order_index ON "exercises" ("order_index");
+CREATE INDEX idx_exercises_deleted_at  ON "exercises" ("deleted_at");
+CREATE INDEX idx_exercises_created_at  ON "exercises" ("created_at");
+CREATE INDEX idx_exercises_lesson_uuid ON "exercises" ("lesson_uuid");
+CREATE INDEX idx_exercises_order_index ON "exercises" ("order_index");
+
+-- user_courses
+CREATE TABLE IF NOT EXISTS "user_courses" (
+    "uuid"              UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "started_at"        TIMESTAMP       NOT NULL    DEFAULT NOW(),
+    "last_accessed_at"  TIMESTAMP       NULL,
+    "user_uuid"         UUID            NOT NULL,
+    "course_uuid"       UUID            NOT NULL,
+    "completed_at"      TIMESTAMP       NULL,
+    
+    CONSTRAINT fk_user_courses_user FOREIGN KEY ("user_uuid") REFERENCES "users"("uuid") ON DELETE CASCADE,
+    CONSTRAINT fk_user_courses_course FOREIGN KEY ("course_uuid") REFERENCES "courses"("uuid") ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX uq_user_courses_user_course ON "user_courses" ("user_uuid", "course_uuid");
+CREATE INDEX        idx_user_courses_user       ON "user_courses" ("user_uuid");
+CREATE INDEX        idx_user_courses_course     ON "user_courses" ("course_uuid");
+
+-- user_lessons
+CREATE TABLE IF NOT EXISTS "user_lessons" (
+    "uuid"              UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "started_at"        TIMESTAMP       NOT NULL    DEFAULT NOW(),
+    "last_accessed_at"  TIMESTAMP       NULL,
+    "user_uuid"         UUID            NOT NULL,
+    "lesson_uuid"       UUID            NOT NULL,
+    "completed_at"      TIMESTAMP       NULL,
+    
+    CONSTRAINT fk_user_lessons_user     FOREIGN KEY ("user_uuid")   REFERENCES "users"("uuid") ON DELETE CASCADE,
+    CONSTRAINT fk_user_lessons_lesson   FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX uq_user_lessons_user_lesson ON "user_lessons" ("user_uuid", "lesson_uuid");
+CREATE INDEX        idx_user_lessons_user       ON "user_lessons" ("user_uuid");
+CREATE INDEX        idx_user_lessons_lesson     ON "user_lessons" ("lesson_uuid");
+
+-- user_exercises
+CREATE TABLE IF NOT EXISTS "user_exercises" (
+    "uuid"              UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "started_at"        TIMESTAMP       NOT NULL    DEFAULT NOW(),
+    "last_accessed_at"  TIMESTAMP       NULL,
+    "user_uuid"         UUID            NOT NULL,
+    "exercise_uuid"     UUID            NOT NULL,
+    "submission"        JSONB           NOT NULL,
+    "attempts"          INTEGER         NOT NULL    DEFAULT 0,
+    "completed_at"      TIMESTAMP       NULL,
+    
+    CONSTRAINT fk_user_exercises_user       FOREIGN KEY ("user_uuid")       REFERENCES "users"("uuid") ON DELETE CASCADE,
+    CONSTRAINT fk_user_exercises_exercise   FOREIGN KEY ("exercise_uuid")   REFERENCES "exercises"("uuid") ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX uq_user_exercises_user_exercise ON "user_exercises" ("user_uuid", "exercise_uuid");
+CREATE INDEX        idx_user_exercises_user         ON "user_exercises" ("user_uuid");
+CREATE INDEX        idx_user_exercises_exercise     ON "user_exercises" ("exercise_uuid");

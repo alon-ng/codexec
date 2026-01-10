@@ -55,7 +55,7 @@ func (q *Queries) GetCourseFull(ctx context.Context, argUuid uuid.UUID) (CourseF
 				OrderIndex:  *e.ExerciseOrderIndex,
 				Reward:      *e.ExerciseReward,
 				Type:        *e.ExerciseType,
-				Data:        e.ExerciseData,
+				Data:        *e.ExerciseData,
 			})
 		}
 

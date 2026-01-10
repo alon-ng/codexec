@@ -110,3 +110,32 @@ type User struct {
 	Score        int32      `json:"score"`
 	IsAdmin      bool       `json:"is_admin"`
 }
+
+type UserCourse struct {
+	Uuid           uuid.UUID  `json:"uuid"`
+	StartedAt      time.Time  `json:"started_at"`
+	LastAccessedAt *time.Time `json:"last_accessed_at"`
+	UserUuid       uuid.UUID  `json:"user_uuid"`
+	CourseUuid     uuid.UUID  `json:"course_uuid"`
+	CompletedAt    *time.Time `json:"completed_at"`
+}
+
+type UserExercise struct {
+	Uuid           uuid.UUID       `json:"uuid"`
+	StartedAt      time.Time       `json:"started_at"`
+	LastAccessedAt *time.Time      `json:"last_accessed_at"`
+	UserUuid       uuid.UUID       `json:"user_uuid"`
+	ExerciseUuid   uuid.UUID       `json:"exercise_uuid"`
+	Submission     json.RawMessage `json:"submission"`
+	Attempts       int32           `json:"attempts"`
+	CompletedAt    *time.Time      `json:"completed_at"`
+}
+
+type UserLesson struct {
+	Uuid           uuid.UUID  `json:"uuid"`
+	StartedAt      time.Time  `json:"started_at"`
+	LastAccessedAt *time.Time `json:"last_accessed_at"`
+	UserUuid       uuid.UUID  `json:"user_uuid"`
+	LessonUuid     uuid.UUID  `json:"lesson_uuid"`
+	CompletedAt    *time.Time `json:"completed_at"`
+}
