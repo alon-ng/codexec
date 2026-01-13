@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"time"
@@ -41,13 +40,8 @@ func (s *Provider) HashPassword(password string) string {
 
 // VerifyPassword verifies a plaintext password against a salted password hash.
 func (s *Provider) VerifyPassword(password string, hash string) bool {
-	hashBytes, err := hex.DecodeString(hash)
-	if err != nil {
-		return false
-	}
-
 	computedHash := s.HashPassword(password)
-	return bytes.Equal(hashBytes, []byte(computedHash))
+	return computedHash == hash
 }
 
 // GenerateToken generates a JWT token for a user.

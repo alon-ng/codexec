@@ -1230,6 +1230,35 @@ paths:
       summary: Update a lesson
       tags:
       - lessons
+  /me:
+    get:
+      consumes:
+      - application/json
+      description: Get the current user from the JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Get the current user from the JWT token
+      tags:
+      - me
   /users:
     get:
       consumes:

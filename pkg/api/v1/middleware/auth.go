@@ -52,7 +52,7 @@ func AuthMiddleware(authProvider *auth.Provider, userCache *cache.UserCache, log
 		}
 
 		// Store user UUID and user object in context
-		c.Set("user_uuid", userUUID)
+		c.Set("user_uuid", userUUID.String())
 		c.Set("user", user)
 		c.Next()
 	}

@@ -9,6 +9,7 @@ import (
 	"codim/pkg/api/v1/modules/courses"
 	"codim/pkg/api/v1/modules/exercises"
 	"codim/pkg/api/v1/modules/lessons"
+	"codim/pkg/api/v1/modules/me"
 	"codim/pkg/api/v1/modules/users"
 	"codim/pkg/db"
 	"codim/pkg/utils/logger"
@@ -50,6 +51,7 @@ func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Pro
 		protected := v1.Group("/")
 		protected.Use(middleware.AuthMiddleware(authProvider, userCache, log))
 		{
+			me.RegisterRoutes(protected, q, log)
 			admin := protected.Group("/")
 			admin.Use(middleware.AdminMiddleware(log))
 			{
