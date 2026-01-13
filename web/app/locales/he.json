@@ -1,0 +1,50 @@
+{
+  "navigation": {
+    "overview": "סקירה",
+    "myCourses": "הקורסים שלי"
+  },
+  "common": {
+    "email": "דואר אלקטרוני",
+    "password": "סיסמה",
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "signIn": "התחברות",
+    "signUp": "הירשם",
+    "signOut": "יציאה",
+    "submit": "שליחה",
+    "cancel": "ביטול",
+    "save": "שמירה",
+    "delete": "מחיקה",
+    "edit": "עריכה",
+    "create": "יצירה",
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "or": "או",
+    "google": "גוגל"
+  },
+  "auth": {
+    "welcomeBack": "ברוכים הבאים",
+    "signInToAccount": "התחברות לחשבון",
+    "createAccount": "יצירת חשבון",
+    "signUpToGetStarted": "הירשם להתחיל",
+    "forgotPassword": "שכחת סיסמה?",
+    "dontHaveAccount": "אין לך חשבון?",
+    "alreadyHaveAccount": "יש לך חשבון כבר?",
+    "signInWith": "או התחבר באמצעות",
+    "signUpWith": "או הירשם באמצעות",
+    "loginSuccessful": "התחברת בהצלחה!",
+    "signupSuccessful": "הירשמת בהצלחה!",
+    "loginError": "אירעה שגיאה בזמן התחברות. אנא נסה שנית.",
+    "signupError": "אירעה שגיאה בזמן הירשמות. אנא נסה שנית.",
+    "emailPlaceholder": "john@example.com",
+    "passwordPlaceholder": "********",
+    "firstNamePlaceholder": "גון",
+    "lastNamePlaceholder": "דוד"
+  },
+  "language": {
+    "english": "English",
+    "hebrew": "עברית",
+    "switchLanguage": "החלף שפה"
+  }
+}

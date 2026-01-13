@@ -1,0 +1,50 @@
+{
+    "navigation": {
+        "overview": "Overview",
+        "myCourses": "My Courses"
+    },
+    "common": {
+        "email": "Email",
+        "password": "Password",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "signOut": "Sign Out",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "or": "Or",
+        "google": "Google"
+    },
+    "auth": {
+        "welcomeBack": "Welcome back",
+        "signInToAccount": "Sign in to your account",
+        "createAccount": "Create an account",
+        "signUpToGetStarted": "Sign up to get started",
+        "forgotPassword": "Forgot password?",
+        "dontHaveAccount": "Don't have an account?",
+        "alreadyHaveAccount": "Already have an account?",
+        "signInWith": "Or sign in with",
+        "signUpWith": "Or sign up with",
+        "loginSuccessful": "Login successful!",
+        "signupSuccessful": "Signup successful!",
+        "loginError": "An error occurred during login. Please try again.",
+        "signupError": "An error occurred during signup. Please try again.",
+        "emailPlaceholder": "john@example.com",
+        "passwordPlaceholder": "********",
+        "firstNamePlaceholder": "John",
+        "lastNamePlaceholder": "Doe"
+    },
+    "language": {
+        "english": "English",
+        "arabic": "العربية",
+        "switchLanguage": "Switch Language"
+    }
+}

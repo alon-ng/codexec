@@ -147,6 +147,10 @@ values*.yaml
 Chart.lock
 requirements.lock
 
+# Node
+node_modules/
+.pnpm-store/
+
 .DS_Store
 *.ignore.*
 .vscode/settings.json
@@ -154,3 +158,4 @@ requirements.lock
 
 # Go debug
 __debug_bin*
+
