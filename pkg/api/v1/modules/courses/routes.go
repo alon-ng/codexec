@@ -7,7 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(router *gin.RouterGroup, q *db.Queries, log *logger.Logger) {
+func RegisterPublicRoutes(router *gin.RouterGroup, q *db.Queries, log *logger.Logger) {
+	svc := NewService(q)
+	ctrl := NewController(svc, log)
+
+	coursesGroup := router.Group("/courses")
+	{
+		coursesGroup.GET("", ctrl.List)
+		coursesGroup.GET("/:uuid", ctrl.Get)
+	}
+}
+
+func RegisterAdminRoutes(router *gin.RouterGroup, q *db.Queries, log *logger.Logger) {
 	svc := NewService(q)
 	ctrl := NewController(svc, log)
 
@@ -17,7 +28,5 @@ func RegisterRoutes(router *gin.RouterGroup, q *db.Queries, log *logger.Logger) 
 		coursesGroup.PUT("/update", ctrl.Update)
 		coursesGroup.DELETE("/delete/:uuid", ctrl.Delete)
 		coursesGroup.POST("/restore", ctrl.Restore)
-		coursesGroup.GET("", ctrl.List)
-		coursesGroup.GET("/:uuid", ctrl.Get)
 	}
 }

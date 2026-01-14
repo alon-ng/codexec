@@ -18,6 +18,7 @@ import { initClientI18n } from "~/lib/i18n";
 import "~/lib/i18n"; // Initialize client i18n
 import { cn } from "./lib/utils";
 import { detectLanguageFromRequest } from "~/lib/i18n.server";
+import { useLanguage } from "~/lib/useLanguage";
 
 // Loader runs on both server and client
 export async function loader({ request }: Route.LoaderArgs) {
@@ -89,18 +90,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const [queryClient] = useState(() => new QueryClient());
-  const loaderData = useLoaderData<typeof loader>();
-  const language = loaderData?.language ?? "en";
-  const { i18n } = useTranslation();
-  // Use language from loader for SSR consistency, fallback to i18n.language for client updates
-  const currentLang = i18n.language || language;
-  const isRTL = currentLang === "he";
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  }));
+  const { isRTL } = useLanguage();
 
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <Toaster position={isRTL ? "top-left" : "top-right"} />
+      <Toaster position={isRTL ? "top-left" : "top-right"} closeButton={true} />
     </QueryClientProvider>
   );
 }

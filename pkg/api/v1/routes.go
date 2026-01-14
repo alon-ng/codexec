@@ -47,6 +47,7 @@ func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Pro
 	v1 := r.Group("/api/v1")
 	{
 		auth.RegisterRoutes(v1, q, log, authProvider)
+		courses.RegisterPublicRoutes(v1, q, log)
 
 		protected := v1.Group("/")
 		protected.Use(middleware.AuthMiddleware(authProvider, userCache, log))
@@ -56,7 +57,7 @@ func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Pro
 			admin.Use(middleware.AdminMiddleware(log))
 			{
 				users.RegisterRoutes(admin, q, log)
-				courses.RegisterRoutes(admin, q, log)
+				courses.RegisterAdminRoutes(admin, q, log)
 				lessons.RegisterRoutes(admin, q, log)
 				exercises.RegisterRoutes(admin, q, log)
 			}

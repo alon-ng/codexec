@@ -16,7 +16,7 @@ func createRandomCourse(t *testing.T) db.Course {
 	params := db.CreateCourseParams{
 		Name:        fmt.Sprintf("Test Course %d", rnd),
 		Description: fmt.Sprintf("Test Description %d", rnd),
-		Subject:     "Python",
+		Subject:     "python",
 		Price:       100,
 		Discount:    0,
 		IsActive:    true,
@@ -95,7 +95,7 @@ func TestUpdateCourse(t *testing.T) {
 		Uuid:        course.Uuid,
 		Name:        fmt.Sprintf("Updated Test Course %d", rnd),
 		Description: fmt.Sprintf("Updated Test Description %d", rnd),
-		Subject:     "TypeScript",
+		Subject:     "javascript",
 		Price:       150,
 		Discount:    5,
 		IsActive:    false,
@@ -346,7 +346,7 @@ func TestListCoursesWithFilters(t *testing.T) {
 	course2Params := db.CreateCourseParams{
 		Name:        fmt.Sprintf("Test Course %d", rnd),
 		Description: fmt.Sprintf("Test Description %d", rnd),
-		Subject:     "TypeScript",
+		Subject:     "javascript",
 		Price:       100,
 		Discount:    0,
 		IsActive:    false,
@@ -356,7 +356,7 @@ func TestListCoursesWithFilters(t *testing.T) {
 	_, err := testQueries.CreateCourse(context.Background(), course2Params)
 	require.NoError(t, err)
 
-	subject := "Python"
+	subject := "python"
 	isActive := true
 	params := db.ListCoursesParams{
 		Limit:    10,
@@ -371,7 +371,7 @@ func TestListCoursesWithFilters(t *testing.T) {
 
 	var foundCourse1 bool
 	for _, course := range courses {
-		require.Equal(t, "Python", course.Subject)
+		require.Equal(t, "python", course.Subject)
 		require.True(t, course.IsActive)
 		if course.Uuid == course1.Uuid {
 			foundCourse1 = true

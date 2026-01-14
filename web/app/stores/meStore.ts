@@ -42,7 +42,7 @@ export const useMeStore = create<MeState>((set, get) => ({
             });
         } catch (error: any) {
             get().clearMe();
-            if (typeof window !== "undefined") {
+            if (typeof window !== "undefined" && window.location.pathname !== "/login") {
                 window.location.href = "/login";
             }
         }

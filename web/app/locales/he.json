@@ -1,5 +1,9 @@
 {
   "navigation": {
+    "home": "דף הבית",
+    "courses": "הקורסים שלנו",
+    "about": "עלינו",
+    "contact": "יצירת קשר",
     "overview": "סקירה",
     "myCourses": "הקורסים שלי"
   },
@@ -21,7 +25,9 @@
     "error": "שגיאה",
     "success": "הצלחה",
     "or": "או",
-    "google": "גוגל"
+    "google": "גוגל",
+    "buy": "קנה",
+    "readMore": "קרא עוד"
   },
   "auth": {
     "welcomeBack": "ברוכים הבאים",
@@ -46,5 +52,11 @@
     "english": "English",
     "hebrew": "עברית",
     "switchLanguage": "החלף שפה"
+  },
+  "difficulty": {
+    "title": "רמת קושי",
+    "1": "מתחיל",
+    "2": "בינוני",
+    "3": "מתקדם"
   }
 }

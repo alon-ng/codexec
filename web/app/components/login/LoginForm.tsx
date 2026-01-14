@@ -42,7 +42,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     };
 
     return (
-        <motion.div className="flex flex-col gap-12" variants={blurInVariants} initial="hidden" animate="visible">
+        <motion.div className="flex flex-col gap-12" variants={blurInVariants()} initial="hidden" animate="visible">
             <div>
                 <div className="text-4xl font-bold">
                     {t("auth.welcomeBack")}

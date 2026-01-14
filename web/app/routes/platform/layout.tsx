@@ -1,7 +1,18 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router";
 import { useMeStore } from "~/stores/meStore";
-import { PlatformNavbar } from "~/components/platform/navbar/PlatformNavbar";
+import { PlatformNavbar } from "~/components/navbar/PlatformNavbar";
+
+const navigationItems = [
+  {
+    label: "navigation.overview",
+    href: "/platform",
+  },
+  {
+    label: "navigation.myCourses",
+    href: "/platform/courses",
+  },
+];
 
 export default function PlatformLayout() {
   const { loadMe, isLoading, isLoggedIn } = useMeStore();
@@ -30,8 +41,8 @@ export default function PlatformLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <PlatformNavbar />
-      <main className="flex-1">
+      <PlatformNavbar navigationItems={navigationItems} showUserMenu={true} />
+      <main className="flex-1 mt-28">
         <Outlet />
       </main>
     </div>

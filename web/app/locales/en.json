@@ -1,5 +1,9 @@
 {
     "navigation": {
+        "home": "Home",
+        "courses": "Courses",
+        "about": "About",
+        "contact": "Contact",
         "overview": "Overview",
         "myCourses": "My Courses"
     },
@@ -21,7 +25,9 @@
         "error": "Error",
         "success": "Success",
         "or": "Or",
-        "google": "Google"
+        "buy": "Buy",
+        "google": "Google",
+        "readMore": "Read More"
     },
     "auth": {
         "welcomeBack": "Welcome back",
@@ -46,5 +52,11 @@
         "english": "English",
         "arabic": "العربية",
         "switchLanguage": "Switch Language"
+    },
+    "difficulty": {
+        "title": "Difficulty",
+        "1": "Beginner",
+        "2": "Intermediate",
+        "3": "Advanced"
     }
 }
