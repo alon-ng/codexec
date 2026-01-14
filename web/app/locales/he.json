@@ -58,5 +58,12 @@
     "1": "מתחיל",
     "2": "בינוני",
     "3": "מתקדם"
+  },
+  "course": {
+    "lessons": "שיעורים",
+    "certificateNote": "הקורס כולל תעודת אישור",
+    "lessonsNote": "שיעורים",
+    "exerciesNote": "תרגילים",
+    "durationNote": "שעות לימוד"
   }
 }

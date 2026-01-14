@@ -58,5 +58,12 @@
         "1": "Beginner",
         "2": "Intermediate",
         "3": "Advanced"
+    },
+    "course": {
+        "lessons": "Lessons",
+        "certificateNote": "Certificate of completion",
+        "lessonsNote": "lessons",
+        "exerciesNote": "exercises",
+        "durationNote": "hours total"
     }
 }
