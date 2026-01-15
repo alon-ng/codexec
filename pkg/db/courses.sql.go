@@ -27,41 +27,32 @@ func (q *Queries) CountCourses(ctx context.Context) (int64, error) {
 
 const createCourse = `-- name: CreateCourse :one
 INSERT INTO "courses" (
-  "name", 
-  "description", 
   "subject",
   "price",
   "discount",
   "is_active",
-  "difficulty",
-  "bullets"
+  "difficulty"
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
+  $1, $2, $3, $4, $5
 )
-RETURNING uuid, created_at, modified_at, deleted_at, name, description, subject, price, discount, is_active, difficulty, bullets
+RETURNING uuid, created_at, modified_at, deleted_at, subject, price, discount, is_active, difficulty
 `
 
 type CreateCourseParams struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Subject     string `json:"subject"`
-	Price       int16  `json:"price"`
-	Discount    int16  `json:"discount"`
-	IsActive    bool   `json:"is_active"`
-	Difficulty  int16  `json:"difficulty"`
-	Bullets     string `json:"bullets"`
+	Subject    string `json:"subject"`
+	Price      int16  `json:"price"`
+	Discount   int16  `json:"discount"`
+	IsActive   bool   `json:"is_active"`
+	Difficulty int16  `json:"difficulty"`
 }
 
 func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error) {
 	row := q.db.QueryRow(ctx, createCourse,
-		arg.Name,
-		arg.Description,
 		arg.Subject,
 		arg.Price,
 		arg.Discount,
 		arg.IsActive,
 		arg.Difficulty,
-		arg.Bullets,
 	)
 	var i Course
 	err := row.Scan(
@@ -69,14 +60,11 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (Cou
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Name,
-		&i.Description,
 		&i.Subject,
 		&i.Price,
 		&i.Discount,
 		&i.IsActive,
 		&i.Difficulty,
-		&i.Bullets,
 	)
 	return i, err
 }
@@ -93,52 +81,53 @@ func (q *Queries) DeleteCourse(ctx context.Context, argUuid uuid.UUID) error {
 }
 
 const getCourse = `-- name: GetCourse :one
-SELECT uuid, created_at, modified_at, deleted_at, name, description, subject, price, discount, is_active, difficulty, bullets FROM "courses"
-WHERE "uuid" = $1 AND "deleted_at" IS NULL 
+SELECT courses.uuid, created_at, modified_at, deleted_at, subject, price, discount, is_active, difficulty, course_translations.uuid, course_uuid, language, name, description, bullets FROM "courses"
+JOIN "course_translations" ON "courses"."uuid" = "course_translations"."course_uuid" AND "course_translations"."language" = $2
+WHERE "courses"."uuid" = $1 AND "courses"."deleted_at" IS NULL 
 LIMIT 1
 `
 
-func (q *Queries) GetCourse(ctx context.Context, argUuid uuid.UUID) (Course, error) {
-	row := q.db.QueryRow(ctx, getCourse, argUuid)
-	var i Course
-	err := row.Scan(
-		&i.Uuid,
-		&i.CreatedAt,
-		&i.ModifiedAt,
-		&i.DeletedAt,
-		&i.Name,
-		&i.Description,
-		&i.Subject,
-		&i.Price,
-		&i.Discount,
-		&i.IsActive,
-		&i.Difficulty,
-		&i.Bullets,
-	)
-	return i, err
+type GetCourseParams struct {
+	Uuid     uuid.UUID `json:"uuid"`
+	Language string    `json:"language"`
 }
 
-const getCourseByName = `-- name: GetCourseByName :one
-SELECT uuid, created_at, modified_at, deleted_at, name, description, subject, price, discount, is_active, difficulty, bullets FROM "courses"
-WHERE "name" = $1 AND "deleted_at" IS NULL 
-LIMIT 1
-`
+type GetCourseRow struct {
+	Uuid        uuid.UUID  `json:"uuid"`
+	CreatedAt   time.Time  `json:"created_at"`
+	ModifiedAt  time.Time  `json:"modified_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	Subject     string     `json:"subject"`
+	Price       int16      `json:"price"`
+	Discount    int16      `json:"discount"`
+	IsActive    bool       `json:"is_active"`
+	Difficulty  int16      `json:"difficulty"`
+	Uuid_2      uuid.UUID  `json:"uuid_2"`
+	CourseUuid  uuid.UUID  `json:"course_uuid"`
+	Language    string     `json:"language"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Bullets     string     `json:"bullets"`
+}
 
-func (q *Queries) GetCourseByName(ctx context.Context, name string) (Course, error) {
-	row := q.db.QueryRow(ctx, getCourseByName, name)
-	var i Course
+func (q *Queries) GetCourse(ctx context.Context, arg GetCourseParams) (GetCourseRow, error) {
+	row := q.db.QueryRow(ctx, getCourse, arg.Uuid, arg.Language)
+	var i GetCourseRow
 	err := row.Scan(
 		&i.Uuid,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Name,
-		&i.Description,
 		&i.Subject,
 		&i.Price,
 		&i.Discount,
 		&i.IsActive,
 		&i.Difficulty,
+		&i.Uuid_2,
+		&i.CourseUuid,
+		&i.Language,
+		&i.Name,
+		&i.Description,
 		&i.Bullets,
 	)
 	return i, err
@@ -155,10 +144,11 @@ func (q *Queries) HardDeleteCourse(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const listCourses = `-- name: ListCourses :many
-SELECT uuid, created_at, modified_at, deleted_at, name, description, subject, price, discount, is_active, difficulty, bullets FROM "courses"
+SELECT courses.uuid, created_at, modified_at, deleted_at, subject, price, discount, is_active, difficulty, course_translations.uuid, course_uuid, language, name, description, bullets FROM "courses"
+JOIN "course_translations" ON "courses"."uuid" = "course_translations"."course_uuid" AND "course_translations"."language" = $3
 WHERE "deleted_at" IS NULL
-AND   ($3::text IS NULL OR "subject" = $3)
-AND   ($4::boolean IS NULL OR "is_active" = $4)
+AND   ($4::text IS NULL OR "subject" = $4)
+AND   ($5::boolean IS NULL OR "is_active" = $5)
 ORDER BY "created_at" DESC
 LIMIT $1 OFFSET $2
 `
@@ -166,14 +156,34 @@ LIMIT $1 OFFSET $2
 type ListCoursesParams struct {
 	Limit    int32   `json:"limit"`
 	Offset   int32   `json:"offset"`
+	Language string  `json:"language"`
 	Subject  *string `json:"subject"`
 	IsActive *bool   `json:"is_active"`
 }
 
-func (q *Queries) ListCourses(ctx context.Context, arg ListCoursesParams) ([]Course, error) {
+type ListCoursesRow struct {
+	Uuid        uuid.UUID  `json:"uuid"`
+	CreatedAt   time.Time  `json:"created_at"`
+	ModifiedAt  time.Time  `json:"modified_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	Subject     string     `json:"subject"`
+	Price       int16      `json:"price"`
+	Discount    int16      `json:"discount"`
+	IsActive    bool       `json:"is_active"`
+	Difficulty  int16      `json:"difficulty"`
+	Uuid_2      uuid.UUID  `json:"uuid_2"`
+	CourseUuid  uuid.UUID  `json:"course_uuid"`
+	Language    string     `json:"language"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Bullets     string     `json:"bullets"`
+}
+
+func (q *Queries) ListCourses(ctx context.Context, arg ListCoursesParams) ([]ListCoursesRow, error) {
 	rows, err := q.db.Query(ctx, listCourses,
 		arg.Limit,
 		arg.Offset,
+		arg.Language,
 		arg.Subject,
 		arg.IsActive,
 	)
@@ -181,21 +191,24 @@ func (q *Queries) ListCourses(ctx context.Context, arg ListCoursesParams) ([]Cou
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Course{}
+	items := []ListCoursesRow{}
 	for rows.Next() {
-		var i Course
+		var i ListCoursesRow
 		if err := rows.Scan(
 			&i.Uuid,
 			&i.CreatedAt,
 			&i.ModifiedAt,
 			&i.DeletedAt,
-			&i.Name,
-			&i.Description,
 			&i.Subject,
 			&i.Price,
 			&i.Discount,
 			&i.IsActive,
 			&i.Difficulty,
+			&i.Uuid_2,
+			&i.CourseUuid,
+			&i.Language,
+			&i.Name,
+			&i.Description,
 			&i.Bullets,
 		); err != nil {
 			return nil, err
@@ -221,42 +234,33 @@ func (q *Queries) UndeleteCourse(ctx context.Context, argUuid uuid.UUID) error {
 
 const updateCourse = `-- name: UpdateCourse :one
 UPDATE "courses"
-SET "name" = COALESCE($2, "name"), 
-    "description" = COALESCE($3, "description"), 
-    "subject" = COALESCE($4, "subject"), 
-    "price" = COALESCE($5, "price"),
-    "discount" = COALESCE($6, "discount"),
-    "is_active" = COALESCE($7, "is_active"),
-    "difficulty" = COALESCE($8, "difficulty"),
-    "bullets" = COALESCE($9, "bullets"),
+SET "subject" = COALESCE($2, "subject"), 
+    "price" = COALESCE($3, "price"),
+    "discount" = COALESCE($4, "discount"),
+    "is_active" = COALESCE($5, "is_active"),
+    "difficulty" = COALESCE($6, "difficulty"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
-RETURNING uuid, created_at, modified_at, deleted_at, name, description, subject, price, discount, is_active, difficulty, bullets
+RETURNING uuid, created_at, modified_at, deleted_at, subject, price, discount, is_active, difficulty
 `
 
 type UpdateCourseParams struct {
-	Uuid        uuid.UUID `json:"uuid"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Subject     string    `json:"subject"`
-	Price       int16     `json:"price"`
-	Discount    int16     `json:"discount"`
-	IsActive    bool      `json:"is_active"`
-	Difficulty  int16     `json:"difficulty"`
-	Bullets     string    `json:"bullets"`
+	Uuid       uuid.UUID `json:"uuid"`
+	Subject    string    `json:"subject"`
+	Price      int16     `json:"price"`
+	Discount   int16     `json:"discount"`
+	IsActive   bool      `json:"is_active"`
+	Difficulty int16     `json:"difficulty"`
 }
 
 func (q *Queries) UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Course, error) {
 	row := q.db.QueryRow(ctx, updateCourse,
 		arg.Uuid,
-		arg.Name,
-		arg.Description,
 		arg.Subject,
 		arg.Price,
 		arg.Discount,
 		arg.IsActive,
 		arg.Difficulty,
-		arg.Bullets,
 	)
 	var i Course
 	err := row.Scan(
@@ -264,95 +268,112 @@ func (q *Queries) UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Cou
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Name,
-		&i.Description,
 		&i.Subject,
 		&i.Price,
 		&i.Discount,
 		&i.IsActive,
 		&i.Difficulty,
-		&i.Bullets,
 	)
 	return i, err
 }
 
 const getCourseFull = `-- name: getCourseFull :many
-SELECT  courses.uuid            AS "course_uuid", 
-        courses.created_at      AS "course_created_at", 
-        courses.modified_at     AS "course_modified_at", 
-        courses.deleted_at      AS "course_deleted_at", 
-        courses.name            AS "course_name", 
-        courses.description     AS "course_description", 
-        courses.subject         AS "course_subject", 
-        courses.price           AS "course_price", 
-        courses.discount        AS "course_discount", 
-        courses.is_active       AS "course_is_active", 
-        courses.difficulty      AS "course_difficulty", 
-        courses.bullets         AS "course_bullets", 
-        lessons.uuid            AS "lesson_uuid", 
-        lessons.created_at      AS "lesson_created_at", 
-        lessons.modified_at     AS "lesson_modified_at", 
-        lessons.deleted_at      AS "lesson_deleted_at", 
-        lessons.course_uuid     AS "lesson_course_uuid", 
-        lessons.name            AS "lesson_name", 
-        lessons.description     AS "lesson_description", 
-        lessons.order_index     AS "lesson_order_index", 
-        lessons.is_public       AS "lesson_is_public", 
-        exercises.uuid          AS "exercise_uuid", 
-        exercises.created_at    AS "exercise_created_at", 
-        exercises.modified_at   AS "exercise_modified_at", 
-        exercises.deleted_at    AS "exercise_deleted_at", 
-        exercises.lesson_uuid   AS "exercise_lesson_uuid", 
-        exercises.name          AS "exercise_name", 
-        exercises.description   AS "exercise_description", 
-        exercises.order_index   AS "exercise_order_index", 
-        exercises.reward        AS "exercise_reward", 
-        exercises.type          AS "exercise_type",
-        exercises.data          AS "exercise_data" 
+SELECT  courses.uuid                        AS "course_uuid", 
+        courses.created_at                  AS "course_created_at", 
+        courses.modified_at                 AS "course_modified_at", 
+        courses.deleted_at                  AS "course_deleted_at", 
+        courses.subject                     AS "course_subject", 
+        courses.price                       AS "course_price", 
+        courses.discount                    AS "course_discount", 
+        courses.is_active                   AS "course_is_active", 
+        courses.difficulty                  AS "course_difficulty",
+        course_translations.uuid            AS "course_translation_uuid",
+        course_translations.language        AS "course_translation_language",
+        course_translations.name            AS "course_name", 
+        course_translations.description     AS "course_description", 
+        course_translations.bullets         AS "course_bullets", 
+        lessons.uuid                        AS "lesson_uuid", 
+        lessons.created_at                  AS "lesson_created_at", 
+        lessons.modified_at                 AS "lesson_modified_at", 
+        lessons.deleted_at                  AS "lesson_deleted_at", 
+        lessons.course_uuid                 AS "lesson_course_uuid", 
+        lessons.order_index                 AS "lesson_order_index", 
+        lessons.is_public                   AS "lesson_is_public", 
+        lesson_translations.uuid            AS "lesson_translation_uuid",
+        lesson_translations.language        AS "lesson_translation_language",
+        lesson_translations.name            AS "lesson_name", 
+        lesson_translations.description     AS "lesson_description", 
+        exercises.uuid                      AS "exercise_uuid", 
+        exercises.created_at                AS "exercise_created_at", 
+        exercises.modified_at               AS "exercise_modified_at", 
+        exercises.deleted_at                AS "exercise_deleted_at", 
+        exercises.lesson_uuid               AS "exercise_lesson_uuid", 
+        exercises.order_index               AS "exercise_order_index", 
+        exercises.reward                    AS "exercise_reward", 
+        exercises.type                      AS "exercise_type",
+        exercises.data                      AS "exercise_data",
+        exercise_translations.uuid          AS "exercise_translation_uuid",
+        exercise_translations.language      AS "exercise_translation_language",
+        exercise_translations.name          AS "exercise_name", 
+        exercise_translations.description   AS "exercise_description"
 FROM "courses"
-LEFT JOIN "lessons"   ON "courses"."uuid" = "lessons"."course_uuid"   AND "lessons"."deleted_at" IS NULL
-LEFT JOIN "exercises" ON "lessons"."uuid" = "exercises"."lesson_uuid" AND "exercises"."deleted_at" IS NULL
+JOIN "course_translations"        ON "courses"."uuid" = "course_translations"."course_uuid" AND "course_translations"."language" = $2
+LEFT JOIN "lessons"               ON "courses"."uuid" = "lessons"."course_uuid"   AND "lessons"."deleted_at" IS NULL
+LEFT JOIN "lesson_translations"   ON "lessons"."uuid" = "lesson_translations"."lesson_uuid" AND "lesson_translations"."language" = $2
+LEFT JOIN "exercises"             ON "lessons"."uuid" = "exercises"."lesson_uuid" AND "exercises"."deleted_at" IS NULL
+LEFT JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $2
 WHERE "courses"."uuid" = $1 AND "courses"."deleted_at" IS NULL
 ORDER BY "lessons"."order_index" ASC, "exercises"."order_index" ASC
 `
 
-type getCourseFullRow struct {
-	CourseUuid          uuid.UUID        `json:"course_uuid"`
-	CourseCreatedAt     time.Time        `json:"course_created_at"`
-	CourseModifiedAt    time.Time        `json:"course_modified_at"`
-	CourseDeletedAt     *time.Time       `json:"course_deleted_at"`
-	CourseName          string           `json:"course_name"`
-	CourseDescription   string           `json:"course_description"`
-	CourseSubject       string           `json:"course_subject"`
-	CoursePrice         int16            `json:"course_price"`
-	CourseDiscount      int16            `json:"course_discount"`
-	CourseIsActive      bool             `json:"course_is_active"`
-	CourseDifficulty    int16            `json:"course_difficulty"`
-	CourseBullets       string           `json:"course_bullets"`
-	LessonUuid          *uuid.UUID       `json:"lesson_uuid"`
-	LessonCreatedAt     *time.Time       `json:"lesson_created_at"`
-	LessonModifiedAt    *time.Time       `json:"lesson_modified_at"`
-	LessonDeletedAt     *time.Time       `json:"lesson_deleted_at"`
-	LessonCourseUuid    *uuid.UUID       `json:"lesson_course_uuid"`
-	LessonName          *string          `json:"lesson_name"`
-	LessonDescription   *string          `json:"lesson_description"`
-	LessonOrderIndex    *int16           `json:"lesson_order_index"`
-	LessonIsPublic      *bool            `json:"lesson_is_public"`
-	ExerciseUuid        *uuid.UUID       `json:"exercise_uuid"`
-	ExerciseCreatedAt   *time.Time       `json:"exercise_created_at"`
-	ExerciseModifiedAt  *time.Time       `json:"exercise_modified_at"`
-	ExerciseDeletedAt   *time.Time       `json:"exercise_deleted_at"`
-	ExerciseLessonUuid  *uuid.UUID       `json:"exercise_lesson_uuid"`
-	ExerciseName        *string          `json:"exercise_name"`
-	ExerciseDescription *string          `json:"exercise_description"`
-	ExerciseOrderIndex  *int16           `json:"exercise_order_index"`
-	ExerciseReward      *int16           `json:"exercise_reward"`
-	ExerciseType        *ExerciseType    `json:"exercise_type"`
-	ExerciseData        *json.RawMessage `json:"exercise_data"`
+type getCourseFullParams struct {
+	Uuid     uuid.UUID `json:"uuid"`
+	Language string    `json:"language"`
 }
 
-func (q *Queries) getCourseFull(ctx context.Context, argUuid uuid.UUID) ([]getCourseFullRow, error) {
-	rows, err := q.db.Query(ctx, getCourseFull, argUuid)
+type getCourseFullRow struct {
+	CourseUuid                  uuid.UUID        `json:"course_uuid"`
+	CourseCreatedAt             time.Time        `json:"course_created_at"`
+	CourseModifiedAt            time.Time        `json:"course_modified_at"`
+	CourseDeletedAt             *time.Time       `json:"course_deleted_at"`
+	CourseSubject               string           `json:"course_subject"`
+	CoursePrice                 int16            `json:"course_price"`
+	CourseDiscount              int16            `json:"course_discount"`
+	CourseIsActive              bool             `json:"course_is_active"`
+	CourseDifficulty            int16            `json:"course_difficulty"`
+	CourseTranslationUuid       uuid.UUID        `json:"course_translation_uuid"`
+	CourseTranslationLanguage   string           `json:"course_translation_language"`
+	CourseName                  string           `json:"course_name"`
+	CourseDescription           string           `json:"course_description"`
+	CourseBullets               string           `json:"course_bullets"`
+	LessonUuid                  *uuid.UUID       `json:"lesson_uuid"`
+	LessonCreatedAt             *time.Time       `json:"lesson_created_at"`
+	LessonModifiedAt            *time.Time       `json:"lesson_modified_at"`
+	LessonDeletedAt             *time.Time       `json:"lesson_deleted_at"`
+	LessonCourseUuid            *uuid.UUID       `json:"lesson_course_uuid"`
+	LessonOrderIndex            *int16           `json:"lesson_order_index"`
+	LessonIsPublic              *bool            `json:"lesson_is_public"`
+	LessonTranslationUuid       *uuid.UUID       `json:"lesson_translation_uuid"`
+	LessonTranslationLanguage   *string          `json:"lesson_translation_language"`
+	LessonName                  *string          `json:"lesson_name"`
+	LessonDescription           *string          `json:"lesson_description"`
+	ExerciseUuid                *uuid.UUID       `json:"exercise_uuid"`
+	ExerciseCreatedAt           *time.Time       `json:"exercise_created_at"`
+	ExerciseModifiedAt          *time.Time       `json:"exercise_modified_at"`
+	ExerciseDeletedAt           *time.Time       `json:"exercise_deleted_at"`
+	ExerciseLessonUuid          *uuid.UUID       `json:"exercise_lesson_uuid"`
+	ExerciseOrderIndex          *int16           `json:"exercise_order_index"`
+	ExerciseReward              *int16           `json:"exercise_reward"`
+	ExerciseType                *ExerciseType    `json:"exercise_type"`
+	ExerciseData                *json.RawMessage `json:"exercise_data"`
+	ExerciseTranslationUuid     *uuid.UUID       `json:"exercise_translation_uuid"`
+	ExerciseTranslationLanguage *string          `json:"exercise_translation_language"`
+	ExerciseName                *string          `json:"exercise_name"`
+	ExerciseDescription         *string          `json:"exercise_description"`
+}
+
+func (q *Queries) getCourseFull(ctx context.Context, arg getCourseFullParams) ([]getCourseFullRow, error) {
+	rows, err := q.db.Query(ctx, getCourseFull, arg.Uuid, arg.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -365,34 +386,40 @@ func (q *Queries) getCourseFull(ctx context.Context, argUuid uuid.UUID) ([]getCo
 			&i.CourseCreatedAt,
 			&i.CourseModifiedAt,
 			&i.CourseDeletedAt,
-			&i.CourseName,
-			&i.CourseDescription,
 			&i.CourseSubject,
 			&i.CoursePrice,
 			&i.CourseDiscount,
 			&i.CourseIsActive,
 			&i.CourseDifficulty,
+			&i.CourseTranslationUuid,
+			&i.CourseTranslationLanguage,
+			&i.CourseName,
+			&i.CourseDescription,
 			&i.CourseBullets,
 			&i.LessonUuid,
 			&i.LessonCreatedAt,
 			&i.LessonModifiedAt,
 			&i.LessonDeletedAt,
 			&i.LessonCourseUuid,
-			&i.LessonName,
-			&i.LessonDescription,
 			&i.LessonOrderIndex,
 			&i.LessonIsPublic,
+			&i.LessonTranslationUuid,
+			&i.LessonTranslationLanguage,
+			&i.LessonName,
+			&i.LessonDescription,
 			&i.ExerciseUuid,
 			&i.ExerciseCreatedAt,
 			&i.ExerciseModifiedAt,
 			&i.ExerciseDeletedAt,
 			&i.ExerciseLessonUuid,
-			&i.ExerciseName,
-			&i.ExerciseDescription,
 			&i.ExerciseOrderIndex,
 			&i.ExerciseReward,
 			&i.ExerciseType,
 			&i.ExerciseData,
+			&i.ExerciseTranslationUuid,
+			&i.ExerciseTranslationLanguage,
+			&i.ExerciseName,
+			&i.ExerciseDescription,
 		); err != nil {
 			return nil, err
 		}

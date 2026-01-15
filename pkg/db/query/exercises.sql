@@ -1,11 +1,13 @@
 -- name: GetExercise :one
 SELECT * FROM "exercises"
-WHERE "uuid" = $1 AND "deleted_at" IS NULL 
+JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $2
+WHERE "exercises"."uuid" = $1 AND "exercises"."deleted_at" IS NULL 
 LIMIT 1;
 
 -- name: ListExercises :many
 SELECT * FROM "exercises"
-WHERE "deleted_at" IS NULL
+JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $3
+WHERE "exercises"."deleted_at" IS NULL
 AND   (sqlc.narg('lesson_uuid')::uuid IS NULL OR "lesson_uuid" = sqlc.narg('lesson_uuid'))
 ORDER BY "created_at" DESC
 LIMIT $1 OFFSET $2;
@@ -13,26 +15,22 @@ LIMIT $1 OFFSET $2;
 -- name: CreateExercise :one
 INSERT INTO "exercises" (
   "lesson_uuid", 
-  "name", 
-  "description",
   "order_index",
   "reward",
   "type",
   "data"
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
+  $1, $2, $3, $4, $5
 )
 RETURNING *;
 
 -- name: UpdateExercise :one
 UPDATE "exercises"
 SET "lesson_uuid" = COALESCE($2, "lesson_uuid"), 
-    "name" = COALESCE($3, "name"), 
-    "description" = COALESCE($4, "description"), 
-    "order_index" = COALESCE($5, "order_index"),
-    "reward" = COALESCE($6, "reward"),
-    "type" = COALESCE($7, "type"),
-    "data" = COALESCE($8, "data"),
+    "order_index" = COALESCE($3, "order_index"),
+    "reward" = COALESCE($4, "reward"),
+    "type" = COALESCE($5, "type"),
+    "data" = COALESCE($6, "data"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING *;

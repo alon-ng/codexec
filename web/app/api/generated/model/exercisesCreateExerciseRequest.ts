@@ -6,12 +6,15 @@
  * OpenAPI spec version: 1.0
  */
 import type { ExercisesCreateExerciseRequestData } from "./exercisesCreateExerciseRequestData";
+import type { DbExerciseType } from "./dbExerciseType";
 
 export interface ExercisesCreateExerciseRequest {
   data: ExercisesCreateExerciseRequestData;
   description: string;
+  language: string;
   lesson_uuid: string;
   name: string;
   order_index: number;
   reward: number;
+  type: DbExerciseType;
 }

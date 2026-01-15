@@ -6,19 +6,18 @@
  * OpenAPI spec version: 1.0
  */
 import type { DbLessonFull } from "./dbLessonFull";
+import type { DbCourseTranslation } from "./dbCourseTranslation";
 
 export interface DbCourseFull {
-  bullets?: string;
   created_at?: string;
   deleted_at?: string;
-  description?: string;
   difficulty?: number;
   discount?: number;
   is_active?: boolean;
   lessons?: DbLessonFull[];
   modified_at?: string;
-  name?: string;
   price?: number;
   subject?: string;
+  translation?: DbCourseTranslation;
   uuid?: string;
 }

@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise  body      CreateExerciseRequest  true  "Exercise creation data"
-// @Success      201       {object}  db.Exercise
+// @Success      201       {object}  db.ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      409       {object}  errors.ErrorResponse
@@ -42,10 +42,6 @@ func (c *Controller) Create(ctx *gin.Context) {
 
 	exercise, err := c.svc.Create(ctx.Request.Context(), req)
 	if err != nil {
-		if err.ErrorMessage == ErrExerciseNameAlreadyExists {
-			e.HandleError(ctx, c.log, err, http.StatusConflict)
-			return
-		}
 		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
 		return
 	}
@@ -61,7 +57,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise  body      UpdateRequest  true  "Exercise update data"
-// @Success      200       {object}  db.Exercise
+// @Success      200       {object}  db.ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      500       {object}  errors.ErrorResponse
@@ -155,10 +151,11 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Param        limit       query     int     false  "Limit (default: 10)"  default(10)
-// @Param        offset      query     int     false  "Offset (default: 0)"  default(0)
-// @Param        lesson_uuid query     string  false  "Filter by lesson UUID"
-// @Success      200         {array}   db.Exercise
+// @Param        limit       query     int      false  "Limit (default: 10)"  default(10)
+// @Param        offset      query     int      false  "Offset (default: 0)"  default(0)
+// @Param        lesson_uuid query     string   false  "Filter by lesson UUID"
+// @Param        language    query     string   false  "Filter by language"  default(en)
+// @Success      200         {array}   db.ExerciseWithTranslation
 // @Failure      400         {object}  errors.ErrorResponse
 // @Failure      401         {object}  errors.ErrorResponse
 // @Failure      500         {object}  errors.ErrorResponse
@@ -186,8 +183,9 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Param        uuid  path      string  true  "Exercise UUID"
-// @Success      200   {object}  db.Exercise
+// @Param        uuid  		path      string  true  	"Exercise UUID"
+// @Param        language   query     string  false  	"Language"  	default(en) example(en)
+// @Success      200   {object}  db.ExerciseWithTranslation
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse
@@ -201,7 +199,12 @@ func (c *Controller) Get(ctx *gin.Context) {
 		return
 	}
 
-	exercise, err := c.svc.Get(ctx.Request.Context(), id)
+	language := ctx.Query("language")
+	if language == "" {
+		language = "en"
+	}
+
+	exercise, err := c.svc.Get(ctx.Request.Context(), id, language)
 	if err != nil {
 		if err.ErrorMessage == ErrExerciseNotFound {
 			e.HandleError(ctx, c.log, err, http.StatusNotFound)
@@ -213,4 +216,33 @@ func (c *Controller) Get(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, exercise)
+}
+
+// AddTranslation godoc
+// @Summary      Add a translation to an existing exercise
+// @Description  Add a new translation for an existing exercise
+// @Tags         exercises
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        translation  body      AddExerciseTranslationRequest  true  "Translation data"
+// @Success      201          {object}  db.ExerciseTranslation
+// @Failure      400          {object}  errors.ErrorResponse
+// @Failure      401          {object}  errors.ErrorResponse
+// @Failure      500          {object}  errors.ErrorResponse
+// @Router       /exercises/add-translation [post]
+func (c *Controller) AddTranslation(ctx *gin.Context) {
+	var req AddExerciseTranslationRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
+		return
+	}
+
+	translation, err := c.svc.AddTranslation(ctx.Request.Context(), req)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(201, translation)
 }

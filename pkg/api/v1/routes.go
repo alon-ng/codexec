@@ -15,6 +15,7 @@ import (
 	"codim/pkg/utils/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
@@ -30,7 +31,13 @@ func init() {
 	apiDocs.SwaggerInfo.Schemes = []string{"http", "https"}
 }
 
-func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Provider, redisClient *redis.Client) *gin.Engine {
+func NewRouter(
+	q *db.Queries,
+	p *pgxpool.Pool,
+	log *logger.Logger,
+	authProvider *authProvider.Provider,
+	redisClient *redis.Client,
+) *gin.Engine {
 	// Disable Gin's default logger output
 	gin.DefaultWriter = log.Writer()
 	gin.DefaultErrorWriter = log.WriterLevel(logrus.ErrorLevel)
@@ -46,20 +53,20 @@ func NewRouter(q *db.Queries, log *logger.Logger, authProvider *authProvider.Pro
 
 	v1 := r.Group("/api/v1")
 	{
-		auth.RegisterRoutes(v1, q, log, authProvider)
-		courses.RegisterPublicRoutes(v1, q, log)
+		auth.RegisterRoutes(v1, q, p, log, authProvider)
+		courses.RegisterPublicRoutes(v1, q, p, log)
 
 		protected := v1.Group("/")
 		protected.Use(middleware.AuthMiddleware(authProvider, userCache, log))
 		{
-			me.RegisterRoutes(protected, q, log)
+			me.RegisterRoutes(protected, q, p, log)
 			admin := protected.Group("/")
 			admin.Use(middleware.AdminMiddleware(log))
 			{
-				users.RegisterRoutes(admin, q, log)
-				courses.RegisterAdminRoutes(admin, q, log)
-				lessons.RegisterRoutes(admin, q, log)
-				exercises.RegisterRoutes(admin, q, log)
+				users.RegisterRoutes(admin, q, p, log)
+				courses.RegisterAdminRoutes(admin, q, p, log)
+				lessons.RegisterRoutes(admin, q, p, log)
+				exercises.RegisterRoutes(admin, q, p, log)
 			}
 		}
 	}

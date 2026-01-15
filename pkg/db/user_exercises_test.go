@@ -13,7 +13,9 @@ import (
 
 func createRandomUserExercise(t *testing.T) db.UserExercise {
 	user := createRandomUser(t)
-	exercise := createRandomExercise(t)
+	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
+	exercise := createRandomExercise(t, &lesson)
 
 	submission := json.RawMessage(`{"answer": "test"}`)
 	params := db.CreateUserExerciseParams{
@@ -58,7 +60,9 @@ func TestCreateUserExercise(t *testing.T) {
 
 func TestCreateUserExerciseWithCompletedAt(t *testing.T) {
 	user := createRandomUser(t)
-	exercise := createRandomExercise(t)
+	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
+	exercise := createRandomExercise(t, &lesson)
 	now := time.Now()
 
 	submission := json.RawMessage(`{"answer": "completed"}`)

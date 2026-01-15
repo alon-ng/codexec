@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -38,32 +39,22 @@ func (q *Queries) CountLessonsByCourse(ctx context.Context, courseUuid uuid.UUID
 const createLesson = `-- name: CreateLesson :one
 INSERT INTO "lessons" (
   "course_uuid", 
-  "name", 
-  "description",
   "order_index",
   "is_public"
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3
 )
-RETURNING uuid, created_at, modified_at, deleted_at, course_uuid, name, description, order_index, is_public
+RETURNING uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public
 `
 
 type CreateLessonParams struct {
-	CourseUuid  uuid.UUID `json:"course_uuid"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	OrderIndex  int16     `json:"order_index"`
-	IsPublic    bool      `json:"is_public"`
+	CourseUuid uuid.UUID `json:"course_uuid"`
+	OrderIndex int16     `json:"order_index"`
+	IsPublic   bool      `json:"is_public"`
 }
 
 func (q *Queries) CreateLesson(ctx context.Context, arg CreateLessonParams) (Lesson, error) {
-	row := q.db.QueryRow(ctx, createLesson,
-		arg.CourseUuid,
-		arg.Name,
-		arg.Description,
-		arg.OrderIndex,
-		arg.IsPublic,
-	)
+	row := q.db.QueryRow(ctx, createLesson, arg.CourseUuid, arg.OrderIndex, arg.IsPublic)
 	var i Lesson
 	err := row.Scan(
 		&i.Uuid,
@@ -71,8 +62,6 @@ func (q *Queries) CreateLesson(ctx context.Context, arg CreateLessonParams) (Les
 		&i.ModifiedAt,
 		&i.DeletedAt,
 		&i.CourseUuid,
-		&i.Name,
-		&i.Description,
 		&i.OrderIndex,
 		&i.IsPublic,
 	)
@@ -91,24 +80,48 @@ func (q *Queries) DeleteLesson(ctx context.Context, argUuid uuid.UUID) error {
 }
 
 const getLesson = `-- name: GetLesson :one
-SELECT uuid, created_at, modified_at, deleted_at, course_uuid, name, description, order_index, is_public FROM "lessons"
-WHERE "uuid" = $1 AND "deleted_at" IS NULL 
+SELECT lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public, lesson_translations.uuid, lesson_uuid, language, name, description FROM "lessons"
+JOIN "lesson_translations" ON "lessons"."uuid" = "lesson_translations"."lesson_uuid" AND "lesson_translations"."language" = $2
+WHERE "lessons"."uuid" = $1 AND "lessons"."deleted_at" IS NULL 
 LIMIT 1
 `
 
-func (q *Queries) GetLesson(ctx context.Context, argUuid uuid.UUID) (Lesson, error) {
-	row := q.db.QueryRow(ctx, getLesson, argUuid)
-	var i Lesson
+type GetLessonParams struct {
+	Uuid     uuid.UUID `json:"uuid"`
+	Language string    `json:"language"`
+}
+
+type GetLessonRow struct {
+	Uuid        uuid.UUID  `json:"uuid"`
+	CreatedAt   time.Time  `json:"created_at"`
+	ModifiedAt  time.Time  `json:"modified_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	CourseUuid  uuid.UUID  `json:"course_uuid"`
+	OrderIndex  int16      `json:"order_index"`
+	IsPublic    bool       `json:"is_public"`
+	Uuid_2      uuid.UUID  `json:"uuid_2"`
+	LessonUuid  uuid.UUID  `json:"lesson_uuid"`
+	Language    string     `json:"language"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+}
+
+func (q *Queries) GetLesson(ctx context.Context, arg GetLessonParams) (GetLessonRow, error) {
+	row := q.db.QueryRow(ctx, getLesson, arg.Uuid, arg.Language)
+	var i GetLessonRow
 	err := row.Scan(
 		&i.Uuid,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
 		&i.CourseUuid,
-		&i.Name,
-		&i.Description,
 		&i.OrderIndex,
 		&i.IsPublic,
+		&i.Uuid_2,
+		&i.LessonUuid,
+		&i.Language,
+		&i.Name,
+		&i.Description,
 	)
 	return i, err
 }
@@ -124,9 +137,10 @@ func (q *Queries) HardDeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const listLessons = `-- name: ListLessons :many
-SELECT uuid, created_at, modified_at, deleted_at, course_uuid, name, description, order_index, is_public FROM "lessons"
-WHERE "deleted_at" IS NULL
-AND   ($3::uuid IS NULL OR "course_uuid" = $3)
+SELECT lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public, lesson_translations.uuid, lesson_uuid, language, name, description FROM "lessons"
+JOIN "lesson_translations" ON "lessons"."uuid" = "lesson_translations"."lesson_uuid" AND "lesson_translations"."language" = $3
+WHERE "lessons"."deleted_at" IS NULL
+AND   ($4::uuid IS NULL OR "course_uuid" = $4)
 ORDER BY "created_at" DESC
 LIMIT $1 OFFSET $2
 `
@@ -134,28 +148,52 @@ LIMIT $1 OFFSET $2
 type ListLessonsParams struct {
 	Limit      int32      `json:"limit"`
 	Offset     int32      `json:"offset"`
+	Language   string     `json:"language"`
 	CourseUuid *uuid.UUID `json:"course_uuid"`
 }
 
-func (q *Queries) ListLessons(ctx context.Context, arg ListLessonsParams) ([]Lesson, error) {
-	rows, err := q.db.Query(ctx, listLessons, arg.Limit, arg.Offset, arg.CourseUuid)
+type ListLessonsRow struct {
+	Uuid        uuid.UUID  `json:"uuid"`
+	CreatedAt   time.Time  `json:"created_at"`
+	ModifiedAt  time.Time  `json:"modified_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	CourseUuid  uuid.UUID  `json:"course_uuid"`
+	OrderIndex  int16      `json:"order_index"`
+	IsPublic    bool       `json:"is_public"`
+	Uuid_2      uuid.UUID  `json:"uuid_2"`
+	LessonUuid  uuid.UUID  `json:"lesson_uuid"`
+	Language    string     `json:"language"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+}
+
+func (q *Queries) ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error) {
+	rows, err := q.db.Query(ctx, listLessons,
+		arg.Limit,
+		arg.Offset,
+		arg.Language,
+		arg.CourseUuid,
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Lesson{}
+	items := []ListLessonsRow{}
 	for rows.Next() {
-		var i Lesson
+		var i ListLessonsRow
 		if err := rows.Scan(
 			&i.Uuid,
 			&i.CreatedAt,
 			&i.ModifiedAt,
 			&i.DeletedAt,
 			&i.CourseUuid,
-			&i.Name,
-			&i.Description,
 			&i.OrderIndex,
 			&i.IsPublic,
+			&i.Uuid_2,
+			&i.LessonUuid,
+			&i.Language,
+			&i.Name,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -181,30 +219,24 @@ func (q *Queries) UndeleteLesson(ctx context.Context, argUuid uuid.UUID) error {
 const updateLesson = `-- name: UpdateLesson :one
 UPDATE "lessons"
 SET "course_uuid" = COALESCE($2, "course_uuid"), 
-    "name" = COALESCE($3, "name"), 
-    "description" = COALESCE($4, "description"), 
-    "order_index" = COALESCE($5, "order_index"),
-    "is_public" = COALESCE($6, "is_public"),
+    "order_index" = COALESCE($3, "order_index"),
+    "is_public" = COALESCE($4, "is_public"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
-RETURNING uuid, created_at, modified_at, deleted_at, course_uuid, name, description, order_index, is_public
+RETURNING uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public
 `
 
 type UpdateLessonParams struct {
-	Uuid        uuid.UUID `json:"uuid"`
-	CourseUuid  uuid.UUID `json:"course_uuid"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	OrderIndex  int16     `json:"order_index"`
-	IsPublic    bool      `json:"is_public"`
+	Uuid       uuid.UUID `json:"uuid"`
+	CourseUuid uuid.UUID `json:"course_uuid"`
+	OrderIndex int16     `json:"order_index"`
+	IsPublic   bool      `json:"is_public"`
 }
 
 func (q *Queries) UpdateLesson(ctx context.Context, arg UpdateLessonParams) (Lesson, error) {
 	row := q.db.QueryRow(ctx, updateLesson,
 		arg.Uuid,
 		arg.CourseUuid,
-		arg.Name,
-		arg.Description,
 		arg.OrderIndex,
 		arg.IsPublic,
 	)
@@ -215,8 +247,6 @@ func (q *Queries) UpdateLesson(ctx context.Context, arg UpdateLessonParams) (Les
 		&i.ModifiedAt,
 		&i.DeletedAt,
 		&i.CourseUuid,
-		&i.Name,
-		&i.Description,
 		&i.OrderIndex,
 		&i.IsPublic,
 	)

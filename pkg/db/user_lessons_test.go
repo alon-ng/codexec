@@ -12,7 +12,8 @@ import (
 
 func createRandomUserLesson(t *testing.T) db.UserLesson {
 	user := createRandomUser(t)
-	lesson := createRandomLesson(t)
+	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
 
 	params := db.CreateUserLessonParams{
 		UserUuid:    user.Uuid,
@@ -52,7 +53,8 @@ func TestCreateUserLesson(t *testing.T) {
 
 func TestCreateUserLessonWithCompletedAt(t *testing.T) {
 	user := createRandomUser(t)
-	lesson := createRandomLesson(t)
+	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
 	now := time.Now()
 
 	params := db.CreateUserLessonParams{

@@ -9,6 +9,7 @@ import { blurInVariants } from "~/utils/animations";
 import { useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import type { DbCourseWithTranslation } from "~/api/generated/model";
 
 const breadcrumbs: BreadcrumbProps[] = [
     { label: "navigation.home", to: "/" },
@@ -18,7 +19,7 @@ const breadcrumbs: BreadcrumbProps[] = [
 const LIMIT = 9;
 
 export default function Courses() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const observerTarget = useRef<HTMLDivElement>(null);
 
     const {
@@ -30,7 +31,7 @@ export default function Courses() {
         error
     } = useInfiniteQuery({
         queryKey: ['courses', 'infinite'],
-        queryFn: ({ pageParam = 0 }) => getCourses({ limit: LIMIT, offset: pageParam }),
+        queryFn: ({ pageParam = 0 }) => getCourses({ limit: LIMIT, offset: pageParam, language: i18n.language }),
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage && lastPage.length < LIMIT) return undefined;
             return allPages.length * LIMIT;
@@ -72,7 +73,7 @@ export default function Courses() {
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pb-8">
                 {courses.map((course, index) => (
                     <motion.div key={`${course.uuid}-${index}`} variants={blurInVariants(index % LIMIT * 0.1)} initial="hidden" animate="visible">
-                        <CourseCard course={course} />
+                        <CourseCard course={course as Required<DbCourseWithTranslation>} />
                     </motion.div>
                 ))}
 

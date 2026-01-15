@@ -4,50 +4,12 @@ import (
 	"codim/pkg/db"
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/go-openapi/testify/v2/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func createRandomLessonWithCourse(t *testing.T, course db.Course) db.Lesson {
-	rnd := getRandomInt()
-	params := db.CreateLessonParams{
-		CourseUuid:  course.Uuid,
-		Name:        fmt.Sprintf("Test Lesson %d", rnd),
-		Description: fmt.Sprintf("Test Description %d", rnd),
-		OrderIndex:  1,
-		IsPublic:    true,
-	}
-
-	lesson, err := testQueries.CreateLesson(context.Background(), params)
-	require.NoError(t, err)
-	require.NotEmpty(t, lesson)
-
-	return lesson
-}
-
-func createRandomExerciseWithLesson(t *testing.T, lesson db.Lesson) db.Exercise {
-	rnd := getRandomInt()
-	testData := json.RawMessage(fmt.Sprintf(`{"answer": "Test Answer", "question": "Test Question %d"}`, rnd))
-	params := db.CreateExerciseParams{
-		LessonUuid:  lesson.Uuid,
-		Name:        fmt.Sprintf("Test Exercise %d", rnd),
-		Description: fmt.Sprintf("Test Description %d", rnd),
-		OrderIndex:  1,
-		Reward:      10,
-		Type:        db.ExerciseTypeQuiz,
-		Data:        testData,
-	}
-
-	exercise, err := testQueries.CreateExercise(context.Background(), params)
-	require.NoError(t, err)
-	require.NotEmpty(t, exercise)
-
-	return exercise
-}
 
 func createRandomUserCourse(t *testing.T) db.UserCourse {
 	user := createRandomUser(t)
@@ -140,6 +102,8 @@ func TestDeleteUserCourse(t *testing.T) {
 func TestGetUserCourseFull(t *testing.T) {
 	user := createRandomUser(t)
 	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
+	exercise := createRandomExercise(t, &lesson)
 
 	// Create user course
 	userCourseParams := db.CreateUserCourseParams{
@@ -150,9 +114,6 @@ func TestGetUserCourseFull(t *testing.T) {
 	_, err := testQueries.CreateUserCourse(context.Background(), userCourseParams)
 	require.NoError(t, err)
 
-	// Create lesson
-	lesson := createRandomLessonWithCourse(t, course)
-
 	// Create user lesson
 	userLessonParams := db.CreateUserLessonParams{
 		UserUuid:    user.Uuid,
@@ -161,9 +122,6 @@ func TestGetUserCourseFull(t *testing.T) {
 	}
 	_, err = testQueries.CreateUserLesson(context.Background(), userLessonParams)
 	require.NoError(t, err)
-
-	// Create exercise
-	exercise := createRandomExerciseWithLesson(t, lesson)
 
 	// Create user exercise
 	submission := json.RawMessage(`{"answer": "test"}`)
@@ -201,6 +159,8 @@ func TestGetUserCourseFull(t *testing.T) {
 func TestGetUserCourseFullWithCompletedItems(t *testing.T) {
 	user := createRandomUser(t)
 	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
+	exercise := createRandomExercise(t, &lesson)
 	now := time.Now()
 
 	// Create completed user course
@@ -212,9 +172,6 @@ func TestGetUserCourseFullWithCompletedItems(t *testing.T) {
 	_, err := testQueries.CreateUserCourse(context.Background(), userCourseParams)
 	require.NoError(t, err)
 
-	// Create lesson
-	lesson := createRandomLessonWithCourse(t, course)
-
 	// Create completed user lesson
 	userLessonParams := db.CreateUserLessonParams{
 		UserUuid:    user.Uuid,
@@ -223,9 +180,6 @@ func TestGetUserCourseFullWithCompletedItems(t *testing.T) {
 	}
 	_, err = testQueries.CreateUserLesson(context.Background(), userLessonParams)
 	require.NoError(t, err)
-
-	// Create exercise
-	exercise := createRandomExerciseWithLesson(t, lesson)
 
 	// Create completed user exercise
 	submission := json.RawMessage(`{"answer": "test"}`)

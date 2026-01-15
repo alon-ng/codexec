@@ -24,19 +24,30 @@ CREATE TABLE IF NOT EXISTS "courses" (
     "created_at"    TIMESTAMP       NOT NULL    DEFAULT NOW(),
     "modified_at"   TIMESTAMP       NOT NULL    DEFAULT NOW(),
     "deleted_at"    TIMESTAMP       NULL,
-    "name"		    VARCHAR(255)	NOT NULL	UNIQUE,
-	"description"	TEXT	    	NOT NULL,
 	"subject"		VARCHAR(255)	NOT NULL,
 	"price"		    SMALLINT		NOT NULL,
 	"discount"	    SMALLINT		NOT NULL    DEFAULT 0,
 	"is_active"	    BOOLEAN			NOT NULL	DEFAULT FALSE,
-	"difficulty"    SMALLINT		NOT NULL	DEFAULT 0,
-	"bullets"		TEXT        	NOT NULL	DEFAULT ''
+	"difficulty"    SMALLINT		NOT NULL	DEFAULT 0
 );
 
 CREATE INDEX idx_courses_deleted_at  ON "courses" ("deleted_at");
 CREATE INDEX idx_courses_created_at  ON "courses" ("created_at");
 CREATE INDEX idx_courses_difficulty  ON "courses" ("difficulty");
+
+-- course_translations
+CREATE TABLE IF NOT EXISTS "course_translations" (
+    "uuid"          UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "course_uuid"   UUID            NOT NULL,
+    "language"      VARCHAR(2)      NOT NULL,
+    "name"          VARCHAR(255)    NOT NULL,
+    "description"   TEXT            NOT NULL,
+    "bullets"       TEXT            NOT NULL    DEFAULT '',
+    CONSTRAINT fk_course_translations_course FOREIGN KEY ("course_uuid") REFERENCES "courses"("uuid") ON DELETE CASCADE
+);
+
+CREATE INDEX        idx_course_translations_language        ON "course_translations" ("language");
+CREATE UNIQUE INDEX uq_course_translations_course_language  ON "course_translations" ("course_uuid", "language");
 
 -- lessons
 CREATE TABLE IF NOT EXISTS "lessons" (
@@ -45,8 +56,6 @@ CREATE TABLE IF NOT EXISTS "lessons" (
     "modified_at"   TIMESTAMP       NOT NULL    DEFAULT NOW(),
     "deleted_at"    TIMESTAMP       NULL,
     "course_uuid"   UUID            NOT NULL,
-    "name"		    VARCHAR(128)	NOT NULL	UNIQUE,
-    "description"	TEXT	    	NOT NULL,
     "order_index"	SMALLINT		NOT NULL,
     "is_public"	    BOOLEAN			NOT NULL	DEFAULT FALSE,
     CONSTRAINT fk_lessons_course FOREIGN KEY ("course_uuid") REFERENCES "courses"("uuid") ON DELETE CASCADE
@@ -57,6 +66,18 @@ CREATE INDEX idx_lessons_created_at  ON "lessons" ("created_at");
 CREATE INDEX idx_lessons_course_uuid ON "lessons" ("course_uuid");
 CREATE INDEX idx_lessons_order_index ON "lessons" ("order_index");
 
+-- lesson_translations
+CREATE TABLE IF NOT EXISTS "lesson_translations" (
+    "uuid"          UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "lesson_uuid"   UUID            NOT NULL,
+    "language"      VARCHAR(2)      NOT NULL,
+    "name"          VARCHAR(255)    NOT NULL,
+    "description"   TEXT            NOT NULL,
+    CONSTRAINT fk_lesson_translations_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE
+);
+
+CREATE INDEX        idx_lesson_translations_language        ON "lesson_translations" ("language");
+CREATE UNIQUE INDEX uq_lesson_translations_lesson_language  ON "lesson_translations" ("lesson_uuid", "language");
 CREATE TYPE exercise_type AS ENUM ('quiz', 'code');
 
 -- exercises
@@ -66,8 +87,6 @@ CREATE TABLE IF NOT EXISTS "exercises" (
     "modified_at"   TIMESTAMP       NOT NULL    DEFAULT NOW(),
     "deleted_at"    TIMESTAMP       NULL,
     "lesson_uuid"   UUID            NOT NULL,
-    "name"		    VARCHAR(128)	NOT NULL	UNIQUE,
-    "description"	TEXT	    	NOT NULL,
     "order_index"	SMALLINT		NOT NULL,
     "reward"	    SMALLINT		NOT NULL,
     "type"          exercise_type   NOT NULL,
@@ -79,6 +98,19 @@ CREATE INDEX idx_exercises_deleted_at  ON "exercises" ("deleted_at");
 CREATE INDEX idx_exercises_created_at  ON "exercises" ("created_at");
 CREATE INDEX idx_exercises_lesson_uuid ON "exercises" ("lesson_uuid");
 CREATE INDEX idx_exercises_order_index ON "exercises" ("order_index");
+
+-- exercise_translations
+CREATE TABLE IF NOT EXISTS "exercise_translations" (
+    "uuid"          UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "exercise_uuid" UUID            NOT NULL,
+    "language"      VARCHAR(2)      NOT NULL,
+    "name"          VARCHAR(255)    NOT NULL,
+    "description"   TEXT            NOT NULL,
+    CONSTRAINT fk_exercise_translations_exercise FOREIGN KEY ("exercise_uuid") REFERENCES "exercises"("uuid") ON DELETE CASCADE
+);
+
+CREATE INDEX        idx_exercise_translations_language          ON "exercise_translations" ("language");
+CREATE UNIQUE INDEX uq_exercise_translations_exercise_language  ON "exercise_translations" ("exercise_uuid", "language");
 
 -- user_courses
 CREATE TABLE IF NOT EXISTS "user_courses" (

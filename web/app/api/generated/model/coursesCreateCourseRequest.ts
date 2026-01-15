@@ -12,6 +12,7 @@ export interface CoursesCreateCourseRequest {
   difficulty?: number;
   discount?: number;
   is_active?: boolean;
+  language: string;
   name: string;
   price: number;
   subject: string;

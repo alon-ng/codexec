@@ -17,23 +17,31 @@ type Querier interface {
 	CountLessonsByCourse(ctx context.Context, courseUuid uuid.UUID) (int64, error)
 	CountUsers(ctx context.Context) (int64, error)
 	CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error)
+	CreateCourseTranslation(ctx context.Context, arg CreateCourseTranslationParams) (CourseTranslation, error)
 	CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error)
+	CreateExerciseTranslation(ctx context.Context, arg CreateExerciseTranslationParams) (ExerciseTranslation, error)
 	CreateLesson(ctx context.Context, arg CreateLessonParams) (Lesson, error)
+	CreateLessonTranslation(ctx context.Context, arg CreateLessonTranslationParams) (LessonTranslation, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateUserCourse(ctx context.Context, arg CreateUserCourseParams) (UserCourse, error)
 	CreateUserExercise(ctx context.Context, arg CreateUserExerciseParams) (UserExercise, error)
 	CreateUserLesson(ctx context.Context, arg CreateUserLessonParams) (UserLesson, error)
 	DeleteCourse(ctx context.Context, argUuid uuid.UUID) error
+	DeleteCourseTranslation(ctx context.Context, argUuid uuid.UUID) error
 	DeleteExercise(ctx context.Context, argUuid uuid.UUID) error
+	DeleteExerciseTranslation(ctx context.Context, argUuid uuid.UUID) error
 	DeleteLesson(ctx context.Context, argUuid uuid.UUID) error
+	DeleteLessonTranslation(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUser(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUserCourse(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUserExercise(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUserLesson(ctx context.Context, argUuid uuid.UUID) error
-	GetCourse(ctx context.Context, argUuid uuid.UUID) (Course, error)
-	GetCourseByName(ctx context.Context, name string) (Course, error)
-	GetExercise(ctx context.Context, argUuid uuid.UUID) (Exercise, error)
-	GetLesson(ctx context.Context, argUuid uuid.UUID) (Lesson, error)
+	GetCourse(ctx context.Context, arg GetCourseParams) (GetCourseRow, error)
+	GetCourseTranslation(ctx context.Context, argUuid uuid.UUID) (GetCourseTranslationRow, error)
+	GetExercise(ctx context.Context, arg GetExerciseParams) (GetExerciseRow, error)
+	GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID) (GetExerciseTranslationRow, error)
+	GetLesson(ctx context.Context, arg GetLessonParams) (GetLessonRow, error)
+	GetLessonTranslation(ctx context.Context, argUuid uuid.UUID) (GetLessonTranslationRow, error)
 	GetUser(ctx context.Context, argUuid uuid.UUID) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserExercise(ctx context.Context, argUuid uuid.UUID) (UserExercise, error)
@@ -44,23 +52,26 @@ type Querier interface {
 	HardDeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 	HardDeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	HardDeleteUser(ctx context.Context, argUuid uuid.UUID) error
-	ListCourses(ctx context.Context, arg ListCoursesParams) ([]Course, error)
-	ListExercises(ctx context.Context, arg ListExercisesParams) ([]Exercise, error)
-	ListLessons(ctx context.Context, arg ListLessonsParams) ([]Lesson, error)
+	ListCourses(ctx context.Context, arg ListCoursesParams) ([]ListCoursesRow, error)
+	ListExercises(ctx context.Context, arg ListExercisesParams) ([]ListExercisesRow, error)
+	ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	UndeleteCourse(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteUser(ctx context.Context, argUuid uuid.UUID) error
 	UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Course, error)
+	UpdateCourseTranslation(ctx context.Context, arg UpdateCourseTranslationParams) (CourseTranslation, error)
 	UpdateExercise(ctx context.Context, arg UpdateExerciseParams) (Exercise, error)
+	UpdateExerciseTranslation(ctx context.Context, arg UpdateExerciseTranslationParams) (ExerciseTranslation, error)
 	UpdateLesson(ctx context.Context, arg UpdateLessonParams) (Lesson, error)
+	UpdateLessonTranslation(ctx context.Context, arg UpdateLessonTranslationParams) (LessonTranslation, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UpdateUserCourse(ctx context.Context, arg UpdateUserCourseParams) (UserCourse, error)
 	UpdateUserExercise(ctx context.Context, arg UpdateUserExerciseParams) (UserExercise, error)
 	UpdateUserLesson(ctx context.Context, arg UpdateUserLessonParams) (UserLesson, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)
-	getCourseFull(ctx context.Context, argUuid uuid.UUID) ([]getCourseFullRow, error)
+	getCourseFull(ctx context.Context, arg getCourseFullParams) ([]getCourseFullRow, error)
 	getUserCourseFull(ctx context.Context, arg getUserCourseFullParams) ([]getUserCourseFullRow, error)
 }
 

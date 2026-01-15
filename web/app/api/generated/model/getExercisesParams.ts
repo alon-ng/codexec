@@ -19,4 +19,8 @@ export type GetExercisesParams = {
    * Filter by lesson UUID
    */
   lesson_uuid?: string;
+  /**
+   * Filter by language
+   */
+  language?: string;
 };

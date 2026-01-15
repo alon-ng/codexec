@@ -32,6 +32,30 @@ definitions:
     - last_name
     - password
     type: object
+  courses.AddCourseTranslationRequest:
+    properties:
+      bullets:
+        example: |-
+          Aprende lo básico
+          Practica ejercicios
+        type: string
+      course_uuid:
+        type: string
+      description:
+        example: Aprende los fundamentos de Python
+        type: string
+      language:
+        example: es
+        type: string
+      name:
+        example: Introducción a Python
+        type: string
+    required:
+    - course_uuid
+    - description
+    - language
+    - name
+    type: object
   courses.CreateCourseRequest:
     properties:
       bullets:
@@ -51,6 +75,9 @@ definitions:
       is_active:
         example: true
         type: boolean
+      language:
+        example: en
+        type: string
       name:
         example: Introduction to Python
         type: string
@@ -62,6 +89,7 @@ definitions:
         type: string
     required:
     - description
+    - language
     - name
     - price
     - subject
@@ -92,6 +120,9 @@ definitions:
       is_active:
         example: true
         type: boolean
+      language:
+        example: en
+        type: string
       name:
         example: Introduction to Python
         type: string
@@ -104,44 +135,16 @@ definitions:
       uuid:
         type: string
     required:
+    - description
+    - language
+    - name
     - uuid
-    type: object
-  db.Course:
-    properties:
-      bullets:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      description:
-        type: string
-      difficulty:
-        type: integer
-      discount:
-        type: integer
-      is_active:
-        type: boolean
-      modified_at:
-        type: string
-      name:
-        type: string
-      price:
-        type: integer
-      subject:
-        type: string
-      uuid:
-        type: string
     type: object
   db.CourseFull:
     properties:
-      bullets:
-        type: string
       created_at:
         type: string
       deleted_at:
-        type: string
-      description:
         type: string
       difficulty:
         type: integer
@@ -155,37 +158,63 @@ definitions:
         type: array
       modified_at:
         type: string
+      price:
+        type: integer
+      subject:
+        type: string
+      translation:
+        $ref: '#/definitions/db.CourseTranslation'
+      uuid:
+        type: string
+    type: object
+  db.CourseTranslation:
+    properties:
+      bullets:
+        type: string
+      course_uuid:
+        type: string
+      description:
+        type: string
+      language:
+        type: string
       name:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.CourseWithTranslation:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      difficulty:
+        type: integer
+      discount:
+        type: integer
+      is_active:
+        type: boolean
+      modified_at:
         type: string
       price:
         type: integer
       subject:
         type: string
+      translation:
+        $ref: '#/definitions/db.CourseTranslation'
       uuid:
         type: string
     type: object
-  db.Exercise:
+  db.ExerciseTranslation:
     properties:
-      created_at:
-        type: string
-      data:
-        type: object
-      deleted_at:
-        type: string
       description:
         type: string
-      lesson_uuid:
+      exercise_uuid:
         type: string
-      modified_at:
+      language:
         type: string
       name:
         type: string
-      order_index:
-        type: integer
-      reward:
-        type: integer
-      type:
-        $ref: '#/definitions/db.ExerciseType'
       uuid:
         type: string
     type: object
@@ -197,24 +226,26 @@ definitions:
     x-enum-varnames:
     - ExerciseTypeQuiz
     - ExerciseTypeCode
-  db.Lesson:
+  db.ExerciseWithTranslation:
     properties:
-      course_uuid:
-        type: string
       created_at:
         type: string
+      data:
+        type: object
       deleted_at:
         type: string
-      description:
+      lesson_uuid:
         type: string
-      is_public:
-        type: boolean
       modified_at:
-        type: string
-      name:
         type: string
       order_index:
         type: integer
+      reward:
+        type: integer
+      translation:
+        $ref: '#/definitions/db.ExerciseTranslation'
+      type:
+        $ref: '#/definitions/db.ExerciseType'
       uuid:
         type: string
     type: object
@@ -226,20 +257,50 @@ definitions:
         type: string
       deleted_at:
         type: string
-      description:
-        type: string
       exercises:
         items:
-          $ref: '#/definitions/db.Exercise'
+          $ref: '#/definitions/db.ExerciseWithTranslation'
         type: array
       is_public:
         type: boolean
       modified_at:
         type: string
+      order_index:
+        type: integer
+      translation:
+        $ref: '#/definitions/db.LessonTranslation'
+      uuid:
+        type: string
+    type: object
+  db.LessonTranslation:
+    properties:
+      description:
+        type: string
+      language:
+        type: string
+      lesson_uuid:
+        type: string
       name:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.LessonWithTranslation:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      is_public:
+        type: boolean
+      modified_at:
         type: string
       order_index:
         type: integer
+      translation:
+        $ref: '#/definitions/db.LessonTranslation'
       uuid:
         type: string
     type: object
@@ -279,6 +340,25 @@ definitions:
         example: Error message describing what went wrong
         type: string
     type: object
+  exercises.AddExerciseTranslationRequest:
+    properties:
+      description:
+        example: Imprime Hola Mundo
+        type: string
+      exercise_uuid:
+        type: string
+      language:
+        example: es
+        type: string
+      name:
+        example: Hola Mundo
+        type: string
+    required:
+    - description
+    - exercise_uuid
+    - language
+    - name
+    type: object
   exercises.CreateExerciseRequest:
     properties:
       data:
@@ -286,6 +366,9 @@ definitions:
         type: object
       description:
         example: Print Hello World
+        type: string
+      language:
+        example: en
         type: string
       lesson_uuid:
         type: string
@@ -298,13 +381,19 @@ definitions:
       reward:
         example: 10
         type: integer
+      type:
+        allOf:
+        - $ref: '#/definitions/db.ExerciseType'
+        example: quiz
     required:
     - data
     - description
+    - language
     - lesson_uuid
     - name
     - order_index
     - reward
+    - type
     type: object
   exercises.IDRequest:
     properties:
@@ -320,6 +409,9 @@ definitions:
         type: object
       description:
         example: Print Hello World
+        type: string
+      language:
+        example: en
         type: string
       lesson_uuid:
         example: 123e4567-e89b-12d3-a456-426614174000
@@ -338,6 +430,25 @@ definitions:
     required:
     - uuid
     type: object
+  lessons.AddLessonTranslationRequest:
+    properties:
+      description:
+        example: Aprende los fundamentos de Python
+        type: string
+      language:
+        example: es
+        type: string
+      lesson_uuid:
+        type: string
+      name:
+        example: Fundamentos de Python
+        type: string
+    required:
+    - description
+    - language
+    - lesson_uuid
+    - name
+    type: object
   lessons.CreateLessonRequest:
     properties:
       course_uuid:
@@ -348,6 +459,9 @@ definitions:
       is_public:
         example: false
         type: boolean
+      language:
+        example: en
+        type: string
       name:
         example: Python Basics
         type: string
@@ -357,6 +471,7 @@ definitions:
     required:
     - course_uuid
     - description
+    - language
     - name
     - order_index
     type: object
@@ -378,6 +493,9 @@ definitions:
       is_public:
         example: false
         type: boolean
+      language:
+        example: en
+        type: string
       name:
         example: Python Basics
         type: string
@@ -552,6 +670,18 @@ paths:
         in: query
         name: subject
         type: string
+      - default: en
+        description: Filter by language
+        example: en
+        in: query
+        name: language
+        type: string
+      - default: true
+        description: Filter by is_active
+        example: true
+        in: query
+        name: is_active
+        type: boolean
       produces:
       - application/json
       responses:
@@ -559,7 +689,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.Course'
+              $ref: '#/definitions/db.CourseWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -589,6 +719,11 @@ paths:
         name: uuid
         required: true
         type: string
+      - default: en
+        description: Language
+        in: query
+        name: language
+        type: string
       produces:
       - application/json
       responses:
@@ -617,6 +752,42 @@ paths:
       summary: Get a course by UUID
       tags:
       - courses
+  /courses/add-translation:
+    post:
+      consumes:
+      - application/json
+      description: Add a new translation for an existing course
+      parameters:
+      - description: Translation data
+        in: body
+        name: translation
+        required: true
+        schema:
+          $ref: '#/definitions/courses.AddCourseTranslationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.CourseTranslation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Add a translation to an existing course
+      tags:
+      - courses
   /courses/create:
     post:
       consumes:
@@ -635,7 +806,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.Course'
+            $ref: '#/definitions/db.CourseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -746,7 +917,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Course'
+            $ref: '#/definitions/db.CourseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -785,6 +956,11 @@ paths:
         in: query
         name: lesson_uuid
         type: string
+      - default: en
+        description: Filter by language
+        in: query
+        name: language
+        type: string
       produces:
       - application/json
       responses:
@@ -792,7 +968,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.Exercise'
+              $ref: '#/definitions/db.ExerciseWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -822,13 +998,19 @@ paths:
         name: uuid
         required: true
         type: string
+      - default: en
+        description: Language
+        example: en
+        in: query
+        name: language
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Exercise'
+            $ref: '#/definitions/db.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -850,6 +1032,42 @@ paths:
       summary: Get an exercise by UUID
       tags:
       - exercises
+  /exercises/add-translation:
+    post:
+      consumes:
+      - application/json
+      description: Add a new translation for an existing exercise
+      parameters:
+      - description: Translation data
+        in: body
+        name: translation
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.AddExerciseTranslationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.ExerciseTranslation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Add a translation to an existing exercise
+      tags:
+      - exercises
   /exercises/create:
     post:
       consumes:
@@ -868,7 +1086,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.Exercise'
+            $ref: '#/definitions/db.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -979,7 +1197,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Exercise'
+            $ref: '#/definitions/db.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1025,7 +1243,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.Lesson'
+              $ref: '#/definitions/db.LessonWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -1055,13 +1273,19 @@ paths:
         name: uuid
         required: true
         type: string
+      - default: en
+        description: Language
+        example: en
+        in: query
+        name: language
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Lesson'
+            $ref: '#/definitions/db.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1083,6 +1307,42 @@ paths:
       summary: Get a lesson by UUID
       tags:
       - lessons
+  /lessons/add-translation:
+    post:
+      consumes:
+      - application/json
+      description: Add a new translation for an existing lesson
+      parameters:
+      - description: Translation data
+        in: body
+        name: translation
+        required: true
+        schema:
+          $ref: '#/definitions/lessons.AddLessonTranslationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.LessonTranslation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Add a translation to an existing lesson
+      tags:
+      - lessons
   /lessons/create:
     post:
       consumes:
@@ -1101,7 +1361,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.Lesson'
+            $ref: '#/definitions/db.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1212,7 +1472,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.Lesson'
+            $ref: '#/definitions/db.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:

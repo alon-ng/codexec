@@ -8,14 +8,16 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Service struct {
 	q *db.Queries
+	p *pgxpool.Pool
 }
 
-func NewService(q *db.Queries) *Service {
-	return &Service{q: q}
+func NewService(q *db.Queries, p *pgxpool.Pool) *Service {
+	return &Service{q: q, p: p}
 }
 
 func (s *Service) Create(ctx context.Context, req CreateUserRequest) (db.User, *e.APIError) {

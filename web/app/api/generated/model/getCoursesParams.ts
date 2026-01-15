@@ -19,4 +19,12 @@ export type GetCoursesParams = {
    * Filter by subject
    */
   subject?: string;
+  /**
+   * Filter by language
+   */
+  language?: string;
+  /**
+   * Filter by is_active
+   */
+  is_active?: boolean;
 };

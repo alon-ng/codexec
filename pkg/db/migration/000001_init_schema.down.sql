@@ -26,6 +26,11 @@ DROP INDEX IF EXISTS uq_users_email;
 
 DROP TABLE IF EXISTS users;
 
+-- exercise_translations
+DROP INDEX IF EXISTS idx_exercise_translations_language;
+DROP INDEX IF EXISTS uq_exercise_translations_exercise_language;
+DROP TABLE IF EXISTS exercise_translations;
+
 -- exercises
 DROP INDEX IF EXISTS idx_exercises_deleted_at;
 DROP INDEX IF EXISTS idx_exercises_created_at;
@@ -35,6 +40,11 @@ DROP INDEX IF EXISTS idx_exercises_order_index;
 DROP TABLE IF EXISTS exercises;
 DROP TYPE IF EXISTS exercise_type;
 
+-- lesson_translations
+DROP INDEX IF EXISTS idx_lesson_translations_language;
+DROP INDEX IF EXISTS uq_lesson_translations_lesson_language;
+DROP TABLE IF EXISTS lesson_translations;
+
 -- lessons
 DROP INDEX IF EXISTS idx_lessons_deleted_at;
 DROP INDEX IF EXISTS idx_lessons_created_at;
@@ -42,6 +52,11 @@ DROP INDEX IF EXISTS idx_lessons_course_uuid;
 DROP INDEX IF EXISTS idx_lessons_order_index;
 
 DROP TABLE IF EXISTS lessons;
+
+-- course_translations
+DROP INDEX IF EXISTS idx_course_translations_language;
+DROP INDEX IF EXISTS uq_course_translations_course_language;
+DROP TABLE IF EXISTS course_translations;
 
 -- courses
 DROP INDEX IF EXISTS idx_courses_deleted_at;

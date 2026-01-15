@@ -16,6 +16,22 @@ export default defineConfig({
           path: 'app/lib/axios.ts',
           name: 'customInstance',
         },
+        operations: {},
+        schemas: {
+          'db.CourseWithTranslation': {
+            required: [
+              'uuid',
+              'created_at',
+              'modified_at',
+              'subject',
+              'price',
+              'discount',
+              'is_active',
+              'difficulty',
+              'translation',
+            ],
+          },
+        },
       },
       prettier: true,
     },

@@ -13,17 +13,17 @@ import { motion } from "motion/react";
 import { blurInVariants } from "~/utils/animations";
 
 export default function Course({ params }: Route.ComponentProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const { data, isLoading, error } = useQuery({
         queryKey: ['course', params.uuid],
-        queryFn: () => getCoursesUuid(params.uuid),
+        queryFn: () => getCoursesUuid(params.uuid, { language: i18n.language }),
     });
 
     const breadcrumbs: BreadcrumbProps[] = [
         { label: "navigation.home", to: "/" },
         { label: "navigation.courses", to: "/courses" },
-        { label: t(data?.name || "common.loading"), to: isLoading ? undefined : `/courses/${params.uuid}` },
+        { label: data?.translation?.name || t("common.loading"), to: isLoading ? undefined : `/courses/${params.uuid}` },
     ]
 
     useEffect(() => {
@@ -40,9 +40,9 @@ export default function Course({ params }: Route.ComponentProps) {
 
     return (
         <div className="flex flex-col h-full">
-            <PageHeader title={t(data.name!)} breadcrumbs={breadcrumbs} />
+            <PageHeader title={data.translation?.name!} breadcrumbs={breadcrumbs} />
             <div className="flex justify-between gap-4">
-                <div>{data.description}</div>
+                <div>{data.translation?.description}</div>
                 <motion.div variants={blurInVariants(0.2)} initial="hidden" animate="visible">
                     <Card className="w-64">
                         <CardContent className="flex flex-col gap-2">
@@ -56,10 +56,10 @@ export default function Course({ params }: Route.ComponentProps) {
                                     <Award className="w-4 h-4" /> {t("course.certificateNote")}
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-500 text-sm">
-                                    <BookMarked className="w-4 h-4" /> {data.lessons!.length} {t("course.lessonsNote")}
+                                    <BookMarked className="w-4 h-4" /> {data.lessons?.length ?? 0} {t("course.lessonsNote")}
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-500 text-sm">
-                                    <BadgeCheck className="w-4 h-4" /> {data.lessons!.map((lesson) => lesson.exercises!).flat().length} {t("course.exerciesNote")}
+                                    <BadgeCheck className="w-4 h-4" /> {data.lessons?.map((lesson) => lesson.exercises?.length ?? 0).flat().reduce((a, b) => a + b, 0)} {t("course.exerciesNote")}
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                                     <Clock className="w-4 h-4" /> 15 {t("course.durationNote")}

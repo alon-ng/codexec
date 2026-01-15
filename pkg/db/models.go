@@ -56,44 +56,62 @@ func (ns NullExerciseType) Value() (driver.Value, error) {
 }
 
 type Course struct {
-	Uuid        uuid.UUID  `json:"uuid"`
-	CreatedAt   time.Time  `json:"created_at"`
-	ModifiedAt  time.Time  `json:"modified_at"`
-	DeletedAt   *time.Time `json:"deleted_at"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	Subject     string     `json:"subject"`
-	Price       int16      `json:"price"`
-	Discount    int16      `json:"discount"`
-	IsActive    bool       `json:"is_active"`
-	Difficulty  int16      `json:"difficulty"`
-	Bullets     string     `json:"bullets"`
+	Uuid       uuid.UUID  `json:"uuid"`
+	CreatedAt  time.Time  `json:"created_at"`
+	ModifiedAt time.Time  `json:"modified_at"`
+	DeletedAt  *time.Time `json:"deleted_at"`
+	Subject    string     `json:"subject"`
+	Price      int16      `json:"price"`
+	Discount   int16      `json:"discount"`
+	IsActive   bool       `json:"is_active"`
+	Difficulty int16      `json:"difficulty"`
+}
+
+type CourseTranslation struct {
+	Uuid        uuid.UUID `json:"uuid"`
+	CourseUuid  uuid.UUID `json:"course_uuid"`
+	Language    string    `json:"language"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Bullets     string    `json:"bullets"`
 }
 
 type Exercise struct {
-	Uuid        uuid.UUID       `json:"uuid"`
-	CreatedAt   time.Time       `json:"created_at"`
-	ModifiedAt  time.Time       `json:"modified_at"`
-	DeletedAt   *time.Time      `json:"deleted_at"`
-	LessonUuid  uuid.UUID       `json:"lesson_uuid"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	OrderIndex  int16           `json:"order_index"`
-	Reward      int16           `json:"reward"`
-	Type        ExerciseType    `json:"type"`
-	Data        json.RawMessage `json:"data"`
+	Uuid       uuid.UUID       `json:"uuid"`
+	CreatedAt  time.Time       `json:"created_at"`
+	ModifiedAt time.Time       `json:"modified_at"`
+	DeletedAt  *time.Time      `json:"deleted_at"`
+	LessonUuid uuid.UUID       `json:"lesson_uuid"`
+	OrderIndex int16           `json:"order_index"`
+	Reward     int16           `json:"reward"`
+	Type       ExerciseType    `json:"type"`
+	Data       json.RawMessage `json:"data"`
+}
+
+type ExerciseTranslation struct {
+	Uuid         uuid.UUID `json:"uuid"`
+	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
+	Language     string    `json:"language"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
 }
 
 type Lesson struct {
-	Uuid        uuid.UUID  `json:"uuid"`
-	CreatedAt   time.Time  `json:"created_at"`
-	ModifiedAt  time.Time  `json:"modified_at"`
-	DeletedAt   *time.Time `json:"deleted_at"`
-	CourseUuid  uuid.UUID  `json:"course_uuid"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	OrderIndex  int16      `json:"order_index"`
-	IsPublic    bool       `json:"is_public"`
+	Uuid       uuid.UUID  `json:"uuid"`
+	CreatedAt  time.Time  `json:"created_at"`
+	ModifiedAt time.Time  `json:"modified_at"`
+	DeletedAt  *time.Time `json:"deleted_at"`
+	CourseUuid uuid.UUID  `json:"course_uuid"`
+	OrderIndex int16      `json:"order_index"`
+	IsPublic   bool       `json:"is_public"`
+}
+
+type LessonTranslation struct {
+	Uuid        uuid.UUID `json:"uuid"`
+	LessonUuid  uuid.UUID `json:"lesson_uuid"`
+	Language    string    `json:"language"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
 }
 
 type User struct {

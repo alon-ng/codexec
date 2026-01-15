@@ -8,50 +8,97 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Service struct {
 	q *db.Queries
+	p *pgxpool.Pool
 }
 
-func NewService(q *db.Queries) *Service {
-	return &Service{q: q}
+func NewService(q *db.Queries, p *pgxpool.Pool) *Service {
+	return &Service{q: q, p: p}
 }
 
-func (s *Service) Create(ctx context.Context, req CreateLessonRequest) (db.Lesson, *e.APIError) {
-	lesson, err := s.q.CreateLesson(ctx, db.CreateLessonParams{
-		CourseUuid:  req.CourseUuid,
-		Name:        req.Name,
-		Description: req.Description,
-		OrderIndex:  req.OrderIndex,
-		IsPublic:    req.IsPublic,
+func (s *Service) Create(ctx context.Context, req CreateLessonRequest) (db.LessonWithTranslation, *e.APIError) {
+	tx, err := s.p.Begin(ctx)
+	if err != nil {
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonCreationFailed)
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := s.q.WithTx(tx)
+
+	lesson, err := qtx.CreateLesson(ctx, db.CreateLessonParams{
+		CourseUuid: req.CourseUuid,
+		OrderIndex: req.OrderIndex,
+		IsPublic:   req.IsPublic,
 	})
 
 	if err != nil {
-		if db.IsDuplicateKeyErrorWithConstraint(err, "lessons_name_key") {
-			return db.Lesson{}, e.NewAPIError(err, ErrLessonNameAlreadyExists)
-		}
-		return db.Lesson{}, e.NewAPIError(err, ErrLessonCreationFailed)
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonCreationFailed)
 	}
 
-	return lesson, nil
+	translation, err := qtx.CreateLessonTranslation(ctx, db.CreateLessonTranslationParams{
+		LessonUuid:  lesson.Uuid,
+		Language:    req.Language,
+		Name:        req.Name,
+		Description: req.Description,
+	})
+	if err != nil {
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonTranslationCreationFailed)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonCreationFailed)
+	}
+
+	return db.LessonWithTranslation{
+		Lesson:      lesson,
+		Translation: translation,
+	}, nil
 }
 
-func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateLessonRequest) (db.Lesson, *e.APIError) {
-	lesson, err := s.q.UpdateLesson(ctx, db.UpdateLessonParams{
+func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateLessonRequest) (db.LessonWithTranslation, *e.APIError) {
+	tx, err := s.p.Begin(ctx)
+	if err != nil {
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonUpdateFailed)
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := s.q.WithTx(tx)
+
+	lesson, err := qtx.UpdateLesson(ctx, db.UpdateLessonParams{
+		Uuid:       id,
+		CourseUuid: req.CourseUuid,
+		OrderIndex: req.OrderIndex,
+		IsPublic:   req.IsPublic,
+	})
+
+	if err != nil {
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonUpdateFailed)
+	}
+
+	translation, err := qtx.UpdateLessonTranslation(ctx, db.UpdateLessonTranslationParams{
 		Uuid:        id,
-		CourseUuid:  req.CourseUuid,
+		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,
-		OrderIndex:  req.OrderIndex,
-		IsPublic:    req.IsPublic,
 	})
-
 	if err != nil {
-		return db.Lesson{}, e.NewAPIError(err, ErrLessonUpdateFailed)
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonTranslationUpdateFailed)
 	}
 
-	return lesson, nil
+	err = tx.Commit(ctx)
+	if err != nil {
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonUpdateFailed)
+	}
+
+	return db.LessonWithTranslation{
+		Lesson:      lesson,
+		Translation: translation,
+	}, nil
 }
 
 func (s *Service) Delete(ctx context.Context, id uuid.UUID) *e.APIError {
@@ -70,22 +117,22 @@ func (s *Service) Restore(ctx context.Context, id uuid.UUID) *e.APIError {
 	return nil
 }
 
-func (s *Service) Get(ctx context.Context, id uuid.UUID) (db.Lesson, *e.APIError) {
-	lesson, err := s.q.GetLesson(ctx, id)
+func (s *Service) Get(ctx context.Context, id uuid.UUID, language string) (db.LessonWithTranslation, *e.APIError) {
+	lesson, err := s.q.GetLesson(ctx, db.GetLessonParams{
+		Uuid:     id,
+		Language: language,
+	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return db.Lesson{}, e.NewAPIError(err, ErrLessonNotFound)
+			return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonNotFound)
 		}
-		return db.Lesson{}, e.NewAPIError(err, ErrLessonGetFailed)
+		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonGetFailed)
 	}
-	return lesson, nil
+	return lesson.ToLessonWithTranslation(), nil
 }
 
-func (s *Service) List(ctx context.Context, req ListLessonsRequest) ([]db.Lesson, *e.APIError) {
-	var lessons []db.Lesson
-	var err error
-
-	lessons, err = s.q.ListLessons(ctx, db.ListLessonsParams{
+func (s *Service) List(ctx context.Context, req ListLessonsRequest) ([]db.LessonWithTranslation, *e.APIError) {
+	lessons, err := s.q.ListLessons(ctx, db.ListLessonsParams{
 		CourseUuid: req.CourseUuid,
 		Limit:      req.Limit,
 		Offset:     req.Offset,
@@ -95,5 +142,25 @@ func (s *Service) List(ctx context.Context, req ListLessonsRequest) ([]db.Lesson
 		return nil, e.NewAPIError(err, ErrLessonListFailed)
 	}
 
-	return lessons, nil
+	lessonsWithTranslation := make([]db.LessonWithTranslation, len(lessons))
+	for i, lesson := range lessons {
+		lessonsWithTranslation[i] = lesson.ToLessonWithTranslation()
+	}
+
+	return lessonsWithTranslation, nil
+}
+
+func (s *Service) AddTranslation(ctx context.Context, req AddLessonTranslationRequest) (db.LessonTranslation, *e.APIError) {
+	translation, err := s.q.CreateLessonTranslation(ctx, db.CreateLessonTranslationParams{
+		LessonUuid:  req.LessonUuid,
+		Language:    req.Language,
+		Name:        req.Name,
+		Description: req.Description,
+	})
+
+	if err != nil {
+		return db.LessonTranslation{}, e.NewAPIError(err, ErrLessonAddTranslationFailed)
+	}
+
+	return translation, nil
 }

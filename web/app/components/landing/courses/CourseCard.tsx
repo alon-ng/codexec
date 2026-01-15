@@ -1,5 +1,5 @@
 
-import type { DbCourse } from "~/api/generated/model";
+import type { DbCourseWithTranslation } from "~/api/generated/model";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { courseIcons } from "~/utils/course";
@@ -9,7 +9,7 @@ import { ChevronsRightIcon, ShoppingCartIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 
 export interface CourseCardProps {
-    course?: DbCourse
+    course?: Required<DbCourseWithTranslation>
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
@@ -47,7 +47,7 @@ export default function CourseCard({ course }: CourseCardProps) {
             <CardHeader className="flex items-center gap-4">
                 <img src={courseIcons[course.subject as keyof typeof courseIcons]} alt={course.subject} className="h-10 w-10" />
                 <div>
-                    <CardTitle className="text-lg leading-none">{t(course.name!)}</CardTitle>
+                    <CardTitle className="text-lg leading-none">{course.translation.name}</CardTitle>
                     <div className="text-sm text-muted-foreground">
                         <span>{t("difficulty.title")}: </span>
                         {t(`difficulty.${course.difficulty}`)}
@@ -55,7 +55,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                 </div>
             </CardHeader>
             <CardContent className="text-sm flex-1">
-                <div>{t(course.description!)}</div>
+                <div>{course.translation.description}</div>
             </CardContent>
             <CardFooter className="flex items-center justify-between">
                 {

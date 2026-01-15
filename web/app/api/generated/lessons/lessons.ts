@@ -22,9 +22,12 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  DbLesson,
+  DbLessonTranslation,
+  DbLessonWithTranslation,
   ErrorsErrorResponse,
   GetLessonsParams,
+  GetLessonsUuidParams,
+  LessonsAddLessonTranslationRequest,
   LessonsCreateLessonRequest,
   LessonsIDRequest,
   LessonsUpdateRequest,
@@ -43,7 +46,7 @@ export const getLessons = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbLesson[]>(
+  return customInstance<DbLessonWithTranslation[]>(
     { url: `/lessons`, method: "GET", params, signal },
     options,
   );
@@ -178,6 +181,99 @@ export function useGetLessons<
 }
 
 /**
+ * Add a new translation for an existing lesson
+ * @summary Add a translation to an existing lesson
+ */
+export const postLessonsAddTranslation = (
+  lessonsAddLessonTranslationRequest: LessonsAddLessonTranslationRequest,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<DbLessonTranslation>(
+    {
+      url: `/lessons/add-translation`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: lessonsAddLessonTranslationRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostLessonsAddTranslationMutationOptions = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postLessonsAddTranslation>>,
+    TError,
+    { data: LessonsAddLessonTranslationRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postLessonsAddTranslation>>,
+  TError,
+  { data: LessonsAddLessonTranslationRequest },
+  TContext
+> => {
+  const mutationKey = ["postLessonsAddTranslation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postLessonsAddTranslation>>,
+    { data: LessonsAddLessonTranslationRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postLessonsAddTranslation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostLessonsAddTranslationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postLessonsAddTranslation>>
+>;
+export type PostLessonsAddTranslationMutationBody =
+  LessonsAddLessonTranslationRequest;
+export type PostLessonsAddTranslationMutationError = ErrorsErrorResponse;
+
+/**
+ * @summary Add a translation to an existing lesson
+ */
+export const usePostLessonsAddTranslation = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postLessonsAddTranslation>>,
+      TError,
+      { data: LessonsAddLessonTranslationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postLessonsAddTranslation>>,
+  TError,
+  { data: LessonsAddLessonTranslationRequest },
+  TContext
+> => {
+  const mutationOptions = getPostLessonsAddTranslationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * Create a new lesson
  * @summary Create a new lesson
  */
@@ -186,7 +282,7 @@ export const postLessonsCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbLesson>(
+  return customInstance<DbLessonWithTranslation>(
     {
       url: `/lessons/create`,
       method: "POST",
@@ -454,7 +550,7 @@ export const putLessonsUpdate = (
   lessonsUpdateRequest: LessonsUpdateRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<DbLesson>(
+  return customInstance<DbLessonWithTranslation>(
     {
       url: `/lessons/update`,
       method: "PUT",
@@ -542,17 +638,21 @@ export const usePutLessonsUpdate = <
  */
 export const getLessonsUuid = (
   uuid: string,
+  params?: GetLessonsUuidParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbLesson>(
-    { url: `/lessons/${uuid}`, method: "GET", signal },
+  return customInstance<DbLessonWithTranslation>(
+    { url: `/lessons/${uuid}`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetLessonsUuidQueryKey = (uuid?: string) => {
-  return [`/lessons/${uuid}`] as const;
+export const getGetLessonsUuidQueryKey = (
+  uuid?: string,
+  params?: GetLessonsUuidParams,
+) => {
+  return [`/lessons/${uuid}`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetLessonsUuidQueryOptions = <
@@ -560,6 +660,7 @@ export const getGetLessonsUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getLessonsUuid>>, TError, TData>
@@ -569,11 +670,12 @@ export const getGetLessonsUuidQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetLessonsUuidQueryKey(uuid);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetLessonsUuidQueryKey(uuid, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getLessonsUuid>>> = ({
     signal,
-  }) => getLessonsUuid(uuid, requestOptions, signal);
+  }) => getLessonsUuid(uuid, params, requestOptions, signal);
 
   return {
     queryKey,
@@ -597,6 +699,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params: undefined | GetLessonsUuidParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getLessonsUuid>>, TError, TData>
@@ -620,6 +723,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getLessonsUuid>>, TError, TData>
@@ -643,6 +747,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getLessonsUuid>>, TError, TData>
@@ -662,6 +767,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getLessonsUuid>>, TError, TData>
@@ -672,7 +778,7 @@ export function useGetLessonsUuid<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetLessonsUuidQueryOptions(uuid, options);
+  const queryOptions = getGetLessonsUuidQueryOptions(uuid, params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

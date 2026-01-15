@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course  body      CreateCourseRequest  true  "Course creation data"
-// @Success      201     {object}  db.Course
+// @Success      201     {object}  db.CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      409     {object}  errors.ErrorResponse
@@ -42,10 +42,6 @@ func (c *Controller) Create(ctx *gin.Context) {
 
 	course, err := c.svc.Create(ctx.Request.Context(), req)
 	if err != nil {
-		if err.ErrorMessage == ErrCourseNameAlreadyExists {
-			e.HandleError(ctx, c.log, err, http.StatusConflict)
-			return
-		}
 		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
 		return
 	}
@@ -61,7 +57,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course  body      UpdateRequest  true  "Course update data"
-// @Success      200     {object}  db.Course
+// @Success      200     {object}  db.CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -158,7 +154,9 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Param        limit   query     int     false  "Limit (default: 10)"  default(10)
 // @Param        offset  query     int     false  "Offset (default: 0)"  default(0)
 // @Param        subject query     string  false  "Filter by subject"
-// @Success      200     {array}   db.Course
+// @Param        language query     string  false  "Filter by language"  default(en) example(en)
+// @Param        is_active query     bool    false  "Filter by is_active"  default(true) example(true)
+// @Success      200     {array}   db.CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -186,7 +184,8 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Param        uuid  path      string  true  "Course UUID"
+// @Param        uuid  		path      string  true   "Course UUID"
+// @Param        language 	query     string  false  "Language"  default(en)
 // @Success      200   {object}  db.CourseFull
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
@@ -201,7 +200,12 @@ func (c *Controller) Get(ctx *gin.Context) {
 		return
 	}
 
-	course, err := c.svc.Get(ctx.Request.Context(), id)
+	language := ctx.Query("language")
+	if language == "" {
+		language = "en"
+	}
+
+	course, err := c.svc.Get(ctx.Request.Context(), id, language)
 	if err != nil {
 		if err.ErrorMessage == ErrCourseNotFound {
 			e.HandleError(ctx, c.log, err, http.StatusNotFound)
@@ -213,4 +217,33 @@ func (c *Controller) Get(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, course)
+}
+
+// AddTranslation godoc
+// @Summary      Add a translation to an existing course
+// @Description  Add a new translation for an existing course
+// @Tags         courses
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        translation  body      AddCourseTranslationRequest  true  "Translation data"
+// @Success      201          {object}  db.CourseTranslation
+// @Failure      400          {object}  errors.ErrorResponse
+// @Failure      401          {object}  errors.ErrorResponse
+// @Failure      500          {object}  errors.ErrorResponse
+// @Router       /courses/add-translation [post]
+func (c *Controller) AddTranslation(ctx *gin.Context) {
+	var req AddCourseTranslationRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
+		return
+	}
+
+	translation, err := c.svc.AddTranslation(ctx.Request.Context(), req)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(201, translation)
 }

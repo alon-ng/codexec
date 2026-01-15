@@ -22,13 +22,16 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  CoursesAddCourseTranslationRequest,
   CoursesCreateCourseRequest,
   CoursesIDRequest,
   CoursesUpdateRequest,
-  DbCourse,
   DbCourseFull,
+  DbCourseTranslation,
+  DbCourseWithTranslation,
   ErrorsErrorResponse,
   GetCoursesParams,
+  GetCoursesUuidParams,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -44,7 +47,7 @@ export const getCourses = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbCourse[]>(
+  return customInstance<DbCourseWithTranslation[]>(
     { url: `/courses`, method: "GET", params, signal },
     options,
   );
@@ -179,6 +182,99 @@ export function useGetCourses<
 }
 
 /**
+ * Add a new translation for an existing course
+ * @summary Add a translation to an existing course
+ */
+export const postCoursesAddTranslation = (
+  coursesAddCourseTranslationRequest: CoursesAddCourseTranslationRequest,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<DbCourseTranslation>(
+    {
+      url: `/courses/add-translation`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: coursesAddCourseTranslationRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostCoursesAddTranslationMutationOptions = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postCoursesAddTranslation>>,
+    TError,
+    { data: CoursesAddCourseTranslationRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postCoursesAddTranslation>>,
+  TError,
+  { data: CoursesAddCourseTranslationRequest },
+  TContext
+> => {
+  const mutationKey = ["postCoursesAddTranslation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postCoursesAddTranslation>>,
+    { data: CoursesAddCourseTranslationRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postCoursesAddTranslation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostCoursesAddTranslationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postCoursesAddTranslation>>
+>;
+export type PostCoursesAddTranslationMutationBody =
+  CoursesAddCourseTranslationRequest;
+export type PostCoursesAddTranslationMutationError = ErrorsErrorResponse;
+
+/**
+ * @summary Add a translation to an existing course
+ */
+export const usePostCoursesAddTranslation = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postCoursesAddTranslation>>,
+      TError,
+      { data: CoursesAddCourseTranslationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postCoursesAddTranslation>>,
+  TError,
+  { data: CoursesAddCourseTranslationRequest },
+  TContext
+> => {
+  const mutationOptions = getPostCoursesAddTranslationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * Create a new course
  * @summary Create a new course
  */
@@ -187,7 +283,7 @@ export const postCoursesCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbCourse>(
+  return customInstance<DbCourseWithTranslation>(
     {
       url: `/courses/create`,
       method: "POST",
@@ -455,7 +551,7 @@ export const putCoursesUpdate = (
   coursesUpdateRequest: CoursesUpdateRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<DbCourse>(
+  return customInstance<DbCourseWithTranslation>(
     {
       url: `/courses/update`,
       method: "PUT",
@@ -543,17 +639,21 @@ export const usePutCoursesUpdate = <
  */
 export const getCoursesUuid = (
   uuid: string,
+  params?: GetCoursesUuidParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<DbCourseFull>(
-    { url: `/courses/${uuid}`, method: "GET", signal },
+    { url: `/courses/${uuid}`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetCoursesUuidQueryKey = (uuid?: string) => {
-  return [`/courses/${uuid}`] as const;
+export const getGetCoursesUuidQueryKey = (
+  uuid?: string,
+  params?: GetCoursesUuidParams,
+) => {
+  return [`/courses/${uuid}`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetCoursesUuidQueryOptions = <
@@ -561,6 +661,7 @@ export const getGetCoursesUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetCoursesUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCoursesUuid>>, TError, TData>
@@ -570,11 +671,12 @@ export const getGetCoursesUuidQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetCoursesUuidQueryKey(uuid);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCoursesUuidQueryKey(uuid, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getCoursesUuid>>> = ({
     signal,
-  }) => getCoursesUuid(uuid, requestOptions, signal);
+  }) => getCoursesUuid(uuid, params, requestOptions, signal);
 
   return {
     queryKey,
@@ -598,6 +700,7 @@ export function useGetCoursesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params: undefined | GetCoursesUuidParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCoursesUuid>>, TError, TData>
@@ -621,6 +724,7 @@ export function useGetCoursesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetCoursesUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCoursesUuid>>, TError, TData>
@@ -644,6 +748,7 @@ export function useGetCoursesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetCoursesUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCoursesUuid>>, TError, TData>
@@ -663,6 +768,7 @@ export function useGetCoursesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  params?: GetCoursesUuidParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCoursesUuid>>, TError, TData>
@@ -673,7 +779,7 @@ export function useGetCoursesUuid<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetCoursesUuidQueryOptions(uuid, options);
+  const queryOptions = getGetCoursesUuidQueryOptions(uuid, params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

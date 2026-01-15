@@ -8,11 +8,12 @@
 
 export interface CoursesUpdateRequest {
   bullets?: string;
-  description?: string;
+  description: string;
   difficulty?: number;
   discount?: number;
   is_active?: boolean;
-  name?: string;
+  language: string;
+  name: string;
   price?: number;
   subject?: string;
   uuid: string;

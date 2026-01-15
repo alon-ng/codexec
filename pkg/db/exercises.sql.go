@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -27,33 +28,27 @@ func (q *Queries) CountExercises(ctx context.Context) (int64, error) {
 const createExercise = `-- name: CreateExercise :one
 INSERT INTO "exercises" (
   "lesson_uuid", 
-  "name", 
-  "description",
   "order_index",
   "reward",
   "type",
   "data"
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
+  $1, $2, $3, $4, $5
 )
-RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, name, description, order_index, reward, type, data
+RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data
 `
 
 type CreateExerciseParams struct {
-	LessonUuid  uuid.UUID       `json:"lesson_uuid"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	OrderIndex  int16           `json:"order_index"`
-	Reward      int16           `json:"reward"`
-	Type        ExerciseType    `json:"type"`
-	Data        json.RawMessage `json:"data"`
+	LessonUuid uuid.UUID       `json:"lesson_uuid"`
+	OrderIndex int16           `json:"order_index"`
+	Reward     int16           `json:"reward"`
+	Type       ExerciseType    `json:"type"`
+	Data       json.RawMessage `json:"data"`
 }
 
 func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error) {
 	row := q.db.QueryRow(ctx, createExercise,
 		arg.LessonUuid,
-		arg.Name,
-		arg.Description,
 		arg.OrderIndex,
 		arg.Reward,
 		arg.Type,
@@ -66,8 +61,6 @@ func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) 
 		&i.ModifiedAt,
 		&i.DeletedAt,
 		&i.LessonUuid,
-		&i.Name,
-		&i.Description,
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,
@@ -88,26 +81,52 @@ func (q *Queries) DeleteExercise(ctx context.Context, argUuid uuid.UUID) error {
 }
 
 const getExercise = `-- name: GetExercise :one
-SELECT uuid, created_at, modified_at, deleted_at, lesson_uuid, name, description, order_index, reward, type, data FROM "exercises"
-WHERE "uuid" = $1 AND "deleted_at" IS NULL 
+SELECT exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data, exercise_translations.uuid, exercise_uuid, language, name, description FROM "exercises"
+JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $2
+WHERE "exercises"."uuid" = $1 AND "exercises"."deleted_at" IS NULL 
 LIMIT 1
 `
 
-func (q *Queries) GetExercise(ctx context.Context, argUuid uuid.UUID) (Exercise, error) {
-	row := q.db.QueryRow(ctx, getExercise, argUuid)
-	var i Exercise
+type GetExerciseParams struct {
+	Uuid     uuid.UUID `json:"uuid"`
+	Language string    `json:"language"`
+}
+
+type GetExerciseRow struct {
+	Uuid         uuid.UUID       `json:"uuid"`
+	CreatedAt    time.Time       `json:"created_at"`
+	ModifiedAt   time.Time       `json:"modified_at"`
+	DeletedAt    *time.Time      `json:"deleted_at"`
+	LessonUuid   uuid.UUID       `json:"lesson_uuid"`
+	OrderIndex   int16           `json:"order_index"`
+	Reward       int16           `json:"reward"`
+	Type         ExerciseType    `json:"type"`
+	Data         json.RawMessage `json:"data"`
+	Uuid_2       uuid.UUID       `json:"uuid_2"`
+	ExerciseUuid uuid.UUID       `json:"exercise_uuid"`
+	Language     string          `json:"language"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description"`
+}
+
+func (q *Queries) GetExercise(ctx context.Context, arg GetExerciseParams) (GetExerciseRow, error) {
+	row := q.db.QueryRow(ctx, getExercise, arg.Uuid, arg.Language)
+	var i GetExerciseRow
 	err := row.Scan(
 		&i.Uuid,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
 		&i.LessonUuid,
-		&i.Name,
-		&i.Description,
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,
 		&i.Data,
+		&i.Uuid_2,
+		&i.ExerciseUuid,
+		&i.Language,
+		&i.Name,
+		&i.Description,
 	)
 	return i, err
 }
@@ -123,9 +142,10 @@ func (q *Queries) HardDeleteExercise(ctx context.Context, argUuid uuid.UUID) err
 }
 
 const listExercises = `-- name: ListExercises :many
-SELECT uuid, created_at, modified_at, deleted_at, lesson_uuid, name, description, order_index, reward, type, data FROM "exercises"
-WHERE "deleted_at" IS NULL
-AND   ($3::uuid IS NULL OR "lesson_uuid" = $3)
+SELECT exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data, exercise_translations.uuid, exercise_uuid, language, name, description FROM "exercises"
+JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $3
+WHERE "exercises"."deleted_at" IS NULL
+AND   ($4::uuid IS NULL OR "lesson_uuid" = $4)
 ORDER BY "created_at" DESC
 LIMIT $1 OFFSET $2
 `
@@ -133,30 +153,56 @@ LIMIT $1 OFFSET $2
 type ListExercisesParams struct {
 	Limit      int32      `json:"limit"`
 	Offset     int32      `json:"offset"`
+	Language   string     `json:"language"`
 	LessonUuid *uuid.UUID `json:"lesson_uuid"`
 }
 
-func (q *Queries) ListExercises(ctx context.Context, arg ListExercisesParams) ([]Exercise, error) {
-	rows, err := q.db.Query(ctx, listExercises, arg.Limit, arg.Offset, arg.LessonUuid)
+type ListExercisesRow struct {
+	Uuid         uuid.UUID       `json:"uuid"`
+	CreatedAt    time.Time       `json:"created_at"`
+	ModifiedAt   time.Time       `json:"modified_at"`
+	DeletedAt    *time.Time      `json:"deleted_at"`
+	LessonUuid   uuid.UUID       `json:"lesson_uuid"`
+	OrderIndex   int16           `json:"order_index"`
+	Reward       int16           `json:"reward"`
+	Type         ExerciseType    `json:"type"`
+	Data         json.RawMessage `json:"data"`
+	Uuid_2       uuid.UUID       `json:"uuid_2"`
+	ExerciseUuid uuid.UUID       `json:"exercise_uuid"`
+	Language     string          `json:"language"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description"`
+}
+
+func (q *Queries) ListExercises(ctx context.Context, arg ListExercisesParams) ([]ListExercisesRow, error) {
+	rows, err := q.db.Query(ctx, listExercises,
+		arg.Limit,
+		arg.Offset,
+		arg.Language,
+		arg.LessonUuid,
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Exercise{}
+	items := []ListExercisesRow{}
 	for rows.Next() {
-		var i Exercise
+		var i ListExercisesRow
 		if err := rows.Scan(
 			&i.Uuid,
 			&i.CreatedAt,
 			&i.ModifiedAt,
 			&i.DeletedAt,
 			&i.LessonUuid,
-			&i.Name,
-			&i.Description,
 			&i.OrderIndex,
 			&i.Reward,
 			&i.Type,
 			&i.Data,
+			&i.Uuid_2,
+			&i.ExerciseUuid,
+			&i.Language,
+			&i.Name,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -182,34 +228,28 @@ func (q *Queries) UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 const updateExercise = `-- name: UpdateExercise :one
 UPDATE "exercises"
 SET "lesson_uuid" = COALESCE($2, "lesson_uuid"), 
-    "name" = COALESCE($3, "name"), 
-    "description" = COALESCE($4, "description"), 
-    "order_index" = COALESCE($5, "order_index"),
-    "reward" = COALESCE($6, "reward"),
-    "type" = COALESCE($7, "type"),
-    "data" = COALESCE($8, "data"),
+    "order_index" = COALESCE($3, "order_index"),
+    "reward" = COALESCE($4, "reward"),
+    "type" = COALESCE($5, "type"),
+    "data" = COALESCE($6, "data"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
-RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, name, description, order_index, reward, type, data
+RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data
 `
 
 type UpdateExerciseParams struct {
-	Uuid        uuid.UUID       `json:"uuid"`
-	LessonUuid  uuid.UUID       `json:"lesson_uuid"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	OrderIndex  int16           `json:"order_index"`
-	Reward      int16           `json:"reward"`
-	Type        ExerciseType    `json:"type"`
-	Data        json.RawMessage `json:"data"`
+	Uuid       uuid.UUID       `json:"uuid"`
+	LessonUuid uuid.UUID       `json:"lesson_uuid"`
+	OrderIndex int16           `json:"order_index"`
+	Reward     int16           `json:"reward"`
+	Type       ExerciseType    `json:"type"`
+	Data       json.RawMessage `json:"data"`
 }
 
 func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) (Exercise, error) {
 	row := q.db.QueryRow(ctx, updateExercise,
 		arg.Uuid,
 		arg.LessonUuid,
-		arg.Name,
-		arg.Description,
 		arg.OrderIndex,
 		arg.Reward,
 		arg.Type,
@@ -222,8 +262,6 @@ func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) 
 		&i.ModifiedAt,
 		&i.DeletedAt,
 		&i.LessonUuid,
-		&i.Name,
-		&i.Description,
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,

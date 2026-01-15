@@ -10,6 +10,7 @@ import type { ExercisesUpdateRequestData } from "./exercisesUpdateRequestData";
 export interface ExercisesUpdateRequest {
   data?: ExercisesUpdateRequestData;
   description?: string;
+  language?: string;
   lesson_uuid?: string;
   name?: string;
   order_index?: number;

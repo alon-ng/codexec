@@ -10,6 +10,7 @@ export interface LessonsCreateLessonRequest {
   course_uuid: string;
   description: string;
   is_public?: boolean;
+  language: string;
   name: string;
   order_index: number;
 }

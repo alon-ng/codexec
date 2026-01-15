@@ -8,15 +8,17 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Service struct {
 	q           *db.Queries
+	p           *pgxpool.Pool
 	authService *authProvider.Provider
 }
 
-func NewService(q *db.Queries, authService *authProvider.Provider) *Service {
-	return &Service{q: q, authService: authService}
+func NewService(q *db.Queries, p *pgxpool.Pool, authService *authProvider.Provider) *Service {
+	return &Service{q: q, p: p, authService: authService}
 }
 
 func (s *Service) Signup(ctx context.Context, req SignupRequest) (AuthResponse, *e.APIError) {

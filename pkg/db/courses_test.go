@@ -3,7 +3,6 @@ package db_test
 import (
 	"codim/pkg/db"
 	"context"
-	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -11,52 +10,105 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomCourse(t *testing.T) db.Course {
+func createRandomCourse(t *testing.T) db.CourseWithTranslation {
 	rnd := getRandomInt()
 	params := db.CreateCourseParams{
-		Name:        fmt.Sprintf("Test Course %d", rnd),
-		Description: fmt.Sprintf("Test Description %d", rnd),
-		Subject:     "python",
-		Price:       100,
-		Discount:    0,
-		IsActive:    true,
-		Difficulty:  1,
-		Bullets:     "Test Bullets 1\nTest Bullets 2\nTest Bullets 3",
+		Subject:    "python",
+		Price:      100,
+		Discount:   0,
+		IsActive:   true,
+		Difficulty: 1,
 	}
 
 	course, err := testQueries.CreateCourse(context.Background(), params)
 	require.NoError(t, err)
 	require.NotEmpty(t, course)
 
-	require.Equal(t, params.Name, course.Name)
-	require.Equal(t, params.Description, course.Description)
 	require.Equal(t, params.Subject, course.Subject)
 	require.Equal(t, params.Price, course.Price)
 	require.Equal(t, params.Discount, course.Discount)
 	require.Equal(t, params.IsActive, course.IsActive)
 	require.Equal(t, params.Difficulty, course.Difficulty)
-	require.Equal(t, params.Bullets, course.Bullets)
 
 	require.NotZero(t, course.Uuid)
 	require.NotZero(t, course.CreatedAt)
 	require.NotZero(t, course.ModifiedAt)
 	require.Nil(t, course.DeletedAt)
 
-	return course
+	courseTranslation, err := testQueries.CreateCourseTranslation(context.Background(), db.CreateCourseTranslationParams{
+		CourseUuid:  course.Uuid,
+		Language:    "en",
+		Name:        fmt.Sprintf("Test Course %d", rnd),
+		Description: fmt.Sprintf("Test Description %d", rnd),
+		Bullets:     "Test Bullets 1\nTest Bullets 2\nTest Bullets 3",
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, courseTranslation)
+
+	require.Equal(t, course.Uuid, courseTranslation.CourseUuid)
+	require.Equal(t, "en", courseTranslation.Language)
+	require.Equal(t, fmt.Sprintf("Test Course %d", rnd), courseTranslation.Name)
+	require.Equal(t, fmt.Sprintf("Test Description %d", rnd), courseTranslation.Description)
+	require.Equal(t, "Test Bullets 1\nTest Bullets 2\nTest Bullets 3", courseTranslation.Bullets)
+
+	return db.CourseWithTranslation{
+		Course:      course,
+		Translation: courseTranslation,
+	}
 }
 
-func assertCourseEqual(t *testing.T, expectedCourse db.Course, gotCourse db.Course) {
+func assertCourseWithTranslationEqual(t *testing.T, expectedCourse db.CourseWithTranslation, gotCourse db.CourseWithTranslation) {
+	getCourseRow := db.GetCourseRow{
+		Uuid:        gotCourse.Uuid,
+		CreatedAt:   gotCourse.CreatedAt,
+		ModifiedAt:  gotCourse.ModifiedAt,
+		DeletedAt:   gotCourse.DeletedAt,
+		Subject:     gotCourse.Subject,
+		Price:       gotCourse.Price,
+		Discount:    gotCourse.Discount,
+		IsActive:    gotCourse.IsActive,
+		Difficulty:  gotCourse.Difficulty,
+		Language:    gotCourse.Translation.Language,
+		Name:        gotCourse.Translation.Name,
+		Description: gotCourse.Translation.Description,
+		Bullets:     gotCourse.Translation.Bullets,
+	}
+	assertCourseEqual(t, expectedCourse, getCourseRow)
+}
+
+func assertCourseListEqual(t *testing.T, expectedCourse db.CourseWithTranslation, gotCourse db.ListCoursesRow) {
+	getCourseRow := db.GetCourseRow{
+		Uuid:        gotCourse.Uuid,
+		CreatedAt:   gotCourse.CreatedAt,
+		ModifiedAt:  gotCourse.ModifiedAt,
+		DeletedAt:   gotCourse.DeletedAt,
+		Subject:     gotCourse.Subject,
+		Price:       gotCourse.Price,
+		Discount:    gotCourse.Discount,
+		IsActive:    gotCourse.IsActive,
+		Difficulty:  gotCourse.Difficulty,
+		Language:    gotCourse.Language,
+		Name:        gotCourse.Name,
+		Description: gotCourse.Description,
+		Bullets:     gotCourse.Bullets,
+	}
+	assertCourseEqual(t, expectedCourse, getCourseRow)
+}
+
+func assertCourseEqual(t *testing.T, expectedCourse db.CourseWithTranslation, gotCourse db.GetCourseRow) {
 	assert.NotNil(t, gotCourse)
 
 	require.Equal(t, expectedCourse.Uuid, gotCourse.Uuid)
-	require.Equal(t, expectedCourse.Name, gotCourse.Name)
-	require.Equal(t, expectedCourse.Description, gotCourse.Description)
 	require.Equal(t, expectedCourse.Subject, gotCourse.Subject)
 	require.Equal(t, expectedCourse.Price, gotCourse.Price)
 	require.Equal(t, expectedCourse.Discount, gotCourse.Discount)
 	require.Equal(t, expectedCourse.IsActive, gotCourse.IsActive)
 	require.Equal(t, expectedCourse.Difficulty, gotCourse.Difficulty)
-	require.Equal(t, expectedCourse.Bullets, gotCourse.Bullets)
+	require.Equal(t, expectedCourse.Translation.Name, gotCourse.Name)
+	require.Equal(t, expectedCourse.Translation.Description, gotCourse.Description)
+	require.Equal(t, expectedCourse.Translation.Bullets, gotCourse.Bullets)
+	require.Equal(t, expectedCourse.Translation.Language, gotCourse.Language)
+	require.Equal(t, expectedCourse.Translation.CourseUuid, gotCourse.Uuid)
 
 	require.NotZero(t, gotCourse.CreatedAt)
 	require.NotZero(t, gotCourse.ModifiedAt)
@@ -70,17 +122,10 @@ func TestCreateCourse(t *testing.T) {
 func TestGetCourse(t *testing.T) {
 	course := createRandomCourse(t)
 
-	gotCourse, err := testQueries.GetCourse(context.Background(), course.Uuid)
-	require.NoError(t, err)
-	require.NotEmpty(t, gotCourse)
-
-	assertCourseEqual(t, course, gotCourse)
-}
-
-func TestGetCourseByName(t *testing.T) {
-	course := createRandomCourse(t)
-
-	gotCourse, err := testQueries.GetCourseByName(context.Background(), course.Name)
+	gotCourse, err := testQueries.GetCourse(context.Background(), db.GetCourseParams{
+		Uuid:     course.Uuid,
+		Language: "en",
+	})
 	require.NoError(t, err)
 	require.NotEmpty(t, gotCourse)
 
@@ -92,32 +137,42 @@ func TestUpdateCourse(t *testing.T) {
 
 	rnd := getRandomInt()
 	updateParams := db.UpdateCourseParams{
-		Uuid:        course.Uuid,
-		Name:        fmt.Sprintf("Updated Test Course %d", rnd),
-		Description: fmt.Sprintf("Updated Test Description %d", rnd),
-		Subject:     "javascript",
-		Price:       150,
-		Discount:    5,
-		IsActive:    false,
-		Difficulty:  2,
-		Bullets:     "Updated Test Bullets 1\nUpdated Test Bullets 2\nUpdated Test Bullets 3",
+		Uuid:       course.Uuid,
+		Subject:    "javascript",
+		Price:      150,
+		Discount:   5,
+		IsActive:   false,
+		Difficulty: 2,
 	}
 
 	updatedCourse, err := testQueries.UpdateCourse(context.Background(), updateParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedCourse)
 
-	require.Equal(t, updateParams.Name, updatedCourse.Name)
-	require.Equal(t, updateParams.Description, updatedCourse.Description)
 	require.Equal(t, updateParams.Subject, updatedCourse.Subject)
 	require.Equal(t, updateParams.Price, updatedCourse.Price)
 	require.Equal(t, updateParams.Discount, updatedCourse.Discount)
 	require.Equal(t, updateParams.IsActive, updatedCourse.IsActive)
 	require.Equal(t, updateParams.Difficulty, updatedCourse.Difficulty)
-	require.Equal(t, updateParams.Bullets, updatedCourse.Bullets)
 
 	require.NotZero(t, updatedCourse.ModifiedAt)
 	require.Nil(t, updatedCourse.DeletedAt)
+
+	updateTranslationParams := db.UpdateCourseTranslationParams{
+		Uuid:        course.Uuid,
+		Language:    "en",
+		Name:        fmt.Sprintf("Updated Test Course %d", rnd),
+		Description: fmt.Sprintf("Updated Test Description %d", rnd),
+		Bullets:     "Updated Test Bullets 1\nUpdated Test Bullets 2\nUpdated Test Bullets 3",
+	}
+	updateTranslation, err := testQueries.UpdateCourseTranslation(context.Background(), updateTranslationParams)
+	require.NoError(t, err)
+	require.NotEmpty(t, updateTranslation)
+
+	require.Equal(t, updateTranslationParams.Language, updateTranslation.Language)
+	require.Equal(t, updateTranslationParams.Name, updateTranslation.Name)
+	require.Equal(t, updateTranslationParams.Description, updateTranslation.Description)
+	require.Equal(t, updateTranslationParams.Bullets, updateTranslation.Bullets)
 }
 
 func TestDeleteCourse(t *testing.T) {
@@ -126,7 +181,10 @@ func TestDeleteCourse(t *testing.T) {
 	err := testQueries.DeleteCourse(context.Background(), course.Uuid)
 	require.NoError(t, err)
 
-	gotCourse, err := testQueries.GetCourse(context.Background(), course.Uuid)
+	gotCourse, err := testQueries.GetCourse(context.Background(), db.GetCourseParams{
+		Uuid:     course.Uuid,
+		Language: "en",
+	})
 	require.Error(t, err)
 	require.Empty(t, gotCourse)
 }
@@ -137,7 +195,10 @@ func TestHardDeleteCourse(t *testing.T) {
 	err := testQueries.HardDeleteCourse(context.Background(), course.Uuid)
 	require.NoError(t, err)
 
-	gotCourse, err := testQueries.GetCourse(context.Background(), course.Uuid)
+	gotCourse, err := testQueries.GetCourse(context.Background(), db.GetCourseParams{
+		Uuid:     course.Uuid,
+		Language: "en",
+	})
 	require.Error(t, err)
 	require.Empty(t, gotCourse)
 }
@@ -148,107 +209,39 @@ func TestUndeleteCourse(t *testing.T) {
 	err := testQueries.DeleteCourse(context.Background(), course.Uuid)
 	require.NoError(t, err)
 
-	gotCourse, err := testQueries.GetCourse(context.Background(), course.Uuid)
+	gotCourse, err := testQueries.GetCourse(context.Background(), db.GetCourseParams{
+		Uuid:     course.Uuid,
+		Language: "en",
+	})
 	require.Error(t, err)
 	require.Empty(t, gotCourse)
 
 	err = testQueries.UndeleteCourse(context.Background(), course.Uuid)
 	require.NoError(t, err)
 
-	gotCourse, err = testQueries.GetCourse(context.Background(), course.Uuid)
+	gotCourse, err = testQueries.GetCourse(context.Background(), db.GetCourseParams{
+		Uuid:     course.Uuid,
+		Language: "en",
+	})
 	require.NoError(t, err)
 	require.NotEmpty(t, gotCourse)
 
 	assertCourseEqual(t, course, gotCourse)
 }
 
-func TestCreateCourseConflict(t *testing.T) {
-	course := createRandomCourse(t)
-
-	params := db.CreateCourseParams{
-		Name:        course.Name,
-		Description: course.Description,
-		Subject:     course.Subject,
-		Price:       course.Price,
-		Discount:    course.Discount,
-		IsActive:    course.IsActive,
-		Difficulty:  course.Difficulty,
-		Bullets:     course.Bullets,
-	}
-
-	_, err := testQueries.CreateCourse(context.Background(), params)
-	require.Error(t, err)
-	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "courses_name_key"))
-}
-
 func TestGetCourseFull(t *testing.T) {
 	course := createRandomCourse(t)
+	lesson1 := createRandomLesson(t, &course)
+	lesson2 := createRandomLesson(t, &course)
+	exercise1 := createRandomExercise(t, &lesson1)
+	exercise2 := createRandomExercise(t, &lesson1)
+	exercise3 := createRandomExercise(t, &lesson2)
 
-	rnd := getRandomInt()
-	lesson1Params := db.CreateLessonParams{
-		CourseUuid:  course.Uuid,
-		Name:        fmt.Sprintf("Test Lesson 1 %d", rnd),
-		Description: fmt.Sprintf("Test Description 1 %d", rnd),
-		OrderIndex:  1,
-		IsPublic:    true,
-	}
-	lesson1, err := testQueries.CreateLesson(context.Background(), lesson1Params)
-	require.NoError(t, err)
-
-	lesson2Params := db.CreateLessonParams{
-		CourseUuid:  course.Uuid,
-		Name:        fmt.Sprintf("Test Lesson 2 %d", rnd),
-		Description: fmt.Sprintf("Test Description 2 %d", rnd),
-		OrderIndex:  2,
-		IsPublic:    false,
-	}
-	lesson2, err := testQueries.CreateLesson(context.Background(), lesson2Params)
-	require.NoError(t, err)
-
-	exercise1Data := json.RawMessage(fmt.Sprintf(`{"answer": "Answer 1", "question": "Question 1 %d"}`, rnd))
-	exercise1Params := db.CreateExerciseParams{
-		LessonUuid:  lesson1.Uuid,
-		Name:        fmt.Sprintf("Test Exercise 1 %d", rnd),
-		Description: fmt.Sprintf("Test Exercise Description 1 %d", rnd),
-		OrderIndex:  1,
-		Reward:      10,
-		Type:        db.ExerciseTypeQuiz,
-		Data:        exercise1Data,
-	}
-	exercise1, err := testQueries.CreateExercise(context.Background(), exercise1Params)
-	require.NoError(t, err)
-
-	exercise2Data := json.RawMessage(fmt.Sprintf(`{"answer": "Answer 2", "question": "Question 2 %d"}`, rnd))
-	exercise2Params := db.CreateExerciseParams{
-		LessonUuid:  lesson1.Uuid,
-		Name:        fmt.Sprintf("Test Exercise 2 %d", rnd),
-		Description: fmt.Sprintf("Test Exercise Description 2 %d", rnd),
-		OrderIndex:  2,
-		Reward:      20,
-		Type:        db.ExerciseTypeCode,
-		Data:        exercise2Data,
-	}
-	exercise2, err := testQueries.CreateExercise(context.Background(), exercise2Params)
-	require.NoError(t, err)
-
-	exercise3Data := json.RawMessage(fmt.Sprintf(`{"answer": "Answer 3", "question": "Question 3 %d"}`, rnd))
-	exercise3Params := db.CreateExerciseParams{
-		LessonUuid:  lesson2.Uuid,
-		Name:        fmt.Sprintf("Test Exercise 3 %d", rnd),
-		Description: fmt.Sprintf("Test Exercise Description 3 %d", rnd),
-		OrderIndex:  1,
-		Reward:      15,
-		Type:        db.ExerciseTypeQuiz,
-		Data:        exercise3Data,
-	}
-	exercise3, err := testQueries.CreateExercise(context.Background(), exercise3Params)
-	require.NoError(t, err)
-
-	courseFull, err := testQueries.GetCourseFull(context.Background(), course.Uuid)
+	courseFull, err := testQueries.GetCourseFull(context.Background(), course.Uuid, "en")
 	require.NoError(t, err)
 	require.NotEmpty(t, courseFull)
 
-	assertCourseEqual(t, course, courseFull.Course)
+	assertCourseWithTranslationEqual(t, course, courseFull.CourseWithTranslation)
 
 	require.Len(t, courseFull.Lessons, 2)
 
@@ -265,10 +258,10 @@ func TestGetCourseFull(t *testing.T) {
 	require.NotNil(t, foundLesson1, "Lesson 1 should be found")
 	require.NotNil(t, foundLesson2, "Lesson 2 should be found")
 
-	assertLessonEqual(t, lesson1, foundLesson1.Lesson)
+	assertLessonWithTranslationEqual(t, lesson1, foundLesson1.LessonWithTranslation)
 	require.Len(t, foundLesson1.Exercises, 2)
 
-	var foundExercise1, foundExercise2 *db.Exercise
+	var foundExercise1, foundExercise2 *db.ExerciseWithTranslation
 	for i := range foundLesson1.Exercises {
 		if foundLesson1.Exercises[i].Uuid == exercise1.Uuid {
 			foundExercise1 = &foundLesson1.Exercises[i]
@@ -280,14 +273,14 @@ func TestGetCourseFull(t *testing.T) {
 
 	require.NotNil(t, foundExercise1, "Exercise 1 should be found in lesson 1")
 	require.NotNil(t, foundExercise2, "Exercise 2 should be found in lesson 1")
-	assertExerciseEqual(t, exercise1, *foundExercise1)
-	assertExerciseEqual(t, exercise2, *foundExercise2)
+	assertExerciseWithTranslationEqual(t, exercise1, *foundExercise1)
+	assertExerciseWithTranslationEqual(t, exercise2, *foundExercise2)
 
-	assertLessonEqual(t, lesson2, foundLesson2.Lesson)
+	assertLessonWithTranslationEqual(t, lesson2, foundLesson2.LessonWithTranslation)
 	require.Len(t, foundLesson2.Exercises, 1)
 
 	require.Equal(t, exercise3.Uuid, foundLesson2.Exercises[0].Uuid)
-	assertExerciseEqual(t, exercise3, foundLesson2.Exercises[0])
+	assertExerciseWithTranslationEqual(t, exercise3, foundLesson2.Exercises[0])
 }
 
 func TestCountCourses(t *testing.T) {
@@ -316,6 +309,7 @@ func TestListCourses(t *testing.T) {
 	params := db.ListCoursesParams{
 		Limit:    10,
 		Offset:   0,
+		Language: "en",
 		Subject:  nil,
 		IsActive: nil,
 	}
@@ -328,11 +322,11 @@ func TestListCourses(t *testing.T) {
 	for _, course := range courses {
 		if course.Uuid == course1.Uuid {
 			foundCourse1 = true
-			assertCourseEqual(t, course1, course)
+			assertCourseListEqual(t, course1, course)
 		}
 		if course.Uuid == course2.Uuid {
 			foundCourse2 = true
-			assertCourseEqual(t, course2, course)
+			assertCourseListEqual(t, course2, course)
 		}
 	}
 	require.True(t, foundCourse1)
@@ -342,16 +336,12 @@ func TestListCourses(t *testing.T) {
 func TestListCoursesWithFilters(t *testing.T) {
 	course1 := createRandomCourse(t)
 
-	rnd := getRandomInt()
 	course2Params := db.CreateCourseParams{
-		Name:        fmt.Sprintf("Test Course %d", rnd),
-		Description: fmt.Sprintf("Test Description %d", rnd),
-		Subject:     "javascript",
-		Price:       100,
-		Discount:    0,
-		IsActive:    false,
-		Difficulty:  1,
-		Bullets:     "Test Bullets",
+		Subject:    "javascript",
+		Price:      100,
+		Discount:   0,
+		IsActive:   false,
+		Difficulty: 1,
 	}
 	_, err := testQueries.CreateCourse(context.Background(), course2Params)
 	require.NoError(t, err)
@@ -361,6 +351,7 @@ func TestListCoursesWithFilters(t *testing.T) {
 	params := db.ListCoursesParams{
 		Limit:    10,
 		Offset:   0,
+		Language: "en",
 		Subject:  &subject,
 		IsActive: &isActive,
 	}
@@ -378,4 +369,17 @@ func TestListCoursesWithFilters(t *testing.T) {
 		}
 	}
 	require.True(t, foundCourse1)
+}
+
+func TestCreateCourseTranslationWithConflict(t *testing.T) {
+	course := createRandomCourse(t)
+	_, err := testQueries.CreateCourseTranslation(context.Background(), db.CreateCourseTranslationParams{
+		CourseUuid:  course.Uuid,
+		Language:    "en",
+		Name:        "Test Course",
+		Description: "Test Description",
+		Bullets:     "Test Bullets",
+	})
+
+	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "uq_course_translations_course_language"))
 }

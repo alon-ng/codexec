@@ -61,7 +61,7 @@ func main() {
 		cfg.API.JwtRenewalThreshold,
 	)
 
-	router := api.NewRouter(queries, log, authProvider, redisClient)
+	router := api.NewRouter(queries, pool, log, authProvider, redisClient)
 
 	addr := fmt.Sprintf(":%d", cfg.API.Port)
 	log.Infof("Starting server on %s", addr)

@@ -11,9 +11,12 @@ import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import { DbExerciseType } from ".././model";
-import type { DbExercise } from ".././model";
+import type {
+  DbExerciseTranslation,
+  DbExerciseWithTranslation,
+} from ".././model";
 
-export const getGetExercisesResponseMock = (): DbExercise[] =>
+export const getGetExercisesResponseMock = (): DbExerciseWithTranslation[] =>
   Array.from(
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
@@ -27,19 +30,11 @@ export const getGetExercisesResponseMock = (): DbExercise[] =>
       faker.string.alpha({ length: { min: 10, max: 20 } }),
       undefined,
     ]),
-    description: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
     lesson_uuid: faker.helpers.arrayElement([
       faker.string.alpha({ length: { min: 10, max: 20 } }),
       undefined,
     ]),
     modified_at: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    name: faker.helpers.arrayElement([
       faker.string.alpha({ length: { min: 10, max: 20 } }),
       undefined,
     ]),
@@ -49,6 +44,31 @@ export const getGetExercisesResponseMock = (): DbExercise[] =>
     ]),
     reward: faker.helpers.arrayElement([
       faker.number.int({ min: undefined, max: undefined }),
+      undefined,
+    ]),
+    translation: faker.helpers.arrayElement([
+      {
+        description: faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          undefined,
+        ]),
+        exercise_uuid: faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          undefined,
+        ]),
+        language: faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          undefined,
+        ]),
+        name: faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          undefined,
+        ]),
+        uuid: faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          undefined,
+        ]),
+      },
       undefined,
     ]),
     type: faker.helpers.arrayElement([
@@ -61,19 +81,41 @@ export const getGetExercisesResponseMock = (): DbExercise[] =>
     ]),
   }));
 
+export const getPostExercisesAddTranslationResponseMock = (
+  overrideResponse: Partial<DbExerciseTranslation> = {},
+): DbExerciseTranslation => ({
+  description: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  exercise_uuid: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  language: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  name: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  uuid: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
 export const getPostExercisesCreateResponseMock = (
-  overrideResponse: Partial<DbExercise> = {},
-): DbExercise => ({
+  overrideResponse: Partial<DbExerciseWithTranslation> = {},
+): DbExerciseWithTranslation => ({
   created_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
   data: faker.helpers.arrayElement([{}, undefined]),
   deleted_at: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  description: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
@@ -85,16 +127,37 @@ export const getPostExercisesCreateResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  name: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
   order_index: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
     undefined,
   ]),
   reward: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  translation: faker.helpers.arrayElement([
+    {
+      description: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      exercise_uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      language: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    },
     undefined,
   ]),
   type: faker.helpers.arrayElement([
@@ -115,18 +178,14 @@ export const getPostExercisesRestoreResponseMock = (): string =>
   faker.word.sample();
 
 export const getPutExercisesUpdateResponseMock = (
-  overrideResponse: Partial<DbExercise> = {},
-): DbExercise => ({
+  overrideResponse: Partial<DbExerciseWithTranslation> = {},
+): DbExerciseWithTranslation => ({
   created_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
   data: faker.helpers.arrayElement([{}, undefined]),
   deleted_at: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  description: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
@@ -138,16 +197,37 @@ export const getPutExercisesUpdateResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  name: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
   order_index: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
     undefined,
   ]),
   reward: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  translation: faker.helpers.arrayElement([
+    {
+      description: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      exercise_uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      language: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    },
     undefined,
   ]),
   type: faker.helpers.arrayElement([
@@ -162,18 +242,14 @@ export const getPutExercisesUpdateResponseMock = (
 });
 
 export const getGetExercisesUuidResponseMock = (
-  overrideResponse: Partial<DbExercise> = {},
-): DbExercise => ({
+  overrideResponse: Partial<DbExerciseWithTranslation> = {},
+): DbExerciseWithTranslation => ({
   created_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
   data: faker.helpers.arrayElement([{}, undefined]),
   deleted_at: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  description: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
@@ -185,16 +261,37 @@ export const getGetExercisesUuidResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  name: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
   order_index: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
     undefined,
   ]),
   reward: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  translation: faker.helpers.arrayElement([
+    {
+      description: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      exercise_uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      language: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    },
     undefined,
   ]),
   type: faker.helpers.arrayElement([
@@ -210,10 +307,10 @@ export const getGetExercisesUuidResponseMock = (
 
 export const getGetExercisesMockHandler = (
   overrideResponse?:
-    | DbExercise[]
+    | DbExerciseWithTranslation[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<DbExercise[]> | DbExercise[]),
+      ) => Promise<DbExerciseWithTranslation[]> | DbExerciseWithTranslation[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -236,12 +333,40 @@ export const getGetExercisesMockHandler = (
   );
 };
 
-export const getPostExercisesCreateMockHandler = (
+export const getPostExercisesAddTranslationMockHandler = (
   overrideResponse?:
-    | DbExercise
+    | DbExerciseTranslation
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<DbExercise> | DbExercise),
+      ) => Promise<DbExerciseTranslation> | DbExerciseTranslation),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/exercises/add-translation",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostExercisesAddTranslationResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostExercisesCreateMockHandler = (
+  overrideResponse?:
+    | DbExerciseWithTranslation
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<DbExerciseWithTranslation> | DbExerciseWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -322,10 +447,10 @@ export const getPostExercisesRestoreMockHandler = (
 
 export const getPutExercisesUpdateMockHandler = (
   overrideResponse?:
-    | DbExercise
+    | DbExerciseWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.put>[1]>[0],
-      ) => Promise<DbExercise> | DbExercise),
+      ) => Promise<DbExerciseWithTranslation> | DbExerciseWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.put(
@@ -350,10 +475,10 @@ export const getPutExercisesUpdateMockHandler = (
 
 export const getGetExercisesUuidMockHandler = (
   overrideResponse?:
-    | DbExercise
+    | DbExerciseWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<DbExercise> | DbExercise),
+      ) => Promise<DbExerciseWithTranslation> | DbExerciseWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -377,6 +502,7 @@ export const getGetExercisesUuidMockHandler = (
 };
 export const getExercisesMock = () => [
   getGetExercisesMockHandler(),
+  getPostExercisesAddTranslationMockHandler(),
   getPostExercisesCreateMockHandler(),
   getDeleteExercisesDeleteUuidMockHandler(),
   getPostExercisesRestoreMockHandler(),

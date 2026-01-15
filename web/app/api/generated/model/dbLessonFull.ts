@@ -5,17 +5,17 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import type { DbExercise } from "./dbExercise";
+import type { DbExerciseWithTranslation } from "./dbExerciseWithTranslation";
+import type { DbLessonTranslation } from "./dbLessonTranslation";
 
 export interface DbLessonFull {
   course_uuid?: string;
   created_at?: string;
   deleted_at?: string;
-  description?: string;
-  exercises?: DbExercise[];
+  exercises?: DbExerciseWithTranslation[];
   is_public?: boolean;
   modified_at?: string;
-  name?: string;
   order_index?: number;
+  translation?: DbLessonTranslation;
   uuid?: string;
 }
