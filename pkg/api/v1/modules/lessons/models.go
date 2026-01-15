@@ -11,18 +11,13 @@ type CreateLessonRequest struct {
 	Description string    `json:"description" binding:"required" example:"Learn Python fundamentals"`
 }
 
-type UpdateRequest struct {
-	Uuid uuid.UUID `json:"uuid" binding:"required"`
-	UpdateLessonRequest
-}
-
 type UpdateLessonRequest struct {
-	CourseUuid  uuid.UUID `json:"course_uuid" example:"123e4567-e89b-12d3-a456-426614174000"`
-	OrderIndex  int16     `json:"order_index" example:"1"`
-	IsPublic    bool      `json:"is_public" example:"false"`
-	Language    string    `json:"language" example:"en"`
-	Name        string    `json:"name" example:"Python Basics"`
-	Description string    `json:"description" example:"Learn Python fundamentals"`
+	Uuid        uuid.UUID `json:"uuid" binding:"required"`
+	Language    string    `json:"language" binding:"required" example:"en"`
+	OrderIndex  *int16    `json:"order_index" example:"1"`
+	IsPublic    *bool     `json:"is_public" example:"false"`
+	Name        *string   `json:"name" example:"Python Basics"`
+	Description *string   `json:"description" example:"Learn Python fundamentals"`
 }
 
 type ListLessonsRequest struct {

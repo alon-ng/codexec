@@ -19,13 +19,12 @@ RETURNING *;
 
 -- name: UpdateCourseTranslation :one
 UPDATE "course_translations"
-SET "language" = COALESCE($2, "language"),
-    "name" = COALESCE($3, "name"),
-    "description" = COALESCE($4, "description"),
-    "bullets" = COALESCE($5, "bullets")
+SET "name" = COALESCE(sqlc.narg('name'), "name"),
+    "description" = COALESCE(sqlc.narg('description'), "description"),
+    "bullets" = COALESCE(sqlc.narg('bullets'), "bullets")
 FROM "courses"
 WHERE "course_translations"."course_uuid" = "courses"."uuid"
-AND "courses"."uuid" = $1
+AND "courses"."uuid" = $1 AND "course_translations"."language" = $2
 RETURNING "course_translations".*;
 
 -- name: DeleteCourseTranslation :exec

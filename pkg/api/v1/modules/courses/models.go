@@ -14,21 +14,17 @@ type CreateCourseRequest struct {
 	Bullets     string `json:"bullets" example:"Learn basics\nPractice exercises"`
 }
 
-type UpdateRequest struct {
-	Uuid uuid.UUID `json:"uuid" binding:"required"`
-	UpdateCourseRequest
-}
-
 type UpdateCourseRequest struct {
-	Subject     string `json:"subject" example:"Programming"`
-	Price       int16  `json:"price" example:"99"`
-	Discount    int16  `json:"discount" example:"0"`
-	IsActive    bool   `json:"is_active" example:"true"`
-	Difficulty  int16  `json:"difficulty" example:"1"`
-	Language    string `json:"language" binding:"required" example:"en"`
-	Name        string `json:"name" binding:"required" example:"Introduction to Python"`
-	Description string `json:"description" binding:"required" example:"Learn Python basics"`
-	Bullets     string `json:"bullets" example:"Learn basics\nPractice exercises"`
+	Uuid        uuid.UUID `json:"uuid" binding:"required"`
+	Language    string    `json:"language" binding:"required" example:"en"`
+	Subject     *string   `json:"subject" example:"Programming"`
+	Price       *int16    `json:"price" example:"99"`
+	Discount    *int16    `json:"discount" example:"0"`
+	IsActive    *bool     `json:"is_active" example:"true"`
+	Difficulty  *int16    `json:"difficulty" example:"1"`
+	Name        *string   `json:"name" example:"Introduction to Python"`
+	Description *string   `json:"description" example:"Learn Python basics"`
+	Bullets     *string   `json:"bullets" example:"Learn basics\nPractice exercises"`
 }
 
 type ListCoursesRequest struct {

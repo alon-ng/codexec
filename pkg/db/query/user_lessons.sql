@@ -20,9 +20,9 @@ LIMIT 1;
 
 -- name: UpdateUserLesson :one
 UPDATE "user_lessons"
-SET "user_uuid" = COALESCE($2, "user_uuid"), 
-    "lesson_uuid" = COALESCE($3, "lesson_uuid"), 
-    "completed_at" = COALESCE($4, "completed_at")
+SET "user_uuid" = COALESCE(sqlc.narg('user_uuid'), "user_uuid"), 
+    "lesson_uuid" = COALESCE(sqlc.narg('lesson_uuid'), "lesson_uuid"), 
+    "completed_at" = COALESCE(sqlc.narg('completed_at'), "completed_at")
 WHERE "uuid" = $1
 RETURNING *;
 

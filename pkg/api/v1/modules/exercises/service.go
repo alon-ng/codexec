@@ -68,10 +68,14 @@ func (s *Service) Create(ctx context.Context, req CreateExerciseRequest) (db.Exe
 	}, nil
 }
 
-func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateExerciseRequest) (db.ExerciseWithTranslation, *e.APIError) {
-	data, err := json.Marshal(req.Data)
-	if err != nil {
-		return db.ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseUpdateFailed)
+func (s *Service) Update(ctx context.Context, req UpdateExerciseRequest) (db.ExerciseWithTranslation, *e.APIError) {
+	var data *json.RawMessage
+	if req.Data != nil {
+		d, err := json.Marshal(req.Data)
+		if err != nil {
+			return db.ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseUpdateFailed)
+		}
+		data = (*json.RawMessage)(&d)
 	}
 
 	tx, err := s.p.Begin(ctx)
@@ -83,10 +87,10 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateExerciseRe
 	qtx := s.q.WithTx(tx)
 
 	exercise, err := qtx.UpdateExercise(ctx, db.UpdateExerciseParams{
-		Uuid:       id,
-		LessonUuid: req.LessonUuid,
+		Uuid:       req.Uuid,
 		OrderIndex: req.OrderIndex,
 		Reward:     req.Reward,
+		Type:       req.Type,
 		Data:       data,
 	})
 
@@ -95,7 +99,7 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateExerciseRe
 	}
 
 	translation, err := qtx.UpdateExerciseTranslation(ctx, db.UpdateExerciseTranslationParams{
-		Uuid:        id,
+		Uuid:        req.Uuid,
 		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,

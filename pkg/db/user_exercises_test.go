@@ -112,12 +112,15 @@ func TestUpdateUserExercise(t *testing.T) {
 	now := time.Now().UTC()
 
 	updatedSubmission := json.RawMessage(`{"answer": "updated"}`)
+	attempts := int32(5)
+	userUuid := userExercise.UserUuid
+	exerciseUuid := userExercise.ExerciseUuid
 	updateParams := db.UpdateUserExerciseParams{
 		Uuid:         userExercise.Uuid,
-		UserUuid:     userExercise.UserUuid,
-		ExerciseUuid: userExercise.ExerciseUuid,
-		Submission:   updatedSubmission,
-		Attempts:     5,
+		UserUuid:     &userUuid,
+		ExerciseUuid: &exerciseUuid,
+		Submission:   &updatedSubmission,
+		Attempts:     &attempts,
 		CompletedAt:  &now,
 	}
 
@@ -125,7 +128,7 @@ func TestUpdateUserExercise(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedUserExercise)
 
-	require.Equal(t, updateParams.Attempts, updatedUserExercise.Attempts)
+	require.Equal(t, *updateParams.Attempts, updatedUserExercise.Attempts)
 	require.Equal(t, updateParams.CompletedAt, updatedUserExercise.CompletedAt)
 	require.Equal(t, userExercise.Uuid, updatedUserExercise.Uuid)
 	require.Equal(t, userExercise.UserUuid, updatedUserExercise.UserUuid)

@@ -144,41 +144,45 @@ func TestUpdateExercise(t *testing.T) {
 
 	rnd := getRandomInt()
 	updatedData := json.RawMessage(`{"answer": "Updated Answer", "question": "Updated Question"}`)
+	orderIndex := int16(2)
+	reward := int16(20)
+	type_ := db.ExerciseTypeQuiz
 	updateParams := db.UpdateExerciseParams{
 		Uuid:       exercise.Uuid,
-		LessonUuid: lesson.Uuid,
-		OrderIndex: 2,
-		Reward:     20,
-		Type:       db.ExerciseTypeCode,
-		Data:       updatedData,
+		OrderIndex: &orderIndex,
+		Reward:     &reward,
+		Type:       &type_,
+		Data:       &updatedData,
 	}
 
 	updatedExercise, err := testQueries.UpdateExercise(context.Background(), updateParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedExercise)
 
-	require.Equal(t, updateParams.LessonUuid, updatedExercise.LessonUuid)
-	require.Equal(t, updateParams.OrderIndex, updatedExercise.OrderIndex)
-	require.Equal(t, updateParams.Reward, updatedExercise.Reward)
-	require.Equal(t, updateParams.Type, updatedExercise.Type)
-	require.Equal(t, updateParams.Data, updatedExercise.Data)
+	require.Equal(t, *updateParams.OrderIndex, updatedExercise.OrderIndex)
+	require.Equal(t, *updateParams.Reward, updatedExercise.Reward)
+	require.Equal(t, *updateParams.Type, updatedExercise.Type)
+	require.Equal(t, *updateParams.Data, updatedExercise.Data)
 
 	require.NotZero(t, updatedExercise.ModifiedAt)
 	require.Nil(t, updatedExercise.DeletedAt)
 
+	language := "en"
+	name := fmt.Sprintf("Updated Test Exercise %d", rnd)
+	description := fmt.Sprintf("Updated Test Description %d", rnd)
 	updateTranslationParams := db.UpdateExerciseTranslationParams{
 		Uuid:        exercise.Uuid,
-		Language:    "en",
-		Name:        fmt.Sprintf("Updated Test Exercise %d", rnd),
-		Description: fmt.Sprintf("Updated Test Description %d", rnd),
+		Language:    language,
+		Name:        &name,
+		Description: &description,
 	}
 	updateTranslation, err := testQueries.UpdateExerciseTranslation(context.Background(), updateTranslationParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updateTranslation)
 
 	require.Equal(t, updateTranslationParams.Language, updateTranslation.Language)
-	require.Equal(t, updateTranslationParams.Name, updateTranslation.Name)
-	require.Equal(t, updateTranslationParams.Description, updateTranslation.Description)
+	require.Equal(t, *updateTranslationParams.Name, updateTranslation.Name)
+	require.Equal(t, *updateTranslationParams.Description, updateTranslation.Description)
 }
 
 func TestDeleteExercise(t *testing.T) {

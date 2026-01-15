@@ -40,9 +40,9 @@ func (s *Service) Create(ctx context.Context, req CreateUserRequest) (db.User, *
 	return u, nil
 }
 
-func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateUserRequest) (db.User, *e.APIError) {
+func (s *Service) Update(ctx context.Context, req UpdateUserRequest) (db.User, *e.APIError) {
 	u, err := s.q.UpdateUser(ctx, db.UpdateUserParams{
-		Uuid:      id,
+		Uuid:      req.Uuid,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 	})

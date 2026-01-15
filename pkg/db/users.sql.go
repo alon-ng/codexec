@@ -216,11 +216,11 @@ RETURNING uuid, created_at, modified_at, deleted_at, first_name, last_name, emai
 
 type UpdateUserParams struct {
 	Uuid       uuid.UUID `json:"uuid"`
-	FirstName  string    `json:"first_name"`
-	LastName   string    `json:"last_name"`
-	Email      string    `json:"email"`
-	IsVerified bool      `json:"is_verified"`
-	IsAdmin    bool      `json:"is_admin"`
+	FirstName  *string   `json:"first_name"`
+	LastName   *string   `json:"last_name"`
+	Email      *string   `json:"email"`
+	IsVerified *bool     `json:"is_verified"`
+	IsAdmin    *bool     `json:"is_admin"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {

@@ -88,24 +88,29 @@ func TestUpdateUser(t *testing.T) {
 	user := createRandomUser(t)
 
 	rnd := getRandomInt()
+	firstName := fmt.Sprintf("Updated First %d", rnd)
+	lastName := fmt.Sprintf("Updated Last %d", rnd)
+	email := fmt.Sprintf("updated%d@example.com", rnd)
+	isVerified := true
+	isAdmin := true
 	updateParams := db.UpdateUserParams{
 		Uuid:       user.Uuid,
-		FirstName:  fmt.Sprintf("Updated First %d", rnd),
-		LastName:   fmt.Sprintf("Updated Last %d", rnd),
-		Email:      fmt.Sprintf("updated%d@example.com", rnd),
-		IsVerified: true,
-		IsAdmin:    true,
+		FirstName:  &firstName,
+		LastName:   &lastName,
+		Email:      &email,
+		IsVerified: &isVerified,
+		IsAdmin:    &isAdmin,
 	}
 
 	updatedUser, err := testQueries.UpdateUser(context.Background(), updateParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedUser)
 
-	require.Equal(t, updateParams.FirstName, updatedUser.FirstName)
-	require.Equal(t, updateParams.LastName, updatedUser.LastName)
-	require.Equal(t, updateParams.Email, updatedUser.Email)
-	require.Equal(t, updateParams.IsVerified, updatedUser.IsVerified)
-	require.Equal(t, updateParams.IsAdmin, updatedUser.IsAdmin)
+	require.Equal(t, *updateParams.FirstName, updatedUser.FirstName)
+	require.Equal(t, *updateParams.LastName, updatedUser.LastName)
+	require.Equal(t, *updateParams.Email, updatedUser.Email)
+	require.Equal(t, *updateParams.IsVerified, updatedUser.IsVerified)
+	require.Equal(t, *updateParams.IsAdmin, updatedUser.IsAdmin)
 	require.Equal(t, user.PasswordHash, updatedUser.PasswordHash)
 	require.Equal(t, user.Streak, updatedUser.Streak)
 	require.Equal(t, user.Score, updatedUser.Score)

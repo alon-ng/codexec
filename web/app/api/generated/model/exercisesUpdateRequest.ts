@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { ExercisesUpdateRequestData } from "./exercisesUpdateRequestData";
+import type { DbExerciseType } from "./dbExerciseType";
 
 export interface ExercisesUpdateRequest {
   data?: ExercisesUpdateRequestData;
@@ -15,5 +16,6 @@ export interface ExercisesUpdateRequest {
   name?: string;
   order_index?: number;
   reward?: number;
+  type?: DbExerciseType;
   uuid: string;
 }

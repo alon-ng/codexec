@@ -218,9 +218,8 @@ func (q *Queries) UndeleteLesson(ctx context.Context, argUuid uuid.UUID) error {
 
 const updateLesson = `-- name: UpdateLesson :one
 UPDATE "lessons"
-SET "course_uuid" = COALESCE($2, "course_uuid"), 
-    "order_index" = COALESCE($3, "order_index"),
-    "is_public" = COALESCE($4, "is_public"),
+SET "order_index" = COALESCE($2, "order_index"),
+    "is_public" = COALESCE($3, "is_public"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public
@@ -228,18 +227,12 @@ RETURNING uuid, created_at, modified_at, deleted_at, course_uuid, order_index, i
 
 type UpdateLessonParams struct {
 	Uuid       uuid.UUID `json:"uuid"`
-	CourseUuid uuid.UUID `json:"course_uuid"`
-	OrderIndex int16     `json:"order_index"`
-	IsPublic   bool      `json:"is_public"`
+	OrderIndex *int16    `json:"order_index"`
+	IsPublic   *bool     `json:"is_public"`
 }
 
 func (q *Queries) UpdateLesson(ctx context.Context, arg UpdateLessonParams) (Lesson, error) {
-	row := q.db.QueryRow(ctx, updateLesson,
-		arg.Uuid,
-		arg.CourseUuid,
-		arg.OrderIndex,
-		arg.IsPublic,
-	)
+	row := q.db.QueryRow(ctx, updateLesson, arg.Uuid, arg.OrderIndex, arg.IsPublic)
 	var i Lesson
 	err := row.Scan(
 		&i.Uuid,

@@ -136,43 +136,52 @@ func TestUpdateCourse(t *testing.T) {
 	course := createRandomCourse(t)
 
 	rnd := getRandomInt()
+	subject := "javascript"
+	price := int16(150)
+	discount := int16(5)
+	isActive := false
+	difficulty := int16(2)
 	updateParams := db.UpdateCourseParams{
 		Uuid:       course.Uuid,
-		Subject:    "javascript",
-		Price:      150,
-		Discount:   5,
-		IsActive:   false,
-		Difficulty: 2,
+		Subject:    &subject,
+		Price:      &price,
+		Discount:   &discount,
+		IsActive:   &isActive,
+		Difficulty: &difficulty,
 	}
 
 	updatedCourse, err := testQueries.UpdateCourse(context.Background(), updateParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedCourse)
 
-	require.Equal(t, updateParams.Subject, updatedCourse.Subject)
-	require.Equal(t, updateParams.Price, updatedCourse.Price)
-	require.Equal(t, updateParams.Discount, updatedCourse.Discount)
-	require.Equal(t, updateParams.IsActive, updatedCourse.IsActive)
-	require.Equal(t, updateParams.Difficulty, updatedCourse.Difficulty)
+	require.Equal(t, *updateParams.Subject, updatedCourse.Subject)
+	require.Equal(t, *updateParams.Price, updatedCourse.Price)
+	require.Equal(t, *updateParams.Discount, updatedCourse.Discount)
+	require.Equal(t, *updateParams.IsActive, updatedCourse.IsActive)
+	require.Equal(t, *updateParams.Difficulty, updatedCourse.Difficulty)
 
 	require.NotZero(t, updatedCourse.ModifiedAt)
 	require.Nil(t, updatedCourse.DeletedAt)
 
+	language := "en"
+	name := fmt.Sprintf("Updated Test Course %d", rnd)
+	description := fmt.Sprintf("Updated Test Description %d", rnd)
+	bullets := "Updated Test Bullets 1\nUpdated Test Bullets 2\nUpdated Test Bullets 3"
 	updateTranslationParams := db.UpdateCourseTranslationParams{
 		Uuid:        course.Uuid,
-		Language:    "en",
-		Name:        fmt.Sprintf("Updated Test Course %d", rnd),
-		Description: fmt.Sprintf("Updated Test Description %d", rnd),
-		Bullets:     "Updated Test Bullets 1\nUpdated Test Bullets 2\nUpdated Test Bullets 3",
+		Language:    language,
+		Name:        &name,
+		Description: &description,
+		Bullets:     &bullets,
 	}
 	updateTranslation, err := testQueries.UpdateCourseTranslation(context.Background(), updateTranslationParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updateTranslation)
 
 	require.Equal(t, updateTranslationParams.Language, updateTranslation.Language)
-	require.Equal(t, updateTranslationParams.Name, updateTranslation.Name)
-	require.Equal(t, updateTranslationParams.Description, updateTranslation.Description)
-	require.Equal(t, updateTranslationParams.Bullets, updateTranslation.Bullets)
+	require.Equal(t, *updateTranslationParams.Name, updateTranslation.Name)
+	require.Equal(t, *updateTranslationParams.Description, updateTranslation.Description)
+	require.Equal(t, *updateTranslationParams.Bullets, updateTranslation.Bullets)
 }
 
 func TestDeleteCourse(t *testing.T) {

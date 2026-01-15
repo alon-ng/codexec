@@ -55,20 +55,20 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Param        user  body      UpdateRequest  true  "User update data"
+// @Param        user  body      UpdateUserRequest  true  "User update data"
 // @Success      200   {object}  db.User
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
 // @Router       /users/update [put]
 func (c *Controller) Update(ctx *gin.Context) {
-	var req UpdateRequest
+	var req UpdateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
 		return
 	}
 
-	user, err := c.svc.Update(ctx.Request.Context(), req.Uuid, req.UpdateUserRequest)
+	user, err := c.svc.Update(ctx.Request.Context(), req)
 	if err != nil {
 		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
 		return

@@ -63,8 +63,8 @@ RETURNING uuid, started_at, last_accessed_at, user_uuid, course_uuid, completed_
 
 type UpdateUserCourseParams struct {
 	Uuid        uuid.UUID  `json:"uuid"`
-	UserUuid    uuid.UUID  `json:"user_uuid"`
-	CourseUuid  uuid.UUID  `json:"course_uuid"`
+	UserUuid    *uuid.UUID `json:"user_uuid"`
+	CourseUuid  *uuid.UUID `json:"course_uuid"`
 	CompletedAt *time.Time `json:"completed_at"`
 }
 

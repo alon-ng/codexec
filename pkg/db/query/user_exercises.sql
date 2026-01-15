@@ -22,11 +22,11 @@ LIMIT 1;
 
 -- name: UpdateUserExercise :one
 UPDATE "user_exercises"
-SET "user_uuid" = COALESCE($2, "user_uuid"), 
-    "exercise_uuid" = COALESCE($3, "exercise_uuid"), 
-    "submission" = COALESCE($4, "submission"),
-    "attempts" = COALESCE($5, "attempts"),
-    "completed_at" = COALESCE($6, "completed_at")
+SET "user_uuid" = COALESCE(sqlc.narg('user_uuid'), "user_uuid"), 
+    "exercise_uuid" = COALESCE(sqlc.narg('exercise_uuid'), "exercise_uuid"), 
+    "submission" = COALESCE(sqlc.narg('submission'), "submission"),
+    "attempts" = COALESCE(sqlc.narg('attempts'), "attempts"),
+    "completed_at" = COALESCE(sqlc.narg('completed_at'), "completed_at")
 WHERE "uuid" = $1
 RETURNING *;
 

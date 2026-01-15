@@ -29,11 +29,11 @@ RETURNING *;
 
 -- name: UpdateUser :one
 UPDATE "users"
-SET "first_name" = COALESCE($2, "first_name"), 
-    "last_name" = COALESCE($3, "last_name"), 
-    "email" = COALESCE($4, "email"), 
-    "is_verified" = COALESCE($5, "is_verified"), 
-    "is_admin" = COALESCE($6, "is_admin"),
+SET "first_name" = COALESCE(sqlc.narg('first_name'), "first_name"), 
+    "last_name" = COALESCE(sqlc.narg('last_name'), "last_name"), 
+    "email" = COALESCE(sqlc.narg('email'), "email"), 
+    "is_verified" = COALESCE(sqlc.narg('is_verified'), "is_verified"), 
+    "is_admin" = COALESCE(sqlc.narg('is_admin'), "is_admin"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING *;

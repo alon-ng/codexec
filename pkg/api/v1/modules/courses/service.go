@@ -5,6 +5,7 @@ import (
 	"codim/pkg/db"
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -64,7 +65,7 @@ func (s *Service) Create(ctx context.Context, req CreateCourseRequest) (db.Cours
 	}, nil
 }
 
-func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateCourseRequest) (db.CourseWithTranslation, *e.APIError) {
+func (s *Service) Update(ctx context.Context, req UpdateCourseRequest) (db.CourseWithTranslation, *e.APIError) {
 	tx, err := s.p.Begin(ctx)
 	if err != nil {
 		return db.CourseWithTranslation{}, e.NewAPIError(err, ErrCourseUpdateFailed)
@@ -74,7 +75,7 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateCourseRequ
 	qtx := s.q.WithTx(tx)
 
 	course, err := qtx.UpdateCourse(ctx, db.UpdateCourseParams{
-		Uuid:       id,
+		Uuid:       req.Uuid,
 		Subject:    req.Subject,
 		Price:      req.Price,
 		Discount:   req.Discount,
@@ -87,7 +88,7 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateCourseRequ
 	}
 
 	translation, err := qtx.UpdateCourseTranslation(ctx, db.UpdateCourseTranslationParams{
-		Uuid:        id,
+		Uuid:        req.Uuid,
 		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,
@@ -166,6 +167,9 @@ func (s *Service) AddTranslation(ctx context.Context, req AddCourseTranslationRe
 	})
 
 	if err != nil {
+		if db.IsDuplicateKeyErrorWithConstraint(err, "uq_course_translations_course_language") {
+			return db.CourseTranslation{}, e.NewAPIError(err, fmt.Sprintf(ErrCourseTranslationAlreadyExists, req.Language))
+		}
 		return db.CourseTranslation{}, e.NewAPIError(err, ErrCourseAddTranslationFailed)
 	}
 

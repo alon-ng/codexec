@@ -56,20 +56,20 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Param        exercise  body      UpdateRequest  true  "Exercise update data"
+// @Param        exercise  body      UpdateExerciseRequest  true  "Exercise update data"
 // @Success      200       {object}  db.ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      500       {object}  errors.ErrorResponse
 // @Router       /exercises/update [put]
 func (c *Controller) Update(ctx *gin.Context) {
-	var req UpdateRequest
+	var req UpdateExerciseRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
 		return
 	}
 
-	exercise, err := c.svc.Update(ctx.Request.Context(), req.Uuid, req.UpdateExerciseRequest)
+	exercise, err := c.svc.Update(ctx.Request.Context(), req)
 	if err != nil {
 		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
 		return

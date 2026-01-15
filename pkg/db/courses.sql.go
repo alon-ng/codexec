@@ -246,11 +246,11 @@ RETURNING uuid, created_at, modified_at, deleted_at, subject, price, discount, i
 
 type UpdateCourseParams struct {
 	Uuid       uuid.UUID `json:"uuid"`
-	Subject    string    `json:"subject"`
-	Price      int16     `json:"price"`
-	Discount   int16     `json:"discount"`
-	IsActive   bool      `json:"is_active"`
-	Difficulty int16     `json:"difficulty"`
+	Subject    *string   `json:"subject"`
+	Price      *int16    `json:"price"`
+	Discount   *int16    `json:"discount"`
+	IsActive   *bool     `json:"is_active"`
+	Difficulty *int16    `json:"difficulty"`
 }
 
 func (q *Queries) UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Course, error) {

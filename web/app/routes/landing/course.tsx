@@ -7,7 +7,7 @@ import { getCoursesUuid } from "~/api/generated/courses/courses";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "~/components/ui/card";
-import { Award, BadgeCheck, BookMarked, Clock } from "lucide-react";
+import { Award, BadgeCheck, BookMarked, Clock, ShoppingCartIcon } from "lucide-react";
 import { Button } from "~/components/base/Button";
 import { motion } from "motion/react";
 import { blurInVariants } from "~/utils/animations";
@@ -47,7 +47,7 @@ export default function Course({ params }: Route.ComponentProps) {
                     <Card className="w-64">
                         <CardContent className="flex flex-col gap-2">
                             <div className="flex gap-2">
-                                <div className="text-xl font-bold">₪{data.price! - data.discount!}</div>
+                                <div className="text-2xl font-bold">₪{data.price! - data.discount!}</div>
                                 <div className="text-xl text-gray-500 line-through">₪{data.price!}</div>
                             </div>
 
@@ -66,7 +66,10 @@ export default function Course({ params }: Route.ComponentProps) {
                                 </div>
                             </div>
 
-                            <Button>{t("common.buy")}</Button>
+                            <Button>
+                                <ShoppingCartIcon className="w-4 h-4" />
+                                {t("common.buy")}
+                            </Button>
                         </CardContent>
                     </Card>
                 </motion.div>

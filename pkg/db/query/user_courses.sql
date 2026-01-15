@@ -9,9 +9,9 @@ INSERT INTO "user_courses" (
 
 -- name: UpdateUserCourse :one
 UPDATE "user_courses"
-SET "user_uuid" = COALESCE($2, "user_uuid"), 
-    "course_uuid" = COALESCE($3, "course_uuid"), 
-    "completed_at" = COALESCE($4, "completed_at")
+SET "user_uuid" = COALESCE(sqlc.narg('user_uuid'), "user_uuid"), 
+    "course_uuid" = COALESCE(sqlc.narg('course_uuid'), "course_uuid"), 
+    "completed_at" = COALESCE(sqlc.narg('completed_at'), "completed_at")
 WHERE "uuid" = $1
 RETURNING *;
 

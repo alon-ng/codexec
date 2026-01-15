@@ -11,4 +11,5 @@ var (
 	ErrCourseListFailed                = "Failed to list courses"
 	ErrCourseNotFound                  = "Course not found"
 	ErrCourseAddTranslationFailed      = "Failed to add course translation"
+	ErrCourseTranslationAlreadyExists  = "Course translation already exists for language '%s'"
 )

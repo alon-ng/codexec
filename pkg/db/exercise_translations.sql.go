@@ -111,11 +111,10 @@ func (q *Queries) GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID)
 
 const updateExerciseTranslation = `-- name: UpdateExerciseTranslation :one
 UPDATE "exercise_translations"
-SET "language" = COALESCE($2, "language"),
-    "name" = COALESCE($3, "name"),
+SET "name" = COALESCE($3, "name"),
     "description" = COALESCE($4, "description")
 FROM "exercises"
-WHERE "exercise_translations"."exercise_uuid" = "exercises"."uuid"
+WHERE "exercise_translations"."exercise_uuid" = "exercises"."uuid" AND "exercise_translations"."language" = $2
 AND "exercises"."uuid" = $1
 RETURNING exercise_translations.uuid, exercise_translations.exercise_uuid, exercise_translations.language, exercise_translations.name, exercise_translations.description
 `
@@ -123,8 +122,8 @@ RETURNING exercise_translations.uuid, exercise_translations.exercise_uuid, exerc
 type UpdateExerciseTranslationParams struct {
 	Uuid        uuid.UUID `json:"uuid"`
 	Language    string    `json:"language"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
+	Name        *string   `json:"name"`
+	Description *string   `json:"description"`
 }
 
 func (q *Queries) UpdateExerciseTranslation(ctx context.Context, arg UpdateExerciseTranslationParams) (ExerciseTranslation, error) {

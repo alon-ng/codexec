@@ -109,8 +109,8 @@ RETURNING uuid, started_at, last_accessed_at, user_uuid, lesson_uuid, completed_
 
 type UpdateUserLessonParams struct {
 	Uuid        uuid.UUID  `json:"uuid"`
-	UserUuid    uuid.UUID  `json:"user_uuid"`
-	LessonUuid  uuid.UUID  `json:"lesson_uuid"`
+	UserUuid    *uuid.UUID `json:"user_uuid"`
+	LessonUuid  *uuid.UUID `json:"lesson_uuid"`
 	CompletedAt *time.Time `json:"completed_at"`
 }
 

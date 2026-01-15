@@ -75,11 +75,11 @@ RETURNING *;
 
 -- name: UpdateCourse :one
 UPDATE "courses"
-SET "subject" = COALESCE($2, "subject"), 
-    "price" = COALESCE($3, "price"),
-    "discount" = COALESCE($4, "discount"),
-    "is_active" = COALESCE($5, "is_active"),
-    "difficulty" = COALESCE($6, "difficulty"),
+SET "subject" = COALESCE(sqlc.narg('subject'), "subject"), 
+    "price" = COALESCE(sqlc.narg('price'), "price"),
+    "discount" = COALESCE(sqlc.narg('discount'), "discount"),
+    "is_active" = COALESCE(sqlc.narg('is_active'), "is_active"),
+    "difficulty" = COALESCE(sqlc.narg('difficulty'), "difficulty"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING *;

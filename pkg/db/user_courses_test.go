@@ -77,8 +77,8 @@ func TestUpdateUserCourse(t *testing.T) {
 
 	updateParams := db.UpdateUserCourseParams{
 		Uuid:        userCourse.Uuid,
-		UserUuid:    userCourse.UserUuid,
-		CourseUuid:  userCourse.CourseUuid,
+		UserUuid:    &userCourse.UserUuid,
+		CourseUuid:  &userCourse.CourseUuid,
 		CompletedAt: &now,
 	}
 
@@ -86,10 +86,10 @@ func TestUpdateUserCourse(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedUserCourse)
 
+	require.Equal(t, updateParams.Uuid, updatedUserCourse.Uuid)
+	require.Equal(t, *updateParams.UserUuid, updatedUserCourse.UserUuid)
+	require.Equal(t, *updateParams.CourseUuid, updatedUserCourse.CourseUuid)
 	require.Equal(t, updateParams.CompletedAt, updatedUserCourse.CompletedAt)
-	require.Equal(t, userCourse.Uuid, updatedUserCourse.Uuid)
-	require.Equal(t, userCourse.UserUuid, updatedUserCourse.UserUuid)
-	require.Equal(t, userCourse.CourseUuid, updatedUserCourse.CourseUuid)
 }
 
 func TestDeleteUserCourse(t *testing.T) {

@@ -101,7 +101,7 @@ definitions:
     required:
     - uuid
     type: object
-  courses.UpdateRequest:
+  courses.UpdateCourseRequest:
     properties:
       bullets:
         example: |-
@@ -135,9 +135,7 @@ definitions:
       uuid:
         type: string
     required:
-    - description
     - language
-    - name
     - uuid
     type: object
   db.CourseFull:
@@ -402,7 +400,7 @@ definitions:
     required:
     - uuid
     type: object
-  exercises.UpdateRequest:
+  exercises.UpdateExerciseRequest:
     properties:
       data:
         additionalProperties: true
@@ -425,9 +423,14 @@ definitions:
       reward:
         example: 10
         type: integer
+      type:
+        allOf:
+        - $ref: '#/definitions/db.ExerciseType'
+        example: quiz
       uuid:
         type: string
     required:
+    - language
     - uuid
     type: object
   lessons.AddLessonTranslationRequest:
@@ -482,11 +485,8 @@ definitions:
     required:
     - uuid
     type: object
-  lessons.UpdateRequest:
+  lessons.UpdateLessonRequest:
     properties:
-      course_uuid:
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
       description:
         example: Learn Python fundamentals
         type: string
@@ -505,6 +505,7 @@ definitions:
       uuid:
         type: string
     required:
+    - language
     - uuid
     type: object
   users.CreateUserRequest:
@@ -540,7 +541,7 @@ definitions:
     required:
     - uuid
     type: object
-  users.UpdateRequest:
+  users.UpdateUserRequest:
     properties:
       first_name:
         example: John
@@ -910,7 +911,7 @@ paths:
         name: course
         required: true
         schema:
-          $ref: '#/definitions/courses.UpdateRequest'
+          $ref: '#/definitions/courses.UpdateCourseRequest'
       produces:
       - application/json
       responses:
@@ -1190,7 +1191,7 @@ paths:
         name: exercise
         required: true
         schema:
-          $ref: '#/definitions/exercises.UpdateRequest'
+          $ref: '#/definitions/exercises.UpdateExerciseRequest'
       produces:
       - application/json
       responses:
@@ -1465,7 +1466,7 @@ paths:
         name: lesson
         required: true
         schema:
-          $ref: '#/definitions/lessons.UpdateRequest'
+          $ref: '#/definitions/lessons.UpdateLessonRequest'
       produces:
       - application/json
       responses:
@@ -1718,7 +1719,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/users.UpdateRequest'
+          $ref: '#/definitions/users.UpdateUserRequest'
       produces:
       - application/json
       responses:

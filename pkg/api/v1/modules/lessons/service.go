@@ -60,7 +60,7 @@ func (s *Service) Create(ctx context.Context, req CreateLessonRequest) (db.Lesso
 	}, nil
 }
 
-func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateLessonRequest) (db.LessonWithTranslation, *e.APIError) {
+func (s *Service) Update(ctx context.Context, req UpdateLessonRequest) (db.LessonWithTranslation, *e.APIError) {
 	tx, err := s.p.Begin(ctx)
 	if err != nil {
 		return db.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonUpdateFailed)
@@ -70,8 +70,7 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateLessonRequ
 	qtx := s.q.WithTx(tx)
 
 	lesson, err := qtx.UpdateLesson(ctx, db.UpdateLessonParams{
-		Uuid:       id,
-		CourseUuid: req.CourseUuid,
+		Uuid:       req.Uuid,
 		OrderIndex: req.OrderIndex,
 		IsPublic:   req.IsPublic,
 	})
@@ -81,7 +80,7 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateLessonRequ
 	}
 
 	translation, err := qtx.UpdateLessonTranslation(ctx, db.UpdateLessonTranslationParams{
-		Uuid:        id,
+		Uuid:        req.Uuid,
 		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,

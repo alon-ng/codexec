@@ -18,11 +18,10 @@ RETURNING *;
 
 -- name: UpdateExerciseTranslation :one
 UPDATE "exercise_translations"
-SET "language" = COALESCE($2, "language"),
-    "name" = COALESCE($3, "name"),
-    "description" = COALESCE($4, "description")
+SET "name" = COALESCE(sqlc.narg('name'), "name"),
+    "description" = COALESCE(sqlc.narg('description'), "description")
 FROM "exercises"
-WHERE "exercise_translations"."exercise_uuid" = "exercises"."uuid"
+WHERE "exercise_translations"."exercise_uuid" = "exercises"."uuid" AND "exercise_translations"."language" = $2
 AND "exercises"."uuid" = $1
 RETURNING "exercise_translations".*;
 

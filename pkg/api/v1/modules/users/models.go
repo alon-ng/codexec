@@ -11,12 +11,8 @@ type CreateUserRequest struct {
 	IsAdmin    bool   `json:"is_admin" example:"false"`
 }
 
-type UpdateRequest struct {
-	Uuid uuid.UUID `json:"uuid" binding:"required"`
-	UpdateUserRequest
-}
-
 type UpdateUserRequest struct {
-	FirstName string `json:"first_name" example:"John"`
-	LastName  string `json:"last_name" example:"Doe"`
+	Uuid      uuid.UUID `json:"uuid" binding:"required"`
+	FirstName *string   `json:"first_name" example:"John"`
+	LastName  *string   `json:"last_name" example:"Doe"`
 }

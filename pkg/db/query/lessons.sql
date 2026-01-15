@@ -24,9 +24,8 @@ RETURNING *;
 
 -- name: UpdateLesson :one
 UPDATE "lessons"
-SET "course_uuid" = COALESCE($2, "course_uuid"), 
-    "order_index" = COALESCE($3, "order_index"),
-    "is_public" = COALESCE($4, "is_public"),
+SET "order_index" = COALESCE(sqlc.narg('order_index'), "order_index"),
+    "is_public" = COALESCE(sqlc.narg('is_public'), "is_public"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING *;

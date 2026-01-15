@@ -127,12 +127,12 @@ RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submissi
 `
 
 type UpdateUserExerciseParams struct {
-	Uuid         uuid.UUID       `json:"uuid"`
-	UserUuid     uuid.UUID       `json:"user_uuid"`
-	ExerciseUuid uuid.UUID       `json:"exercise_uuid"`
-	Submission   json.RawMessage `json:"submission"`
-	Attempts     int32           `json:"attempts"`
-	CompletedAt  *time.Time      `json:"completed_at"`
+	Uuid         uuid.UUID        `json:"uuid"`
+	UserUuid     *uuid.UUID       `json:"user_uuid"`
+	ExerciseUuid *uuid.UUID       `json:"exercise_uuid"`
+	Submission   *json.RawMessage `json:"submission"`
+	Attempts     *int32           `json:"attempts"`
+	CompletedAt  *time.Time       `json:"completed_at"`
 }
 
 func (q *Queries) UpdateUserExercise(ctx context.Context, arg UpdateUserExerciseParams) (UserExercise, error) {

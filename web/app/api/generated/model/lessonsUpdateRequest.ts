@@ -7,7 +7,6 @@
  */
 
 export interface LessonsUpdateRequest {
-  course_uuid?: string;
   description?: string;
   is_public?: boolean;
   language?: string;

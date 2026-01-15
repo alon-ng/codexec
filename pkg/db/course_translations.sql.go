@@ -116,22 +116,21 @@ func (q *Queries) GetCourseTranslation(ctx context.Context, argUuid uuid.UUID) (
 
 const updateCourseTranslation = `-- name: UpdateCourseTranslation :one
 UPDATE "course_translations"
-SET "language" = COALESCE($2, "language"),
-    "name" = COALESCE($3, "name"),
+SET "name" = COALESCE($3, "name"),
     "description" = COALESCE($4, "description"),
     "bullets" = COALESCE($5, "bullets")
 FROM "courses"
 WHERE "course_translations"."course_uuid" = "courses"."uuid"
-AND "courses"."uuid" = $1
+AND "courses"."uuid" = $1 AND "course_translations"."language" = $2
 RETURNING course_translations.uuid, course_translations.course_uuid, course_translations.language, course_translations.name, course_translations.description, course_translations.bullets
 `
 
 type UpdateCourseTranslationParams struct {
 	Uuid        uuid.UUID `json:"uuid"`
 	Language    string    `json:"language"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Bullets     string    `json:"bullets"`
+	Name        *string   `json:"name"`
+	Description *string   `json:"description"`
+	Bullets     *string   `json:"bullets"`
 }
 
 func (q *Queries) UpdateCourseTranslation(ctx context.Context, arg UpdateCourseTranslationParams) (CourseTranslation, error) {

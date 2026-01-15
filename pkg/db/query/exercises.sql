@@ -26,11 +26,10 @@ RETURNING *;
 
 -- name: UpdateExercise :one
 UPDATE "exercises"
-SET "lesson_uuid" = COALESCE($2, "lesson_uuid"), 
-    "order_index" = COALESCE($3, "order_index"),
-    "reward" = COALESCE($4, "reward"),
-    "type" = COALESCE($5, "type"),
-    "data" = COALESCE($6, "data"),
+SET "order_index" = COALESCE(sqlc.narg('order_index'), "order_index"),
+    "reward" = COALESCE(sqlc.narg('reward'), "reward"),
+    "type" = COALESCE(sqlc.narg('type'), "type"),
+    "data" = COALESCE(sqlc.narg('data'), "data"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING *;

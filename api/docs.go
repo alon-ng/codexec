@@ -492,7 +492,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/courses.UpdateRequest"
+                            "$ref": "#/definitions/courses.UpdateCourseRequest"
                         }
                     }
                 ],
@@ -927,7 +927,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/exercises.UpdateRequest"
+                            "$ref": "#/definitions/exercises.UpdateExerciseRequest"
                         }
                     }
                 ],
@@ -1356,7 +1356,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/lessons.UpdateRequest"
+                            "$ref": "#/definitions/lessons.UpdateLessonRequest"
                         }
                     }
                 ],
@@ -1762,7 +1762,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/users.UpdateRequest"
+                            "$ref": "#/definitions/users.UpdateUserRequest"
                         }
                     }
                 ],
@@ -1990,12 +1990,10 @@ const docTemplate = `{
                 }
             }
         },
-        "courses.UpdateRequest": {
+        "courses.UpdateCourseRequest": {
             "type": "object",
             "required": [
-                "description",
                 "language",
-                "name",
                 "uuid"
             ],
             "properties": {
@@ -2430,9 +2428,10 @@ const docTemplate = `{
                 }
             }
         },
-        "exercises.UpdateRequest": {
+        "exercises.UpdateExerciseRequest": {
             "type": "object",
             "required": [
+                "language",
                 "uuid"
             ],
             "properties": {
@@ -2463,6 +2462,14 @@ const docTemplate = `{
                 "reward": {
                     "type": "integer",
                     "example": 10
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/db.ExerciseType"
+                        }
+                    ],
+                    "example": "quiz"
                 },
                 "uuid": {
                     "type": "string"
@@ -2541,16 +2548,13 @@ const docTemplate = `{
                 }
             }
         },
-        "lessons.UpdateRequest": {
+        "lessons.UpdateLessonRequest": {
             "type": "object",
             "required": [
+                "language",
                 "uuid"
             ],
             "properties": {
-                "course_uuid": {
-                    "type": "string",
-                    "example": "123e4567-e89b-12d3-a456-426614174000"
-                },
                 "description": {
                     "type": "string",
                     "example": "Learn Python fundamentals"
@@ -2622,7 +2626,7 @@ const docTemplate = `{
                 }
             }
         },
-        "users.UpdateRequest": {
+        "users.UpdateUserRequest": {
             "type": "object",
             "required": [
                 "uuid"

@@ -227,29 +227,26 @@ func (q *Queries) UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 
 const updateExercise = `-- name: UpdateExercise :one
 UPDATE "exercises"
-SET "lesson_uuid" = COALESCE($2, "lesson_uuid"), 
-    "order_index" = COALESCE($3, "order_index"),
-    "reward" = COALESCE($4, "reward"),
-    "type" = COALESCE($5, "type"),
-    "data" = COALESCE($6, "data"),
+SET "order_index" = COALESCE($2, "order_index"),
+    "reward" = COALESCE($3, "reward"),
+    "type" = COALESCE($4, "type"),
+    "data" = COALESCE($5, "data"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data
 `
 
 type UpdateExerciseParams struct {
-	Uuid       uuid.UUID       `json:"uuid"`
-	LessonUuid uuid.UUID       `json:"lesson_uuid"`
-	OrderIndex int16           `json:"order_index"`
-	Reward     int16           `json:"reward"`
-	Type       ExerciseType    `json:"type"`
-	Data       json.RawMessage `json:"data"`
+	Uuid       uuid.UUID        `json:"uuid"`
+	OrderIndex *int16           `json:"order_index"`
+	Reward     *int16           `json:"reward"`
+	Type       *ExerciseType    `json:"type"`
+	Data       *json.RawMessage `json:"data"`
 }
 
 func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) (Exercise, error) {
 	row := q.db.QueryRow(ctx, updateExercise,
 		arg.Uuid,
-		arg.LessonUuid,
 		arg.OrderIndex,
 		arg.Reward,
 		arg.Type,

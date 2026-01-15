@@ -128,40 +128,42 @@ func TestGetLesson(t *testing.T) {
 
 func TestUpdateLesson(t *testing.T) {
 	lesson := createRandomLesson(t, nil)
-	course := createRandomCourse(t)
 
 	rnd := getRandomInt()
+	orderIndex := int16(2)
+	isPublic := false
 	updateParams := db.UpdateLessonParams{
 		Uuid:       lesson.Uuid,
-		CourseUuid: course.Uuid,
-		OrderIndex: 2,
-		IsPublic:   false,
+		OrderIndex: &orderIndex,
+		IsPublic:   &isPublic,
 	}
 
 	updatedLesson, err := testQueries.UpdateLesson(context.Background(), updateParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedLesson)
 
-	require.Equal(t, updateParams.CourseUuid, updatedLesson.CourseUuid)
-	require.Equal(t, updateParams.OrderIndex, updatedLesson.OrderIndex)
-	require.Equal(t, updateParams.IsPublic, updatedLesson.IsPublic)
+	require.Equal(t, *updateParams.OrderIndex, updatedLesson.OrderIndex)
+	require.Equal(t, *updateParams.IsPublic, updatedLesson.IsPublic)
 
 	require.NotZero(t, updatedLesson.ModifiedAt)
 	require.Nil(t, updatedLesson.DeletedAt)
 
+	language := "en"
+	name := fmt.Sprintf("Updated Test Lesson %d", rnd)
+	description := fmt.Sprintf("Updated Test Description %d", rnd)
 	updateTranslationParams := db.UpdateLessonTranslationParams{
 		Uuid:        lesson.Uuid,
-		Language:    "en",
-		Name:        fmt.Sprintf("Updated Test Lesson %d", rnd),
-		Description: fmt.Sprintf("Updated Test Description %d", rnd),
+		Language:    language,
+		Name:        &name,
+		Description: &description,
 	}
 	updateTranslation, err := testQueries.UpdateLessonTranslation(context.Background(), updateTranslationParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updateTranslation)
 
 	require.Equal(t, updateTranslationParams.Language, updateTranslation.Language)
-	require.Equal(t, updateTranslationParams.Name, updateTranslation.Name)
-	require.Equal(t, updateTranslationParams.Description, updateTranslation.Description)
+	require.Equal(t, *updateTranslationParams.Name, updateTranslation.Name)
+	require.Equal(t, *updateTranslationParams.Description, updateTranslation.Description)
 }
 
 func TestDeleteLesson(t *testing.T) {
