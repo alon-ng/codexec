@@ -1,8 +1,8 @@
 import type { Variants } from 'motion/react';
 
-export const blurInVariants = (delay: number = 0): Variants => {
+export const blurInVariants = (delay: number = 0, translateY: number = 5): Variants => {
   return {
-    hidden: { opacity: 0, y: 5, filter: 'blur(10px)' },
+    hidden: { opacity: 0, y: translateY, filter: 'blur(10px)' },
     visible: {
       opacity: 1,
       y: 0,

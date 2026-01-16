@@ -11,6 +11,8 @@ import { Award, BadgeCheck, BookMarked, Clock, ShoppingCartIcon } from "lucide-r
 import { Button } from "~/components/base/Button";
 import { motion } from "motion/react";
 import { blurInVariants } from "~/utils/animations";
+import CoursePath from "~/components/landing/courses/CoursePath";
+import type { DbCourseFull } from "~/api/generated/model";
 
 export default function Course({ params }: Route.ComponentProps) {
     const { t, i18n } = useTranslation();
@@ -39,7 +41,7 @@ export default function Course({ params }: Route.ComponentProps) {
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full gap-12">
             <PageHeader title={data.translation?.name!} breadcrumbs={breadcrumbs} />
             <div className="flex justify-between gap-4">
                 <div>{data.translation?.description}</div>
@@ -74,6 +76,7 @@ export default function Course({ params }: Route.ComponentProps) {
                     </Card>
                 </motion.div>
             </div>
+            <CoursePath course={data as Required<DbCourseFull>} />
         </div >
     );
 }
