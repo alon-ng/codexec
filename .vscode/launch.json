@@ -19,6 +19,14 @@
             "mode": "debug",
             "envFile": "${workspaceFolder}/cmd/api/.env",
             "program": "${workspaceFolder}/cmd/api/main.go"
+        },
+        {
+            "name": "Debug Seed Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "envFile": "${workspaceFolder}/cmd/seed/.env",
+            "program": "${workspaceFolder}/cmd/seed/."
         }
     ]
 }
