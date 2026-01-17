@@ -25,7 +25,7 @@ import type {
   CoursesAddCourseTranslationRequest,
   CoursesCreateCourseRequest,
   CoursesIDRequest,
-  CoursesUpdateRequest,
+  CoursesUpdateCourseRequest,
   DbCourseFull,
   DbCourseTranslation,
   DbCourseWithTranslation,
@@ -548,7 +548,7 @@ export const usePostCoursesRestore = <
  * @summary Update a course
  */
 export const putCoursesUpdate = (
-  coursesUpdateRequest: CoursesUpdateRequest,
+  coursesUpdateCourseRequest: CoursesUpdateCourseRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<DbCourseWithTranslation>(
@@ -556,7 +556,7 @@ export const putCoursesUpdate = (
       url: `/courses/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: coursesUpdateRequest,
+      data: coursesUpdateCourseRequest,
     },
     options,
   );
@@ -569,14 +569,14 @@ export const getPutCoursesUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putCoursesUpdate>>,
     TError,
-    { data: CoursesUpdateRequest },
+    { data: CoursesUpdateCourseRequest },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putCoursesUpdate>>,
   TError,
-  { data: CoursesUpdateRequest },
+  { data: CoursesUpdateCourseRequest },
   TContext
 > => {
   const mutationKey = ["putCoursesUpdate"];
@@ -590,7 +590,7 @@ export const getPutCoursesUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putCoursesUpdate>>,
-    { data: CoursesUpdateRequest }
+    { data: CoursesUpdateCourseRequest }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -603,7 +603,7 @@ export const getPutCoursesUpdateMutationOptions = <
 export type PutCoursesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putCoursesUpdate>>
 >;
-export type PutCoursesUpdateMutationBody = CoursesUpdateRequest;
+export type PutCoursesUpdateMutationBody = CoursesUpdateCourseRequest;
 export type PutCoursesUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -617,7 +617,7 @@ export const usePutCoursesUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putCoursesUpdate>>,
       TError,
-      { data: CoursesUpdateRequest },
+      { data: CoursesUpdateCourseRequest },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -626,7 +626,7 @@ export const usePutCoursesUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putCoursesUpdate>>,
   TError,
-  { data: CoursesUpdateRequest },
+  { data: CoursesUpdateCourseRequest },
   TContext
 > => {
   const mutationOptions = getPutCoursesUpdateMutationOptions(options);

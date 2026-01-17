@@ -32,3 +32,24 @@ func (s *Service) Me(ctx context.Context, meUUID uuid.UUID) (db.User, *e.APIErro
 
 	return u, nil
 }
+
+func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.UUID, req ListUserCoursesWithProgressRequest) ([]db.UserCourseWithProgress, *e.APIError) {
+	userCourses, err := s.q.ListUserCoursesWithProgress(ctx, db.ListUserCoursesWithProgressParams{
+		UserUuid: meUUID,
+		Language: req.Language,
+		Limit:    req.Limit,
+		Offset:   req.Offset,
+		Subject:  req.Subject,
+		IsActive: req.IsActive,
+	})
+	if err != nil {
+		return nil, e.NewAPIError(err, ErrGetUserCoursesWithProgressFailed)
+	}
+
+	userCoursesWithProgress := make([]db.UserCourseWithProgress, len(userCourses))
+	for i, userCourse := range userCourses {
+		userCoursesWithProgress[i] = userCourse.ToUserCourseWithProgress()
+	}
+
+	return userCoursesWithProgress, nil
+}

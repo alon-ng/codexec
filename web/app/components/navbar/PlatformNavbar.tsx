@@ -36,7 +36,7 @@ export function PlatformNavbar({ navigationItems, showUserMenu = false }: Platfo
         )}>
 
             <div className="flex gap-4">
-                <Link to="/platform" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2">
                     <img src={logoGradient} alt="Codim" className="h-10 w-10" />
                 </Link>
 

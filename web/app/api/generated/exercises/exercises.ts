@@ -28,7 +28,7 @@ import type {
   ExercisesAddExerciseTranslationRequest,
   ExercisesCreateExerciseRequest,
   ExercisesIDRequest,
-  ExercisesUpdateRequest,
+  ExercisesUpdateExerciseRequest,
   GetExercisesParams,
   GetExercisesUuidParams,
 } from ".././model";
@@ -548,7 +548,7 @@ export const usePostExercisesRestore = <
  * @summary Update an exercise
  */
 export const putExercisesUpdate = (
-  exercisesUpdateRequest: ExercisesUpdateRequest,
+  exercisesUpdateExerciseRequest: ExercisesUpdateExerciseRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<DbExerciseWithTranslation>(
@@ -556,7 +556,7 @@ export const putExercisesUpdate = (
       url: `/exercises/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: exercisesUpdateRequest,
+      data: exercisesUpdateExerciseRequest,
     },
     options,
   );
@@ -569,14 +569,14 @@ export const getPutExercisesUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putExercisesUpdate>>,
     TError,
-    { data: ExercisesUpdateRequest },
+    { data: ExercisesUpdateExerciseRequest },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putExercisesUpdate>>,
   TError,
-  { data: ExercisesUpdateRequest },
+  { data: ExercisesUpdateExerciseRequest },
   TContext
 > => {
   const mutationKey = ["putExercisesUpdate"];
@@ -590,7 +590,7 @@ export const getPutExercisesUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putExercisesUpdate>>,
-    { data: ExercisesUpdateRequest }
+    { data: ExercisesUpdateExerciseRequest }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -603,7 +603,7 @@ export const getPutExercisesUpdateMutationOptions = <
 export type PutExercisesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putExercisesUpdate>>
 >;
-export type PutExercisesUpdateMutationBody = ExercisesUpdateRequest;
+export type PutExercisesUpdateMutationBody = ExercisesUpdateExerciseRequest;
 export type PutExercisesUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -617,7 +617,7 @@ export const usePutExercisesUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putExercisesUpdate>>,
       TError,
-      { data: ExercisesUpdateRequest },
+      { data: ExercisesUpdateExerciseRequest },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -626,7 +626,7 @@ export const usePutExercisesUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putExercisesUpdate>>,
   TError,
-  { data: ExercisesUpdateRequest },
+  { data: ExercisesUpdateExerciseRequest },
   TContext
 > => {
   const mutationOptions = getPutExercisesUpdateMutationOptions(options);

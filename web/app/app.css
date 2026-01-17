@@ -56,6 +56,10 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+
+  --color-codim-pink: #fa137c;
+  --color-codim-purple: #5823cd;
 }
 
 :root {

@@ -7,6 +7,7 @@ import (
 )
 
 func seed(ctx context.Context, queries *db.Queries, authProvider *auth.Provider) {
-	seedAdmin(ctx, queries, authProvider)
-	seedCourse(ctx, queries)
+	user := seedAdmin(ctx, queries, authProvider)
+	course := seedCourse(ctx, queries)
+	seedUserCourse(ctx, queries, user.Uuid, course.Uuid)
 }

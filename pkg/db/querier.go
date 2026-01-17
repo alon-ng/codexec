@@ -55,6 +55,7 @@ type Querier interface {
 	ListCourses(ctx context.Context, arg ListCoursesParams) ([]ListCoursesRow, error)
 	ListExercises(ctx context.Context, arg ListExercisesParams) ([]ListExercisesRow, error)
 	ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error)
+	ListUserCoursesWithProgress(ctx context.Context, arg ListUserCoursesWithProgressParams) ([]ListUserCoursesWithProgressRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	UndeleteCourse(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error

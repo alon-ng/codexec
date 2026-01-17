@@ -33,11 +33,11 @@ export default function Login() {
   }
 
   if (isLoggedIn) {
-    return <Navigate to="/platform" />;
+    return <Navigate to="/classroom" />;
   }
 
   const handleSuccess = () => {
-    navigate("/platform");
+    navigate("/classroom");
   };
 
   return (

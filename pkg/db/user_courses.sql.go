@@ -52,6 +52,182 @@ func (q *Queries) DeleteUserCourse(ctx context.Context, argUuid uuid.UUID) error
 	return err
 }
 
+const listUserCoursesWithProgress = `-- name: ListUserCoursesWithProgress :many
+WITH course_exercise_counts AS (
+    SELECT 
+        lessons.course_uuid,
+        COUNT(exercises.uuid)::BIGINT AS total_exercises
+    FROM lessons
+    JOIN exercises ON lessons.uuid = exercises.lesson_uuid
+    WHERE lessons.deleted_at IS NULL
+      AND exercises.deleted_at IS NULL
+    GROUP BY lessons.course_uuid
+),
+user_exercise_counts AS (
+    SELECT 
+        lessons.course_uuid,
+        user_exercises.user_uuid,
+        COUNT(user_exercises.uuid)::BIGINT AS completed_exercises
+    FROM lessons
+    JOIN exercises ON lessons.uuid = exercises.lesson_uuid
+    JOIN user_exercises ON exercises.uuid = user_exercises.exercise_uuid
+    WHERE lessons.deleted_at IS NULL
+      AND exercises.deleted_at IS NULL
+      AND user_exercises.completed_at IS NOT NULL
+    GROUP BY lessons.course_uuid, user_exercises.user_uuid
+),
+next_lessons AS (
+    SELECT DISTINCT ON (lessons.course_uuid)
+        lessons.course_uuid,
+        lessons.uuid AS lesson_uuid,
+        lesson_translations.name AS lesson_name
+    FROM lessons
+    LEFT JOIN user_lessons ON lessons.uuid = user_lessons.lesson_uuid AND user_lessons.user_uuid = $1
+    LEFT JOIN lesson_translations ON lessons.uuid = lesson_translations.lesson_uuid AND lesson_translations.language = $2
+    WHERE lessons.deleted_at IS NULL
+      AND (user_lessons.completed_at IS NULL OR user_lessons.uuid IS NULL)
+    ORDER BY lessons.course_uuid, lessons.order_index ASC
+),
+next_exercises AS (
+    SELECT DISTINCT ON (lessons.course_uuid)
+        lessons.course_uuid,
+        exercises.uuid AS exercise_uuid,
+        exercise_translations.name AS exercise_name,
+        lessons.uuid AS lesson_uuid,
+        lesson_translations.name AS lesson_name
+    FROM lessons
+    JOIN exercises ON lessons.uuid = exercises.lesson_uuid
+    LEFT JOIN user_exercises ON exercises.uuid = user_exercises.exercise_uuid AND user_exercises.user_uuid = $1
+    LEFT JOIN exercise_translations ON exercises.uuid = exercise_translations.exercise_uuid AND exercise_translations.language = $2
+    LEFT JOIN lesson_translations ON lessons.uuid = lesson_translations.lesson_uuid AND lesson_translations.language = $2
+    WHERE lessons.deleted_at IS NULL
+      AND exercises.deleted_at IS NULL
+      AND (user_exercises.completed_at IS NULL OR user_exercises.uuid IS NULL)
+    ORDER BY lessons.course_uuid, lessons.order_index ASC, exercises.order_index ASC
+)
+SELECT  courses.uuid                        AS "course_uuid", 
+        courses.created_at                  AS "course_created_at", 
+        courses.modified_at                 AS "course_modified_at", 
+        courses.deleted_at                  AS "course_deleted_at", 
+        courses.subject                     AS "course_subject", 
+        courses.price                       AS "course_price", 
+        courses.discount                    AS "course_discount", 
+        courses.is_active                   AS "course_is_active", 
+        courses.difficulty                  AS "course_difficulty",
+        course_translations.uuid            AS "course_translation_uuid",
+        course_translations.language        AS "course_translation_language",
+        course_translations.name            AS "course_name", 
+        course_translations.description     AS "course_description", 
+        course_translations.bullets         AS "course_bullets", 
+        user_courses.started_at             AS "user_course_started_at",
+        user_courses.last_accessed_at       AS "user_course_last_accessed_at",
+        user_courses.completed_at           AS "user_course_completed_at",
+        COALESCE(course_exercise_counts.total_exercises, 0)::INTEGER   AS total_exercises,
+        COALESCE(user_exercise_counts.completed_exercises, 0)::INTEGER AS completed_exercises,
+        next_lessons.lesson_uuid            AS "next_lesson_uuid",
+        next_lessons.lesson_name            AS "next_lesson_name",
+        next_exercises.exercise_uuid        AS "next_exercise_uuid",
+        next_exercises.exercise_name        AS "next_exercise_name"
+FROM "user_courses"
+JOIN "courses"                    ON "user_courses"."course_uuid" = "courses"."uuid" AND "courses"."deleted_at" IS NULL
+JOIN "course_translations"        ON "courses"."uuid" = "course_translations"."course_uuid" AND "course_translations"."language" = $2
+LEFT JOIN course_exercise_counts  ON "courses"."uuid" = course_exercise_counts.course_uuid
+LEFT JOIN user_exercise_counts    ON "courses"."uuid" = user_exercise_counts.course_uuid AND "user_courses"."user_uuid" = user_exercise_counts.user_uuid
+LEFT JOIN next_lessons            ON "courses"."uuid" = next_lessons.course_uuid
+LEFT JOIN next_exercises          ON "courses"."uuid" = next_exercises.course_uuid
+WHERE "user_courses"."user_uuid" = $1
+AND   ($5::text IS NULL OR "courses"."subject" = $5)
+AND   ($6::boolean IS NULL OR "courses"."is_active" = $6)
+ORDER BY "user_courses"."last_accessed_at" DESC
+LIMIT $3 OFFSET $4
+`
+
+type ListUserCoursesWithProgressParams struct {
+	UserUuid uuid.UUID `json:"user_uuid"`
+	Language string    `json:"language"`
+	Limit    int32     `json:"limit"`
+	Offset   int32     `json:"offset"`
+	Subject  *string   `json:"subject"`
+	IsActive *bool     `json:"is_active"`
+}
+
+type ListUserCoursesWithProgressRow struct {
+	CourseUuid                uuid.UUID  `json:"course_uuid"`
+	CourseCreatedAt           time.Time  `json:"course_created_at"`
+	CourseModifiedAt          time.Time  `json:"course_modified_at"`
+	CourseDeletedAt           *time.Time `json:"course_deleted_at"`
+	CourseSubject             string     `json:"course_subject"`
+	CoursePrice               int16      `json:"course_price"`
+	CourseDiscount            int16      `json:"course_discount"`
+	CourseIsActive            bool       `json:"course_is_active"`
+	CourseDifficulty          int16      `json:"course_difficulty"`
+	CourseTranslationUuid     uuid.UUID  `json:"course_translation_uuid"`
+	CourseTranslationLanguage string     `json:"course_translation_language"`
+	CourseName                string     `json:"course_name"`
+	CourseDescription         string     `json:"course_description"`
+	CourseBullets             string     `json:"course_bullets"`
+	UserCourseStartedAt       time.Time  `json:"user_course_started_at"`
+	UserCourseLastAccessedAt  *time.Time `json:"user_course_last_accessed_at"`
+	UserCourseCompletedAt     *time.Time `json:"user_course_completed_at"`
+	TotalExercises            int32      `json:"total_exercises"`
+	CompletedExercises        int32      `json:"completed_exercises"`
+	NextLessonUuid            *uuid.UUID `json:"next_lesson_uuid"`
+	NextLessonName            *string    `json:"next_lesson_name"`
+	NextExerciseUuid          *uuid.UUID `json:"next_exercise_uuid"`
+	NextExerciseName          *string    `json:"next_exercise_name"`
+}
+
+func (q *Queries) ListUserCoursesWithProgress(ctx context.Context, arg ListUserCoursesWithProgressParams) ([]ListUserCoursesWithProgressRow, error) {
+	rows, err := q.db.Query(ctx, listUserCoursesWithProgress,
+		arg.UserUuid,
+		arg.Language,
+		arg.Limit,
+		arg.Offset,
+		arg.Subject,
+		arg.IsActive,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListUserCoursesWithProgressRow{}
+	for rows.Next() {
+		var i ListUserCoursesWithProgressRow
+		if err := rows.Scan(
+			&i.CourseUuid,
+			&i.CourseCreatedAt,
+			&i.CourseModifiedAt,
+			&i.CourseDeletedAt,
+			&i.CourseSubject,
+			&i.CoursePrice,
+			&i.CourseDiscount,
+			&i.CourseIsActive,
+			&i.CourseDifficulty,
+			&i.CourseTranslationUuid,
+			&i.CourseTranslationLanguage,
+			&i.CourseName,
+			&i.CourseDescription,
+			&i.CourseBullets,
+			&i.UserCourseStartedAt,
+			&i.UserCourseLastAccessedAt,
+			&i.UserCourseCompletedAt,
+			&i.TotalExercises,
+			&i.CompletedExercises,
+			&i.NextLessonUuid,
+			&i.NextLessonName,
+			&i.NextExerciseUuid,
+			&i.NextExerciseName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateUserCourse = `-- name: UpdateUserCourse :one
 UPDATE "user_courses"
 SET "user_uuid" = COALESCE($2, "user_uuid"), 

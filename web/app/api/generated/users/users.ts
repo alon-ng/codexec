@@ -27,7 +27,7 @@ import type {
   GetUsersParams,
   UsersCreateUserRequest,
   UsersIDRequest,
-  UsersUpdateRequest,
+  UsersUpdateUserRequest,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -451,7 +451,7 @@ export const usePostUsersRestore = <
  * @summary Update a user
  */
 export const putUsersUpdate = (
-  usersUpdateRequest: UsersUpdateRequest,
+  usersUpdateUserRequest: UsersUpdateUserRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<DbUser>(
@@ -459,7 +459,7 @@ export const putUsersUpdate = (
       url: `/users/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: usersUpdateRequest,
+      data: usersUpdateUserRequest,
     },
     options,
   );
@@ -472,14 +472,14 @@ export const getPutUsersUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putUsersUpdate>>,
     TError,
-    { data: UsersUpdateRequest },
+    { data: UsersUpdateUserRequest },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putUsersUpdate>>,
   TError,
-  { data: UsersUpdateRequest },
+  { data: UsersUpdateUserRequest },
   TContext
 > => {
   const mutationKey = ["putUsersUpdate"];
@@ -493,7 +493,7 @@ export const getPutUsersUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putUsersUpdate>>,
-    { data: UsersUpdateRequest }
+    { data: UsersUpdateUserRequest }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -506,7 +506,7 @@ export const getPutUsersUpdateMutationOptions = <
 export type PutUsersUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putUsersUpdate>>
 >;
-export type PutUsersUpdateMutationBody = UsersUpdateRequest;
+export type PutUsersUpdateMutationBody = UsersUpdateUserRequest;
 export type PutUsersUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -520,7 +520,7 @@ export const usePutUsersUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putUsersUpdate>>,
       TError,
-      { data: UsersUpdateRequest },
+      { data: UsersUpdateUserRequest },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -529,7 +529,7 @@ export const usePutUsersUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putUsersUpdate>>,
   TError,
-  { data: UsersUpdateRequest },
+  { data: UsersUpdateUserRequest },
   TContext
 > => {
   const mutationOptions = getPutUsersUpdateMutationOptions(options);

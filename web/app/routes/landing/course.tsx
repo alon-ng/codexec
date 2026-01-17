@@ -7,7 +7,7 @@ import { getCoursesUuid } from "~/api/generated/courses/courses";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "~/components/ui/card";
-import { Award, BadgeCheck, BookMarked, Clock, ShoppingCartIcon } from "lucide-react";
+import { Award, BadgeCheck, BookMarked, CircleCheckBig, Clock, ShoppingCartIcon } from "lucide-react";
 import { Button } from "~/components/base/Button";
 import { motion } from "motion/react";
 import { blurInVariants } from "~/utils/animations";
@@ -44,7 +44,15 @@ export default function Course({ params }: Route.ComponentProps) {
         <div className="flex flex-col h-full gap-12">
             <PageHeader title={data.translation?.name!} breadcrumbs={breadcrumbs} />
             <div className="flex justify-between gap-4">
-                <div>{data.translation?.description}</div>
+                <motion.div className="flex flex-col gap-4" variants={blurInVariants(0.1)} initial="hidden" animate="visible">
+                    <div>{data.translation?.description}</div>
+                    <div>
+                        {data.translation?.bullets?.split("\n").map((bullet, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                                <CircleCheckBig className="w-4 h-4" /> {bullet}</div>
+                        ))}
+                    </div>
+                </motion.div>
                 <motion.div variants={blurInVariants(0.2)} initial="hidden" animate="visible">
                     <Card className="w-64">
                         <CardContent className="flex flex-col gap-2">

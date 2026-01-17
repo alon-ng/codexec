@@ -6,11 +6,11 @@ import { PlatformNavbar } from "~/components/navbar/PlatformNavbar";
 const navigationItems = [
   {
     label: "navigation.overview",
-    href: "/platform",
+    href: "/classroom",
   },
   {
     label: "navigation.myCourses",
-    href: "/platform/courses",
+    href: "/classroom/courses",
   },
 ];
 
@@ -40,9 +40,9 @@ export default function PlatformLayout() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col bg-background overflow-hidden">
       <PlatformNavbar navigationItems={navigationItems} showUserMenu={true} />
-      <main className="flex-1 mt-28">
+      <main className="flex-1 pt-28 pb-8 px-24 overflow-y-auto">
         <Outlet />
       </main>
     </div>

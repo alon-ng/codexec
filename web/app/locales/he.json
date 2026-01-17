@@ -5,7 +5,8 @@
     "about": "עלינו",
     "contact": "יצירת קשר",
     "overview": "סקירה",
-    "myCourses": "הקורסים שלי"
+    "myCourses": "הקורסים שלי",
+    "classroom": "כיתה"
   },
   "common": {
     "email": "דואר אלקטרוני",
@@ -65,5 +66,8 @@
     "lessonsNote": "שיעורים",
     "exerciesNote": "תרגילים",
     "durationNote": "שעות לימוד"
+  },
+  "classroom": {
+    "continueWhereYouLeftOff": "המשך מאיפה שסיימת"
   }
 }

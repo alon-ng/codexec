@@ -5,7 +5,8 @@
         "about": "About",
         "contact": "Contact",
         "overview": "Overview",
-        "myCourses": "My Courses"
+        "myCourses": "My Courses",
+        "classroom": "Classroom"
     },
     "common": {
         "email": "Email",
@@ -65,5 +66,8 @@
         "lessonsNote": "lessons",
         "exerciesNote": "exercises",
         "durationNote": "hours total"
+    },
+    "classroom": {
+        "continueWhereYouLeftOff": "Continue where you left off"
     }
 }

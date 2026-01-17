@@ -15,5 +15,7 @@ func RegisterRoutes(router *gin.RouterGroup, q *db.Queries, p *pgxpool.Pool, log
 	meGroup := router.Group("/me")
 	{
 		meGroup.GET("/", ctrl.Me)
+		meGroup.GET("/courses", ctrl.ListUserCoursesWithProgress)
 	}
+
 }

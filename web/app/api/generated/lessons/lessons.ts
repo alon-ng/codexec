@@ -30,7 +30,7 @@ import type {
   LessonsAddLessonTranslationRequest,
   LessonsCreateLessonRequest,
   LessonsIDRequest,
-  LessonsUpdateRequest,
+  LessonsUpdateLessonRequest,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -547,7 +547,7 @@ export const usePostLessonsRestore = <
  * @summary Update a lesson
  */
 export const putLessonsUpdate = (
-  lessonsUpdateRequest: LessonsUpdateRequest,
+  lessonsUpdateLessonRequest: LessonsUpdateLessonRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<DbLessonWithTranslation>(
@@ -555,7 +555,7 @@ export const putLessonsUpdate = (
       url: `/lessons/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: lessonsUpdateRequest,
+      data: lessonsUpdateLessonRequest,
     },
     options,
   );
@@ -568,14 +568,14 @@ export const getPutLessonsUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putLessonsUpdate>>,
     TError,
-    { data: LessonsUpdateRequest },
+    { data: LessonsUpdateLessonRequest },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putLessonsUpdate>>,
   TError,
-  { data: LessonsUpdateRequest },
+  { data: LessonsUpdateLessonRequest },
   TContext
 > => {
   const mutationKey = ["putLessonsUpdate"];
@@ -589,7 +589,7 @@ export const getPutLessonsUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putLessonsUpdate>>,
-    { data: LessonsUpdateRequest }
+    { data: LessonsUpdateLessonRequest }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -602,7 +602,7 @@ export const getPutLessonsUpdateMutationOptions = <
 export type PutLessonsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putLessonsUpdate>>
 >;
-export type PutLessonsUpdateMutationBody = LessonsUpdateRequest;
+export type PutLessonsUpdateMutationBody = LessonsUpdateLessonRequest;
 export type PutLessonsUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -616,7 +616,7 @@ export const usePutLessonsUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putLessonsUpdate>>,
       TError,
-      { data: LessonsUpdateRequest },
+      { data: LessonsUpdateLessonRequest },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -625,7 +625,7 @@ export const usePutLessonsUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putLessonsUpdate>>,
   TError,
-  { data: LessonsUpdateRequest },
+  { data: LessonsUpdateLessonRequest },
   TContext
 > => {
   const mutationOptions = getPutLessonsUpdateMutationOptions(options);

@@ -7,8 +7,8 @@ export default [
     route("courses/:uuid", "routes/landing/course.tsx"),
   ]),
   route("login", "routes/auth/login.tsx"),
-  route("platform", "routes/platform/layout.tsx", [
-    index("routes/platform/dashboard.tsx"),
-    // Add more platform routes here
+  route("classroom", "routes/classroom/layout.tsx", [
+    index("routes/classroom/dashboard.tsx"),
+    route("courses", "routes/classroom/courses.tsx"),
   ]),
 ] satisfies RouteConfig;

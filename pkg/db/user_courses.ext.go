@@ -33,6 +33,19 @@ type UserCourseFull struct {
 	Lessons        []UserLessonStatus `json:"lessons"`
 }
 
+type UserCourseWithProgress struct {
+	CourseWithTranslation
+	UserCourseStartedAt      time.Time  `json:"user_course_started_at"`
+	UserCourseLastAccessedAt *time.Time `json:"user_course_last_accessed_at"`
+	UserCourseCompletedAt    *time.Time `json:"user_course_completed_at"`
+	TotalExercises           int32      `json:"total_exercises"`
+	CompletedExercises       int32      `json:"completed_exercises"`
+	NextLessonUuid           *uuid.UUID `json:"next_lesson_uuid"`
+	NextLessonName           *string    `json:"next_lesson_name"`
+	NextExerciseUuid         *uuid.UUID `json:"next_exercise_uuid"`
+	NextExerciseName         *string    `json:"next_exercise_name"`
+}
+
 func (q *Queries) GetUserCourseFull(ctx context.Context, userUuid uuid.UUID, courseUuid uuid.UUID) (UserCourseFull, error) {
 	r, err := q.getUserCourseFull(ctx, getUserCourseFullParams{
 		UserUuid: userUuid,
@@ -101,4 +114,39 @@ func (q *Queries) GetUserCourseFull(ctx context.Context, userUuid uuid.UUID, cou
 	}
 
 	return result, nil
+}
+
+func (l *ListUserCoursesWithProgressRow) ToUserCourseWithProgress() UserCourseWithProgress {
+	return UserCourseWithProgress{
+		CourseWithTranslation: CourseWithTranslation{
+			Course: Course{
+				Uuid:       l.CourseUuid,
+				CreatedAt:  l.CourseCreatedAt,
+				ModifiedAt: l.CourseModifiedAt,
+				DeletedAt:  l.CourseDeletedAt,
+				Subject:    l.CourseSubject,
+				Price:      l.CoursePrice,
+				Discount:   l.CourseDiscount,
+				IsActive:   l.CourseIsActive,
+				Difficulty: l.CourseDifficulty,
+			},
+			Translation: CourseTranslation{
+				Uuid:        l.CourseTranslationUuid,
+				CourseUuid:  l.CourseUuid,
+				Language:    l.CourseTranslationLanguage,
+				Name:        l.CourseName,
+				Description: l.CourseDescription,
+				Bullets:     l.CourseBullets,
+			},
+		},
+		UserCourseStartedAt:      l.UserCourseStartedAt,
+		UserCourseLastAccessedAt: l.UserCourseLastAccessedAt,
+		UserCourseCompletedAt:    l.UserCourseCompletedAt,
+		TotalExercises:           l.TotalExercises,
+		CompletedExercises:       l.CompletedExercises,
+		NextLessonUuid:           l.NextLessonUuid,
+		NextLessonName:           l.NextLessonName,
+		NextExerciseUuid:         l.NextExerciseUuid,
+		NextExerciseName:         l.NextExerciseName,
+	}
 }

@@ -1,26 +1,24 @@
+import type { DbUserCourseWithProgress } from "~/api/generated/model";
 
-import type { DbCourseWithTranslation } from "~/api/generated/model";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { courseIcons } from "~/utils/course";
-import { Button } from "~/components/base/Button";
-import { Skeleton } from "~/components/ui/skeleton";
-import { ChevronsRightIcon, ShoppingCartIcon } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Progress } from "../base/Progress";
+import { Link } from "react-router";
 import Blob from "~/assets/blob.svg?react";
+import { Skeleton } from "../ui/skeleton";
 
-export interface CourseCardProps {
-    course?: Required<DbCourseWithTranslation>
+export interface UserCourseCardProps {
+    course?: Required<DbUserCourseWithProgress>;
 }
 
-export default function CourseCard({ course }: CourseCardProps) {
+export default function UserCourseCard({ course }: UserCourseCardProps) {
     const { t } = useTranslation();
-    const navigate = useNavigate();
 
     if (!course) {
         return (
-            <Card className="relative h-72 overflow-hidden">
-                <CardHeader className="flex flex-row items-center gap-4 space-y-0 z-10">
+            <Card className="relative h-72 bg-transparent overflow-hidden hover:shadow-md hover:cursor-pointer hover:translate-y-[-4px] transition-all duration-200">
+                <CardHeader className="flex items-center gap-4 z-10">
                     <Skeleton className="h-10 w-10 rounded-full" />
                     <div className="space-y-2">
                         <Skeleton className="h-5 w-32" />
@@ -45,8 +43,10 @@ export default function CourseCard({ course }: CourseCardProps) {
         );
     }
 
+    const nextExercisePath = `/classroom/courses/${course.uuid}/lessons/${course.next_lesson_uuid}/exercises/${course.next_exercise_uuid}`;
+
     return (
-        <Card className="relative h-72 overflow-hidden hover:shadow-md hover:cursor-pointer hover:translate-y-[-4px] transition-all duration-200" onClick={() => navigate(`/courses/${course.uuid}`)}>
+        <Card className="relative h-72 bg-transparent overflow-hidden hover:shadow-md hover:cursor-pointer hover:translate-y-[-4px] transition-all duration-200">
             <CardHeader className="flex items-center gap-4 z-10">
                 <img src={courseIcons[course.subject as keyof typeof courseIcons]} alt={course.subject} className="h-10 w-10" />
                 <div>
@@ -60,26 +60,13 @@ export default function CourseCard({ course }: CourseCardProps) {
             <CardContent className="text-sm flex-1 z-10">
                 <div>{course.translation.description}</div>
             </CardContent>
-            <CardFooter className="flex items-center justify-between z-10">
-                {
-                    course.discount! > 0 ? (
-                        <div className="flex items-center gap-2">
-                            <div className="text-sm text-gray-400 line-through leading-none">{course.price!}₪</div>
-                            <div className="text-sm leading-none">{course.price! - course.discount!}₪</div>
-                        </div>
-                    ) : (
-                        <div className="text-sm leading-none">{course.price!}₪</div>
-                    )
-                }
-                <div className="flex items-center gap-2">
-                    <Button variant="outline">
-                        <ShoppingCartIcon className="h-4 w-4" />
-                        {t("common.buy")}
-                    </Button>
-                    <Button variant="outline" onClick={() => navigate(`/courses/${course.uuid}`)}>
-                        {t("common.readMore")}
-                        <ChevronsRightIcon className="rtl:rotate-180 h-4 w-4" />
-                    </Button>
+            <CardFooter className="flex flex-col items-start gap-1 z-10">
+                <Progress value={course.completed_exercises / course.total_exercises * 100} showPercentage={true} />
+                <div className="flex items-center gap-1 text-sm text-muted-foreground w-full">
+                    <span className="shrink-0">{t("classroom.continueWhereYouLeftOff")}:</span>
+                    <Link className="truncate underline hover:text-primary" to={nextExercisePath}>
+                        {course.next_lesson_name} ({course.next_exercise_name})
+                    </Link>
                 </div>
             </CardFooter>
             <Blob className="absolute -top-32 -start-24 size-128 z-0 blur-3xl text-codim-pink/5" />

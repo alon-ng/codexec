@@ -9,6 +9,7 @@ interface CoursePathProps {
     course: Required<DbCourseFull>;
 }
 
+const GLOBAL_ANIMATION_DELAY = 0.3;
 const ANIMATION_DELAY = 0.1;
 const LESSONS_PER_ROW = 3;
 const PATH_COLOR = "bg-muted-foreground/20";
@@ -169,7 +170,7 @@ function CourseRow({ rowLessons, rowIndex, totalRows, isRTL }: CourseRowProps) {
 
     // Calculate connector animation delay - appears after the last lesson in the row
     const connectorAnimationDelay = !isLastRow
-        ? (rowIndex * LESSONS_PER_ROW + rowLessons.length) * ANIMATION_DELAY
+        ? (rowIndex * LESSONS_PER_ROW + rowLessons.length) * ANIMATION_DELAY + GLOBAL_ANIMATION_DELAY
         : 0;
 
     return (
@@ -201,7 +202,7 @@ function CourseRow({ rowLessons, rowIndex, totalRows, isRTL }: CourseRowProps) {
                         isLastRow
                     );
 
-                    const animationDelay = globalIndex * ANIMATION_DELAY;
+                    const animationDelay = globalIndex * ANIMATION_DELAY + GLOBAL_ANIMATION_DELAY;
 
                     return (
                         <LessonNode

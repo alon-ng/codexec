@@ -37,7 +37,7 @@ type CourseSeed struct {
 	Lessons      []LessonSeed
 }
 
-func seedCourse(ctx context.Context, queries *db.Queries) {
+func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 	log.Println("Seeding courses...")
 
 	course := CourseSeed{
@@ -325,6 +325,7 @@ func seedCourse(ctx context.Context, queries *db.Queries) {
 	}
 
 	log.Println("Course seeded successfully!")
+	return c
 }
 
 func getUUIDPtr(u uuid.UUID) *uuid.UUID {
