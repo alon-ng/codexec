@@ -43,7 +43,7 @@ export default function UserCourseCard({ course }: UserCourseCardProps) {
         );
     }
 
-    const nextExercisePath = `/classroom/courses/${course.uuid}/lessons/${course.next_lesson_uuid}/exercises/${course.next_exercise_uuid}`;
+    const nextExercisePath = `/classroom/${course.uuid}/${course.next_lesson_uuid}/${course.next_exercise_uuid}`;
 
     return (
         <Card className="relative h-72 bg-transparent overflow-hidden hover:shadow-md hover:cursor-pointer hover:translate-y-[-4px] transition-all duration-200">

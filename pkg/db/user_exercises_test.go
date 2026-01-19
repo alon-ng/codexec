@@ -87,7 +87,10 @@ func TestCreateUserExerciseWithCompletedAt(t *testing.T) {
 func TestGetUserExercise(t *testing.T) {
 	userExercise := createRandomUserExercise(t)
 
-	gotUserExercise, err := testQueries.GetUserExercise(context.Background(), userExercise.Uuid)
+	gotUserExercise, err := testQueries.GetUserExercise(context.Background(), db.GetUserExerciseParams{
+		UserUuid:     userExercise.UserUuid,
+		ExerciseUuid: userExercise.ExerciseUuid,
+	})
 	require.NoError(t, err)
 	require.NotEmpty(t, gotUserExercise)
 
@@ -97,7 +100,7 @@ func TestGetUserExercise(t *testing.T) {
 func TestGetUserExerciseByUserAndExercise(t *testing.T) {
 	userExercise := createRandomUserExercise(t)
 
-	gotUserExercise, err := testQueries.GetUserExerciseByUserAndExercise(context.Background(), db.GetUserExerciseByUserAndExerciseParams{
+	gotUserExercise, err := testQueries.GetUserExercise(context.Background(), db.GetUserExerciseParams{
 		UserUuid:     userExercise.UserUuid,
 		ExerciseUuid: userExercise.ExerciseUuid,
 	})
@@ -109,39 +112,81 @@ func TestGetUserExerciseByUserAndExercise(t *testing.T) {
 
 func TestUpdateUserExercise(t *testing.T) {
 	userExercise := createRandomUserExercise(t)
-	now := time.Now().UTC()
 
 	updatedSubmission := json.RawMessage(`{"answer": "updated"}`)
-	attempts := int32(5)
 	userUuid := userExercise.UserUuid
 	exerciseUuid := userExercise.ExerciseUuid
-	updateParams := db.UpdateUserExerciseParams{
-		Uuid:         userExercise.Uuid,
-		UserUuid:     &userUuid,
-		ExerciseUuid: &exerciseUuid,
+	updateParams := db.UpdateUserExerciseSubmissionParams{
+		UserUuid:     userUuid,
+		ExerciseUuid: exerciseUuid,
 		Submission:   &updatedSubmission,
-		Attempts:     &attempts,
-		CompletedAt:  &now,
 	}
 
-	updatedUserExercise, err := testQueries.UpdateUserExercise(context.Background(), updateParams)
+	updatedUserExercise, err := testQueries.UpdateUserExerciseSubmission(context.Background(), updateParams)
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedUserExercise)
 
-	require.Equal(t, *updateParams.Attempts, updatedUserExercise.Attempts)
-	require.Equal(t, updateParams.CompletedAt, updatedUserExercise.CompletedAt)
+	require.Equal(t, *updateParams.Submission, updatedUserExercise.Submission)
 	require.Equal(t, userExercise.Uuid, updatedUserExercise.Uuid)
 	require.Equal(t, userExercise.UserUuid, updatedUserExercise.UserUuid)
 	require.Equal(t, userExercise.ExerciseUuid, updatedUserExercise.ExerciseUuid)
 }
 
-func TestDeleteUserExercise(t *testing.T) {
+func TestUpdateUserExerciseSubmissionWithAttempts(t *testing.T) {
 	userExercise := createRandomUserExercise(t)
 
-	err := testQueries.DeleteUserExercise(context.Background(), userExercise.Uuid)
-	require.NoError(t, err)
+	updatedSubmission := json.RawMessage(`{"answer": "updated"}`)
+	userUuid := userExercise.UserUuid
+	exerciseUuid := userExercise.ExerciseUuid
+	updateParams := db.UpdateUserExerciseSubmissionWithAttemptsParams{
+		UserUuid:     userUuid,
+		ExerciseUuid: exerciseUuid,
+		Submission:   &updatedSubmission,
+	}
 
-	// Verify it's deleted
-	_, err = testQueries.GetUserExercise(context.Background(), userExercise.Uuid)
-	require.Error(t, err)
+	updatedUserExercise, err := testQueries.UpdateUserExerciseSubmissionWithAttempts(context.Background(), updateParams)
+	require.NoError(t, err)
+	require.NotEmpty(t, updatedUserExercise)
+
+	require.Equal(t, userExercise.Attempts+1, updatedUserExercise.Attempts)
+	require.Equal(t, *updateParams.Submission, updatedUserExercise.Submission)
+	require.Equal(t, userExercise.Uuid, updatedUserExercise.Uuid)
+	require.Equal(t, userExercise.UserUuid, updatedUserExercise.UserUuid)
+	require.Equal(t, userExercise.ExerciseUuid, updatedUserExercise.ExerciseUuid)
+}
+
+func TestCompleteUserExercise(t *testing.T) {
+	userExercise := createRandomUserExercise(t)
+
+	completeParams := db.CompleteUserExerciseParams{
+		UserUuid:     userExercise.UserUuid,
+		ExerciseUuid: userExercise.ExerciseUuid,
+	}
+
+	completeUserExercise, err := testQueries.CompleteUserExercise(context.Background(), completeParams)
+	require.NoError(t, err)
+	require.NotEmpty(t, completeUserExercise)
+
+	require.NotNil(t, completeUserExercise.CompletedAt)
+	require.Equal(t, userExercise.Uuid, completeUserExercise.Uuid)
+	require.Equal(t, userExercise.UserUuid, completeUserExercise.UserUuid)
+	require.Equal(t, userExercise.ExerciseUuid, completeUserExercise.ExerciseUuid)
+}
+
+func TestResetUserExercise(t *testing.T) {
+	userExercise := createRandomUserExercise(t)
+
+	resetUserExercise, err := testQueries.ResetUserExercise(context.Background(), db.ResetUserExerciseParams{
+		UserUuid:     userExercise.UserUuid,
+		ExerciseUuid: userExercise.ExerciseUuid,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, resetUserExercise)
+
+	require.Equal(t, userExercise.Uuid, resetUserExercise.Uuid)
+	require.Equal(t, userExercise.UserUuid, resetUserExercise.UserUuid)
+	require.Equal(t, userExercise.ExerciseUuid, resetUserExercise.ExerciseUuid)
+	require.Equal(t, json.RawMessage(`{}`), resetUserExercise.Submission)
+	require.Equal(t, int32(0), resetUserExercise.Attempts)
+	require.Nil(t, resetUserExercise.CompletedAt)
 }

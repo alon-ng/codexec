@@ -10,7 +10,12 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { DbUser, DbUserCourseWithProgress } from ".././model";
+import type {
+  DbUser,
+  DbUserCourseFull,
+  DbUserCourseWithProgress,
+  DbUserExercise,
+} from ".././model";
 
 export const getGetMeResponseMock = (
   overrideResponse: Partial<DbUser> = {},
@@ -171,6 +176,123 @@ export const getGetMeCoursesResponseMock = (): DbUserCourseWithProgress[] =>
     ]),
   }));
 
+export const getGetMeCoursesCourseUuidResponseMock = (
+  overrideResponse: Partial<DbUserCourseFull> = {},
+): DbUserCourseFull => ({
+  completed_at: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  course_uuid: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  is_completed: faker.helpers.arrayElement([
+    faker.datatype.boolean(),
+    undefined,
+  ]),
+  last_accessed_at: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  lessons: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      completed_at: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      exercises: faker.helpers.arrayElement([
+        Array.from(
+          { length: faker.number.int({ min: 1, max: 10 }) },
+          (_, i) => i + 1,
+        ).map(() => ({
+          completed_at: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          exercise_uuid: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          is_completed: faker.helpers.arrayElement([
+            faker.datatype.boolean(),
+            undefined,
+          ]),
+          last_accessed_at: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          started_at: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+        })),
+        undefined,
+      ]),
+      is_completed: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      last_accessed_at: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      lesson_uuid: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      started_at: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  started_at: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetMeExercisesExerciseUuidResponseMock = (
+  overrideResponse: Partial<DbUserExercise> = {},
+): DbUserExercise => ({
+  attempts: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  completed_at: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  exercise_uuid: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  last_accessed_at: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  started_at: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  submission: faker.helpers.arrayElement([{}, undefined]),
+  user_uuid: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  uuid: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
 export const getGetMeMockHandler = (
   overrideResponse?:
     | DbUser
@@ -226,7 +348,65 @@ export const getGetMeCoursesMockHandler = (
     options,
   );
 };
+
+export const getGetMeCoursesCourseUuidMockHandler = (
+  overrideResponse?:
+    | DbUserCourseFull
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<DbUserCourseFull> | DbUserCourseFull),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/me/courses/:courseUuid",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetMeCoursesCourseUuidResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetMeExercisesExerciseUuidMockHandler = (
+  overrideResponse?:
+    | DbUserExercise
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<DbUserExercise> | DbUserExercise),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/me/exercises/:exerciseUuid",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetMeExercisesExerciseUuidResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
 export const getMeMock = () => [
   getGetMeMockHandler(),
   getGetMeCoursesMockHandler(),
+  getGetMeCoursesCourseUuidMockHandler(),
+  getGetMeExercisesExerciseUuidMockHandler(),
 ];

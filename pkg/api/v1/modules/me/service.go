@@ -53,3 +53,24 @@ func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.U
 
 	return userCoursesWithProgress, nil
 }
+
+func (s *Service) GetUserCourseFull(ctx context.Context, meUUID uuid.UUID, courseUUID uuid.UUID) (db.UserCourseFull, *e.APIError) {
+	userCourse, err := s.q.GetUserCourseFull(ctx, meUUID, courseUUID)
+	if err != nil {
+		return db.UserCourseFull{}, e.NewAPIError(err, ErrGetUserCourseFullFailed)
+	}
+
+	return userCourse, nil
+}
+
+func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID) (db.UserExercise, *e.APIError) {
+	userExercise, err := s.q.GetUserExercise(ctx, db.GetUserExerciseParams{
+		UserUuid:     meUUID,
+		ExerciseUuid: exerciseUUID,
+	})
+	if err != nil {
+		return db.UserExercise{}, e.NewAPIError(err, ErrGetUserExerciseFailed)
+	}
+
+	return userExercise, nil
+}

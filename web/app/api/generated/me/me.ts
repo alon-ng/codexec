@@ -20,7 +20,9 @@ import type {
 
 import type {
   DbUser,
+  DbUserCourseFull,
   DbUserCourseWithProgress,
+  DbUserExercise,
   ErrorsErrorResponse,
   GetMeCoursesParams,
 } from ".././model";
@@ -291,6 +293,355 @@ export function useGetMeCourses<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetMeCoursesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Get the user course full
+ * @summary Get the user course full
+ */
+export const getMeCoursesCourseUuid = (
+  courseUuid: string,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<DbUserCourseFull>(
+    { url: `/me/courses/${courseUuid}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetMeCoursesCourseUuidQueryKey = (courseUuid?: string) => {
+  return [`/me/courses/${courseUuid}`] as const;
+};
+
+export const getGetMeCoursesCourseUuidQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  courseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetMeCoursesCourseUuidQueryKey(courseUuid);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getMeCoursesCourseUuid>>
+  > = ({ signal }) =>
+    getMeCoursesCourseUuid(courseUuid, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!courseUuid,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMeCoursesCourseUuidQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMeCoursesCourseUuid>>
+>;
+export type GetMeCoursesCourseUuidQueryError = ErrorsErrorResponse;
+
+export function useGetMeCoursesCourseUuid<
+  TData = Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  courseUuid: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+          TError,
+          Awaited<ReturnType<typeof getMeCoursesCourseUuid>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMeCoursesCourseUuid<
+  TData = Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  courseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+          TError,
+          Awaited<ReturnType<typeof getMeCoursesCourseUuid>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMeCoursesCourseUuid<
+  TData = Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  courseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get the user course full
+ */
+
+export function useGetMeCoursesCourseUuid<
+  TData = Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  courseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeCoursesCourseUuid>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMeCoursesCourseUuidQueryOptions(
+    courseUuid,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Get the user exercise
+ * @summary Get the user exercise
+ */
+export const getMeExercisesExerciseUuid = (
+  exerciseUuid: string,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<DbUserExercise>(
+    { url: `/me/exercises/${exerciseUuid}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetMeExercisesExerciseUuidQueryKey = (
+  exerciseUuid?: string,
+) => {
+  return [`/me/exercises/${exerciseUuid}`] as const;
+};
+
+export const getGetMeExercisesExerciseUuidQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetMeExercisesExerciseUuidQueryKey(exerciseUuid);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>
+  > = ({ signal }) =>
+    getMeExercisesExerciseUuid(exerciseUuid, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!exerciseUuid,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMeExercisesExerciseUuidQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>
+>;
+export type GetMeExercisesExerciseUuidQueryError = ErrorsErrorResponse;
+
+export function useGetMeExercisesExerciseUuid<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+          TError,
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMeExercisesExerciseUuid<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+          TError,
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMeExercisesExerciseUuid<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get the user exercise
+ */
+
+export function useGetMeExercisesExerciseUuid<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMeExercisesExerciseUuidQueryOptions(
+    exerciseUuid,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

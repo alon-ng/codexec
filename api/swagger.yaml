@@ -329,6 +329,23 @@ definitions:
       uuid:
         type: string
     type: object
+  db.UserCourseFull:
+    properties:
+      completed_at:
+        type: string
+      course_uuid:
+        type: string
+      is_completed:
+        type: boolean
+      last_accessed_at:
+        type: string
+      lessons:
+        items:
+          $ref: '#/definitions/db.UserLessonStatus'
+        type: array
+      started_at:
+        type: string
+    type: object
   db.UserCourseWithProgress:
     properties:
       completed_exercises:
@@ -368,6 +385,55 @@ definitions:
       user_course_started_at:
         type: string
       uuid:
+        type: string
+    type: object
+  db.UserExercise:
+    properties:
+      attempts:
+        type: integer
+      completed_at:
+        type: string
+      exercise_uuid:
+        type: string
+      last_accessed_at:
+        type: string
+      started_at:
+        type: string
+      submission:
+        type: object
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.UserExerciseStatus:
+    properties:
+      completed_at:
+        type: string
+      exercise_uuid:
+        type: string
+      is_completed:
+        type: boolean
+      last_accessed_at:
+        type: string
+      started_at:
+        type: string
+    type: object
+  db.UserLessonStatus:
+    properties:
+      completed_at:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/db.UserExerciseStatus'
+        type: array
+      is_completed:
+        type: boolean
+      last_accessed_at:
+        type: string
+      lesson_uuid:
+        type: string
+      started_at:
         type: string
     type: object
   errors.ErrorResponse:
@@ -1617,6 +1683,76 @@ paths:
       security:
       - CookieAuth: []
       summary: List the user courses with progress
+      tags:
+      - me
+  /me/courses/{course_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the user course full
+      parameters:
+      - description: Course UUID
+        in: path
+        name: course_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.UserCourseFull'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Get the user course full
+      tags:
+      - me
+  /me/exercises/{exercise_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the user exercise
+      parameters:
+      - description: Exercise UUID
+        in: path
+        name: exercise_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.UserExercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Get the user exercise
       tags:
       - me
   /users:

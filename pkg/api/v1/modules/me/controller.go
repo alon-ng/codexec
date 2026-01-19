@@ -2,7 +2,6 @@ package me
 
 import (
 	e "codim/pkg/api/v1/errors"
-	_ "codim/pkg/db"
 	"codim/pkg/utils/logger"
 	"net/http"
 
@@ -74,4 +73,54 @@ func (c *Controller) ListUserCoursesWithProgress(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, userCourses)
+}
+
+// GetUserCourseFull godoc
+// @Summary      Get the user course full
+// @Description  Get the user course full
+// @Tags         me
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        course_uuid path string true "Course UUID"
+// @Success      200     {object}  db.UserCourseFull
+// @Failure      400     {object}  errors.ErrorResponse
+// @Failure      401     {object}  errors.ErrorResponse
+// @Failure      500     {object}  errors.ErrorResponse
+// @Router       /me/courses/{course_uuid} [get]
+func (c *Controller) GetUserCourseFull(ctx *gin.Context) {
+	meUUID := uuid.MustParse(ctx.GetString("user_uuid"))
+	courseUUID := uuid.MustParse(ctx.Param("course_uuid"))
+	userCourse, err := c.svc.GetUserCourseFull(ctx.Request.Context(), meUUID, courseUUID)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(200, userCourse)
+}
+
+// GetUserExercise godoc
+// @Summary      Get the user exercise
+// @Description  Get the user exercise
+// @Tags         me
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        exercise_uuid path string true "Exercise UUID"
+// @Success      200     {object}  db.UserExercise
+// @Failure      400     {object}  errors.ErrorResponse
+// @Failure      401     {object}  errors.ErrorResponse
+// @Failure      500     {object}  errors.ErrorResponse
+// @Router       /me/exercises/{exercise_uuid} [get]
+func (c *Controller) GetUserExercise(ctx *gin.Context) {
+	meUUID := uuid.MustParse(ctx.GetString("user_uuid"))
+	exerciseUUID := uuid.MustParse(ctx.Param("exercise_uuid"))
+	userExercise, err := c.svc.GetUserExercise(ctx.Request.Context(), meUUID, exerciseUUID)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(200, userExercise)
 }

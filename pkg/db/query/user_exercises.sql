@@ -12,24 +12,36 @@ RETURNING *;
 
 -- name: GetUserExercise :one
 SELECT * FROM "user_exercises"
-WHERE "uuid" = $1
-LIMIT 1;
-
--- name: GetUserExerciseByUserAndExercise :one
-SELECT * FROM "user_exercises"
 WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
 LIMIT 1;
 
--- name: UpdateUserExercise :one
+-- name: UpdateUserExerciseSubmission :one
 UPDATE "user_exercises"
-SET "user_uuid" = COALESCE(sqlc.narg('user_uuid'), "user_uuid"), 
-    "exercise_uuid" = COALESCE(sqlc.narg('exercise_uuid'), "exercise_uuid"), 
-    "submission" = COALESCE(sqlc.narg('submission'), "submission"),
-    "attempts" = COALESCE(sqlc.narg('attempts'), "attempts"),
-    "completed_at" = COALESCE(sqlc.narg('completed_at'), "completed_at")
-WHERE "uuid" = $1
+SET "submission" = COALESCE(sqlc.narg('submission'), "submission"),
+    "last_accessed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
 RETURNING *;
 
--- name: DeleteUserExercise :exec
-DELETE FROM "user_exercises"
-WHERE "uuid" = $1;
+-- name: UpdateUserExerciseSubmissionWithAttempts :one
+UPDATE "user_exercises"
+SET "submission" = COALESCE(sqlc.narg('submission'), "submission"),
+    "attempts" = "attempts" + 1,
+    "last_accessed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
+RETURNING *;
+
+-- name: CompleteUserExercise :one
+UPDATE "user_exercises"
+SET "completed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
+RETURNING *;
+
+-- name: ResetUserExercise :one
+UPDATE "user_exercises"
+SET "submission" = '{}'::jsonb,
+    "attempts" = 0,
+    "completed_at" = NULL,
+    "last_accessed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
+RETURNING *;
+

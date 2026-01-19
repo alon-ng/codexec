@@ -13,6 +13,34 @@ import (
 	"github.com/google/uuid"
 )
 
+const completeUserExercise = `-- name: CompleteUserExercise :one
+UPDATE "user_exercises"
+SET "completed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
+RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at
+`
+
+type CompleteUserExerciseParams struct {
+	UserUuid     uuid.UUID `json:"user_uuid"`
+	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
+}
+
+func (q *Queries) CompleteUserExercise(ctx context.Context, arg CompleteUserExerciseParams) (UserExercise, error) {
+	row := q.db.QueryRow(ctx, completeUserExercise, arg.UserUuid, arg.ExerciseUuid)
+	var i UserExercise
+	err := row.Scan(
+		&i.Uuid,
+		&i.StartedAt,
+		&i.LastAccessedAt,
+		&i.UserUuid,
+		&i.ExerciseUuid,
+		&i.Submission,
+		&i.Attempts,
+		&i.CompletedAt,
+	)
+	return i, err
+}
+
 const createUserExercise = `-- name: CreateUserExercise :one
 INSERT INTO "user_exercises" (
   "user_uuid", 
@@ -56,51 +84,19 @@ func (q *Queries) CreateUserExercise(ctx context.Context, arg CreateUserExercise
 	return i, err
 }
 
-const deleteUserExercise = `-- name: DeleteUserExercise :exec
-DELETE FROM "user_exercises"
-WHERE "uuid" = $1
-`
-
-func (q *Queries) DeleteUserExercise(ctx context.Context, argUuid uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteUserExercise, argUuid)
-	return err
-}
-
 const getUserExercise = `-- name: GetUserExercise :one
-SELECT uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at FROM "user_exercises"
-WHERE "uuid" = $1
-LIMIT 1
-`
-
-func (q *Queries) GetUserExercise(ctx context.Context, argUuid uuid.UUID) (UserExercise, error) {
-	row := q.db.QueryRow(ctx, getUserExercise, argUuid)
-	var i UserExercise
-	err := row.Scan(
-		&i.Uuid,
-		&i.StartedAt,
-		&i.LastAccessedAt,
-		&i.UserUuid,
-		&i.ExerciseUuid,
-		&i.Submission,
-		&i.Attempts,
-		&i.CompletedAt,
-	)
-	return i, err
-}
-
-const getUserExerciseByUserAndExercise = `-- name: GetUserExerciseByUserAndExercise :one
 SELECT uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at FROM "user_exercises"
 WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
 LIMIT 1
 `
 
-type GetUserExerciseByUserAndExerciseParams struct {
+type GetUserExerciseParams struct {
 	UserUuid     uuid.UUID `json:"user_uuid"`
 	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
 }
 
-func (q *Queries) GetUserExerciseByUserAndExercise(ctx context.Context, arg GetUserExerciseByUserAndExerciseParams) (UserExercise, error) {
-	row := q.db.QueryRow(ctx, getUserExerciseByUserAndExercise, arg.UserUuid, arg.ExerciseUuid)
+func (q *Queries) GetUserExercise(ctx context.Context, arg GetUserExerciseParams) (UserExercise, error) {
+	row := q.db.QueryRow(ctx, getUserExercise, arg.UserUuid, arg.ExerciseUuid)
 	var i UserExercise
 	err := row.Scan(
 		&i.Uuid,
@@ -115,35 +111,84 @@ func (q *Queries) GetUserExerciseByUserAndExercise(ctx context.Context, arg GetU
 	return i, err
 }
 
-const updateUserExercise = `-- name: UpdateUserExercise :one
+const resetUserExercise = `-- name: ResetUserExercise :one
 UPDATE "user_exercises"
-SET "user_uuid" = COALESCE($2, "user_uuid"), 
-    "exercise_uuid" = COALESCE($3, "exercise_uuid"), 
-    "submission" = COALESCE($4, "submission"),
-    "attempts" = COALESCE($5, "attempts"),
-    "completed_at" = COALESCE($6, "completed_at")
-WHERE "uuid" = $1
+SET "submission" = '{}'::jsonb,
+    "attempts" = 0,
+    "completed_at" = NULL,
+    "last_accessed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
 RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at
 `
 
-type UpdateUserExerciseParams struct {
-	Uuid         uuid.UUID        `json:"uuid"`
-	UserUuid     *uuid.UUID       `json:"user_uuid"`
-	ExerciseUuid *uuid.UUID       `json:"exercise_uuid"`
-	Submission   *json.RawMessage `json:"submission"`
-	Attempts     *int32           `json:"attempts"`
-	CompletedAt  *time.Time       `json:"completed_at"`
+type ResetUserExerciseParams struct {
+	UserUuid     uuid.UUID `json:"user_uuid"`
+	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
 }
 
-func (q *Queries) UpdateUserExercise(ctx context.Context, arg UpdateUserExerciseParams) (UserExercise, error) {
-	row := q.db.QueryRow(ctx, updateUserExercise,
-		arg.Uuid,
-		arg.UserUuid,
-		arg.ExerciseUuid,
-		arg.Submission,
-		arg.Attempts,
-		arg.CompletedAt,
+func (q *Queries) ResetUserExercise(ctx context.Context, arg ResetUserExerciseParams) (UserExercise, error) {
+	row := q.db.QueryRow(ctx, resetUserExercise, arg.UserUuid, arg.ExerciseUuid)
+	var i UserExercise
+	err := row.Scan(
+		&i.Uuid,
+		&i.StartedAt,
+		&i.LastAccessedAt,
+		&i.UserUuid,
+		&i.ExerciseUuid,
+		&i.Submission,
+		&i.Attempts,
+		&i.CompletedAt,
 	)
+	return i, err
+}
+
+const updateUserExerciseSubmission = `-- name: UpdateUserExerciseSubmission :one
+UPDATE "user_exercises"
+SET "submission" = COALESCE($3, "submission"),
+    "last_accessed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
+RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at
+`
+
+type UpdateUserExerciseSubmissionParams struct {
+	UserUuid     uuid.UUID        `json:"user_uuid"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Submission   *json.RawMessage `json:"submission"`
+}
+
+func (q *Queries) UpdateUserExerciseSubmission(ctx context.Context, arg UpdateUserExerciseSubmissionParams) (UserExercise, error) {
+	row := q.db.QueryRow(ctx, updateUserExerciseSubmission, arg.UserUuid, arg.ExerciseUuid, arg.Submission)
+	var i UserExercise
+	err := row.Scan(
+		&i.Uuid,
+		&i.StartedAt,
+		&i.LastAccessedAt,
+		&i.UserUuid,
+		&i.ExerciseUuid,
+		&i.Submission,
+		&i.Attempts,
+		&i.CompletedAt,
+	)
+	return i, err
+}
+
+const updateUserExerciseSubmissionWithAttempts = `-- name: UpdateUserExerciseSubmissionWithAttempts :one
+UPDATE "user_exercises"
+SET "submission" = COALESCE($3, "submission"),
+    "attempts" = "attempts" + 1,
+    "last_accessed_at" = NOW()
+WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
+RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at
+`
+
+type UpdateUserExerciseSubmissionWithAttemptsParams struct {
+	UserUuid     uuid.UUID        `json:"user_uuid"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Submission   *json.RawMessage `json:"submission"`
+}
+
+func (q *Queries) UpdateUserExerciseSubmissionWithAttempts(ctx context.Context, arg UpdateUserExerciseSubmissionWithAttemptsParams) (UserExercise, error) {
+	row := q.db.QueryRow(ctx, updateUserExerciseSubmissionWithAttempts, arg.UserUuid, arg.ExerciseUuid, arg.Submission)
 	var i UserExercise
 	err := row.Scan(
 		&i.Uuid,

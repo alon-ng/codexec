@@ -11,6 +11,7 @@ import (
 )
 
 type Querier interface {
+	CompleteUserExercise(ctx context.Context, arg CompleteUserExerciseParams) (UserExercise, error)
 	CountCourses(ctx context.Context) (int64, error)
 	CountExercises(ctx context.Context) (int64, error)
 	CountLessons(ctx context.Context) (int64, error)
@@ -34,7 +35,6 @@ type Querier interface {
 	DeleteLessonTranslation(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUser(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUserCourse(ctx context.Context, argUuid uuid.UUID) error
-	DeleteUserExercise(ctx context.Context, argUuid uuid.UUID) error
 	DeleteUserLesson(ctx context.Context, argUuid uuid.UUID) error
 	GetCourse(ctx context.Context, arg GetCourseParams) (GetCourseRow, error)
 	GetCourseTranslation(ctx context.Context, argUuid uuid.UUID) (GetCourseTranslationRow, error)
@@ -44,8 +44,7 @@ type Querier interface {
 	GetLessonTranslation(ctx context.Context, argUuid uuid.UUID) (GetLessonTranslationRow, error)
 	GetUser(ctx context.Context, argUuid uuid.UUID) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
-	GetUserExercise(ctx context.Context, argUuid uuid.UUID) (UserExercise, error)
-	GetUserExerciseByUserAndExercise(ctx context.Context, arg GetUserExerciseByUserAndExerciseParams) (UserExercise, error)
+	GetUserExercise(ctx context.Context, arg GetUserExerciseParams) (UserExercise, error)
 	GetUserLesson(ctx context.Context, argUuid uuid.UUID) (UserLesson, error)
 	GetUserLessonByUserAndLesson(ctx context.Context, arg GetUserLessonByUserAndLessonParams) (UserLesson, error)
 	HardDeleteCourse(ctx context.Context, argUuid uuid.UUID) error
@@ -57,6 +56,7 @@ type Querier interface {
 	ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error)
 	ListUserCoursesWithProgress(ctx context.Context, arg ListUserCoursesWithProgressParams) ([]ListUserCoursesWithProgressRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	ResetUserExercise(ctx context.Context, arg ResetUserExerciseParams) (UserExercise, error)
 	UndeleteCourse(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteLesson(ctx context.Context, argUuid uuid.UUID) error
@@ -69,7 +69,8 @@ type Querier interface {
 	UpdateLessonTranslation(ctx context.Context, arg UpdateLessonTranslationParams) (LessonTranslation, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UpdateUserCourse(ctx context.Context, arg UpdateUserCourseParams) (UserCourse, error)
-	UpdateUserExercise(ctx context.Context, arg UpdateUserExerciseParams) (UserExercise, error)
+	UpdateUserExerciseSubmission(ctx context.Context, arg UpdateUserExerciseSubmissionParams) (UserExercise, error)
+	UpdateUserExerciseSubmissionWithAttempts(ctx context.Context, arg UpdateUserExerciseSubmissionWithAttemptsParams) (UserExercise, error)
 	UpdateUserLesson(ctx context.Context, arg UpdateUserLessonParams) (UserLesson, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)
 	getCourseFull(ctx context.Context, arg getCourseFullParams) ([]getCourseFullRow, error)

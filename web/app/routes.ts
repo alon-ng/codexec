@@ -10,5 +10,6 @@ export default [
   route("classroom", "routes/classroom/layout.tsx", [
     index("routes/classroom/dashboard.tsx"),
     route("courses", "routes/classroom/courses.tsx"),
+    route(":courseUuid/:lessonUuid?/:exerciseUuid?", "routes/classroom/classroom.tsx"),
   ]),
 ] satisfies RouteConfig;
