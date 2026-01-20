@@ -14,10 +14,13 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  AuthLoginRequest,
-  AuthSignupRequest,
   ErrorsErrorResponse,
+  PostAuthLogin200,
+  PostAuthLoginBody,
   PostAuthLogout200,
+  PostAuthLogoutBody,
+  PostAuthSignup201,
+  PostAuthSignupBody,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -29,16 +32,16 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Login a user
  */
 export const postAuthLogin = (
-  authLoginRequest: AuthLoginRequest,
+  postAuthLoginBody: PostAuthLoginBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<void>(
+  return customInstance<PostAuthLogin200>(
     {
       url: `/auth/login`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: authLoginRequest,
+      data: postAuthLoginBody,
       signal,
     },
     options,
@@ -52,14 +55,14 @@ export const getPostAuthLoginMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthLogin>>,
     TError,
-    { data: AuthLoginRequest },
+    { data: PostAuthLoginBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthLogin>>,
   TError,
-  { data: AuthLoginRequest },
+  { data: PostAuthLoginBody },
   TContext
 > => {
   const mutationKey = ["postAuthLogin"];
@@ -73,7 +76,7 @@ export const getPostAuthLoginMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthLogin>>,
-    { data: AuthLoginRequest }
+    { data: PostAuthLoginBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -86,7 +89,7 @@ export const getPostAuthLoginMutationOptions = <
 export type PostAuthLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof postAuthLogin>>
 >;
-export type PostAuthLoginMutationBody = AuthLoginRequest;
+export type PostAuthLoginMutationBody = PostAuthLoginBody;
 export type PostAuthLoginMutationError = ErrorsErrorResponse;
 
 /**
@@ -100,7 +103,7 @@ export const usePostAuthLogin = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthLogin>>,
       TError,
-      { data: AuthLoginRequest },
+      { data: PostAuthLoginBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -109,7 +112,7 @@ export const usePostAuthLogin = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthLogin>>,
   TError,
-  { data: AuthLoginRequest },
+  { data: PostAuthLoginBody },
   TContext
 > => {
   const mutationOptions = getPostAuthLoginMutationOptions(options);
@@ -121,11 +124,18 @@ export const usePostAuthLogin = <
  * @summary Logout a user
  */
 export const postAuthLogout = (
+  postAuthLogoutBody: PostAuthLogoutBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<PostAuthLogout200>(
-    { url: `/auth/logout`, method: "POST", signal },
+    {
+      url: `/auth/logout`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: postAuthLogoutBody,
+      signal,
+    },
     options,
   );
 };
@@ -137,14 +147,14 @@ export const getPostAuthLogoutMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthLogout>>,
     TError,
-    void,
+    { data: PostAuthLogoutBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthLogout>>,
   TError,
-  void,
+  { data: PostAuthLogoutBody },
   TContext
 > => {
   const mutationKey = ["postAuthLogout"];
@@ -158,9 +168,11 @@ export const getPostAuthLogoutMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthLogout>>,
-    void
-  > = () => {
-    return postAuthLogout(requestOptions);
+    { data: PostAuthLogoutBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postAuthLogout(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -169,7 +181,7 @@ export const getPostAuthLogoutMutationOptions = <
 export type PostAuthLogoutMutationResult = NonNullable<
   Awaited<ReturnType<typeof postAuthLogout>>
 >;
-
+export type PostAuthLogoutMutationBody = PostAuthLogoutBody;
 export type PostAuthLogoutMutationError = unknown;
 
 /**
@@ -180,7 +192,7 @@ export const usePostAuthLogout = <TError = unknown, TContext = unknown>(
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthLogout>>,
       TError,
-      void,
+      { data: PostAuthLogoutBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -189,7 +201,7 @@ export const usePostAuthLogout = <TError = unknown, TContext = unknown>(
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthLogout>>,
   TError,
-  void,
+  { data: PostAuthLogoutBody },
   TContext
 > => {
   const mutationOptions = getPostAuthLogoutMutationOptions(options);
@@ -201,16 +213,16 @@ export const usePostAuthLogout = <TError = unknown, TContext = unknown>(
  * @summary Signup a new user
  */
 export const postAuthSignup = (
-  authSignupRequest: AuthSignupRequest,
+  postAuthSignupBody: PostAuthSignupBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<void>(
+  return customInstance<PostAuthSignup201>(
     {
       url: `/auth/signup`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: authSignupRequest,
+      data: postAuthSignupBody,
       signal,
     },
     options,
@@ -224,14 +236,14 @@ export const getPostAuthSignupMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthSignup>>,
     TError,
-    { data: AuthSignupRequest },
+    { data: PostAuthSignupBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthSignup>>,
   TError,
-  { data: AuthSignupRequest },
+  { data: PostAuthSignupBody },
   TContext
 > => {
   const mutationKey = ["postAuthSignup"];
@@ -245,7 +257,7 @@ export const getPostAuthSignupMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthSignup>>,
-    { data: AuthSignupRequest }
+    { data: PostAuthSignupBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -258,7 +270,7 @@ export const getPostAuthSignupMutationOptions = <
 export type PostAuthSignupMutationResult = NonNullable<
   Awaited<ReturnType<typeof postAuthSignup>>
 >;
-export type PostAuthSignupMutationBody = AuthSignupRequest;
+export type PostAuthSignupMutationBody = PostAuthSignupBody;
 export type PostAuthSignupMutationError = ErrorsErrorResponse;
 
 /**
@@ -272,7 +284,7 @@ export const usePostAuthSignup = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthSignup>>,
       TError,
-      { data: AuthSignupRequest },
+      { data: PostAuthSignupBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -281,7 +293,7 @@ export const usePostAuthSignup = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthSignup>>,
   TError,
-  { data: AuthSignupRequest },
+  { data: PostAuthSignupBody },
   TContext
 > => {
   const mutationOptions = getPostAuthSignupMutationOptions(options);

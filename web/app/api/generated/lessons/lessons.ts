@@ -23,15 +23,18 @@ import type {
 
 import type {
   DbLessonWithTranslation,
+  DeleteLessonsDeleteUuidBody,
   ErrorsErrorResponse,
+  GetLessonsBody,
   GetLessonsParams,
+  GetLessonsUuidBody,
   GetLessonsUuidParams,
-  LessonsAddLessonTranslationRequest,
-  LessonsCreateLessonRequest,
-  LessonsIDRequest,
   LessonsLessonTranslation,
   LessonsLessonWithTranslation,
-  LessonsUpdateLessonRequest,
+  PostLessonsAddTranslationBody,
+  PostLessonsCreateBody,
+  PostLessonsRestoreBody,
+  PutLessonsUpdateBody,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -43,24 +46,35 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary List lessons
  */
 export const getLessons = (
+  getLessonsBody: GetLessonsBody,
   params?: GetLessonsParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<LessonsLessonWithTranslation[]>(
-    { url: `/lessons`, method: "GET", params, signal },
+    {
+      url: `/lessons`,
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      params,
+      signal,
+    },
     options,
   );
 };
 
-export const getGetLessonsQueryKey = (params?: GetLessonsParams) => {
-  return [`/lessons`, ...(params ? [params] : [])] as const;
+export const getGetLessonsQueryKey = (
+  getLessonsBody?: GetLessonsBody,
+  params?: GetLessonsParams,
+) => {
+  return [`/lessons`, ...(params ? [params] : []), getLessonsBody] as const;
 };
 
 export const getGetLessonsQueryOptions = <
   TData = Awaited<ReturnType<typeof getLessons>>,
   TError = ErrorsErrorResponse,
 >(
+  getLessonsBody: GetLessonsBody,
   params?: GetLessonsParams,
   options?: {
     query?: Partial<
@@ -71,11 +85,12 @@ export const getGetLessonsQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetLessonsQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetLessonsQueryKey(getLessonsBody, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getLessons>>> = ({
     signal,
-  }) => getLessons(params, requestOptions, signal);
+  }) => getLessons(getLessonsBody, params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getLessons>>,
@@ -93,6 +108,7 @@ export function useGetLessons<
   TData = Awaited<ReturnType<typeof getLessons>>,
   TError = ErrorsErrorResponse,
 >(
+  getLessonsBody: GetLessonsBody,
   params: undefined | GetLessonsParams,
   options: {
     query: Partial<
@@ -116,6 +132,7 @@ export function useGetLessons<
   TData = Awaited<ReturnType<typeof getLessons>>,
   TError = ErrorsErrorResponse,
 >(
+  getLessonsBody: GetLessonsBody,
   params?: GetLessonsParams,
   options?: {
     query?: Partial<
@@ -139,6 +156,7 @@ export function useGetLessons<
   TData = Awaited<ReturnType<typeof getLessons>>,
   TError = ErrorsErrorResponse,
 >(
+  getLessonsBody: GetLessonsBody,
   params?: GetLessonsParams,
   options?: {
     query?: Partial<
@@ -158,6 +176,7 @@ export function useGetLessons<
   TData = Awaited<ReturnType<typeof getLessons>>,
   TError = ErrorsErrorResponse,
 >(
+  getLessonsBody: GetLessonsBody,
   params?: GetLessonsParams,
   options?: {
     query?: Partial<
@@ -169,7 +188,11 @@ export function useGetLessons<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetLessonsQueryOptions(params, options);
+  const queryOptions = getGetLessonsQueryOptions(
+    getLessonsBody,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -186,7 +209,7 @@ export function useGetLessons<
  * @summary Add a translation to an existing lesson
  */
 export const postLessonsAddTranslation = (
-  lessonsAddLessonTranslationRequest: LessonsAddLessonTranslationRequest,
+  postLessonsAddTranslationBody: PostLessonsAddTranslationBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -195,7 +218,7 @@ export const postLessonsAddTranslation = (
       url: `/lessons/add-translation`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: lessonsAddLessonTranslationRequest,
+      data: postLessonsAddTranslationBody,
       signal,
     },
     options,
@@ -209,14 +232,14 @@ export const getPostLessonsAddTranslationMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postLessonsAddTranslation>>,
     TError,
-    { data: LessonsAddLessonTranslationRequest },
+    { data: PostLessonsAddTranslationBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postLessonsAddTranslation>>,
   TError,
-  { data: LessonsAddLessonTranslationRequest },
+  { data: PostLessonsAddTranslationBody },
   TContext
 > => {
   const mutationKey = ["postLessonsAddTranslation"];
@@ -230,7 +253,7 @@ export const getPostLessonsAddTranslationMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postLessonsAddTranslation>>,
-    { data: LessonsAddLessonTranslationRequest }
+    { data: PostLessonsAddTranslationBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -244,7 +267,7 @@ export type PostLessonsAddTranslationMutationResult = NonNullable<
   Awaited<ReturnType<typeof postLessonsAddTranslation>>
 >;
 export type PostLessonsAddTranslationMutationBody =
-  LessonsAddLessonTranslationRequest;
+  PostLessonsAddTranslationBody;
 export type PostLessonsAddTranslationMutationError = ErrorsErrorResponse;
 
 /**
@@ -258,7 +281,7 @@ export const usePostLessonsAddTranslation = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postLessonsAddTranslation>>,
       TError,
-      { data: LessonsAddLessonTranslationRequest },
+      { data: PostLessonsAddTranslationBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -267,7 +290,7 @@ export const usePostLessonsAddTranslation = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postLessonsAddTranslation>>,
   TError,
-  { data: LessonsAddLessonTranslationRequest },
+  { data: PostLessonsAddTranslationBody },
   TContext
 > => {
   const mutationOptions = getPostLessonsAddTranslationMutationOptions(options);
@@ -279,7 +302,7 @@ export const usePostLessonsAddTranslation = <
  * @summary Create a new lesson
  */
 export const postLessonsCreate = (
-  lessonsCreateLessonRequest: LessonsCreateLessonRequest,
+  postLessonsCreateBody: PostLessonsCreateBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -288,7 +311,7 @@ export const postLessonsCreate = (
       url: `/lessons/create`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: lessonsCreateLessonRequest,
+      data: postLessonsCreateBody,
       signal,
     },
     options,
@@ -302,14 +325,14 @@ export const getPostLessonsCreateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postLessonsCreate>>,
     TError,
-    { data: LessonsCreateLessonRequest },
+    { data: PostLessonsCreateBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postLessonsCreate>>,
   TError,
-  { data: LessonsCreateLessonRequest },
+  { data: PostLessonsCreateBody },
   TContext
 > => {
   const mutationKey = ["postLessonsCreate"];
@@ -323,7 +346,7 @@ export const getPostLessonsCreateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postLessonsCreate>>,
-    { data: LessonsCreateLessonRequest }
+    { data: PostLessonsCreateBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -336,7 +359,7 @@ export const getPostLessonsCreateMutationOptions = <
 export type PostLessonsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postLessonsCreate>>
 >;
-export type PostLessonsCreateMutationBody = LessonsCreateLessonRequest;
+export type PostLessonsCreateMutationBody = PostLessonsCreateBody;
 export type PostLessonsCreateMutationError = ErrorsErrorResponse;
 
 /**
@@ -350,7 +373,7 @@ export const usePostLessonsCreate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postLessonsCreate>>,
       TError,
-      { data: LessonsCreateLessonRequest },
+      { data: PostLessonsCreateBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -359,7 +382,7 @@ export const usePostLessonsCreate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postLessonsCreate>>,
   TError,
-  { data: LessonsCreateLessonRequest },
+  { data: PostLessonsCreateBody },
   TContext
 > => {
   const mutationOptions = getPostLessonsCreateMutationOptions(options);
@@ -372,10 +395,16 @@ export const usePostLessonsCreate = <
  */
 export const deleteLessonsDeleteUuid = (
   uuid: string,
+  deleteLessonsDeleteUuidBody: DeleteLessonsDeleteUuidBody,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<string>(
-    { url: `/lessons/delete/${uuid}`, method: "DELETE" },
+    {
+      url: `/lessons/delete/${uuid}`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: deleteLessonsDeleteUuidBody,
+    },
     options,
   );
 };
@@ -387,14 +416,14 @@ export const getDeleteLessonsDeleteUuidMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteLessonsDeleteUuid>>,
     TError,
-    { uuid: string },
+    { uuid: string; data: DeleteLessonsDeleteUuidBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteLessonsDeleteUuid>>,
   TError,
-  { uuid: string },
+  { uuid: string; data: DeleteLessonsDeleteUuidBody },
   TContext
 > => {
   const mutationKey = ["deleteLessonsDeleteUuid"];
@@ -408,11 +437,11 @@ export const getDeleteLessonsDeleteUuidMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteLessonsDeleteUuid>>,
-    { uuid: string }
+    { uuid: string; data: DeleteLessonsDeleteUuidBody }
   > = (props) => {
-    const { uuid } = props ?? {};
+    const { uuid, data } = props ?? {};
 
-    return deleteLessonsDeleteUuid(uuid, requestOptions);
+    return deleteLessonsDeleteUuid(uuid, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -421,7 +450,7 @@ export const getDeleteLessonsDeleteUuidMutationOptions = <
 export type DeleteLessonsDeleteUuidMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteLessonsDeleteUuid>>
 >;
-
+export type DeleteLessonsDeleteUuidMutationBody = DeleteLessonsDeleteUuidBody;
 export type DeleteLessonsDeleteUuidMutationError = ErrorsErrorResponse;
 
 /**
@@ -435,7 +464,7 @@ export const useDeleteLessonsDeleteUuid = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteLessonsDeleteUuid>>,
       TError,
-      { uuid: string },
+      { uuid: string; data: DeleteLessonsDeleteUuidBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -444,7 +473,7 @@ export const useDeleteLessonsDeleteUuid = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteLessonsDeleteUuid>>,
   TError,
-  { uuid: string },
+  { uuid: string; data: DeleteLessonsDeleteUuidBody },
   TContext
 > => {
   const mutationOptions = getDeleteLessonsDeleteUuidMutationOptions(options);
@@ -456,7 +485,7 @@ export const useDeleteLessonsDeleteUuid = <
  * @summary Restore a deleted lesson
  */
 export const postLessonsRestore = (
-  lessonsIDRequest: LessonsIDRequest,
+  postLessonsRestoreBody: PostLessonsRestoreBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -465,7 +494,7 @@ export const postLessonsRestore = (
       url: `/lessons/restore`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: lessonsIDRequest,
+      data: postLessonsRestoreBody,
       signal,
     },
     options,
@@ -479,14 +508,14 @@ export const getPostLessonsRestoreMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postLessonsRestore>>,
     TError,
-    { data: LessonsIDRequest },
+    { data: PostLessonsRestoreBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postLessonsRestore>>,
   TError,
-  { data: LessonsIDRequest },
+  { data: PostLessonsRestoreBody },
   TContext
 > => {
   const mutationKey = ["postLessonsRestore"];
@@ -500,7 +529,7 @@ export const getPostLessonsRestoreMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postLessonsRestore>>,
-    { data: LessonsIDRequest }
+    { data: PostLessonsRestoreBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -513,7 +542,7 @@ export const getPostLessonsRestoreMutationOptions = <
 export type PostLessonsRestoreMutationResult = NonNullable<
   Awaited<ReturnType<typeof postLessonsRestore>>
 >;
-export type PostLessonsRestoreMutationBody = LessonsIDRequest;
+export type PostLessonsRestoreMutationBody = PostLessonsRestoreBody;
 export type PostLessonsRestoreMutationError = ErrorsErrorResponse;
 
 /**
@@ -527,7 +556,7 @@ export const usePostLessonsRestore = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postLessonsRestore>>,
       TError,
-      { data: LessonsIDRequest },
+      { data: PostLessonsRestoreBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -536,7 +565,7 @@ export const usePostLessonsRestore = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postLessonsRestore>>,
   TError,
-  { data: LessonsIDRequest },
+  { data: PostLessonsRestoreBody },
   TContext
 > => {
   const mutationOptions = getPostLessonsRestoreMutationOptions(options);
@@ -548,7 +577,7 @@ export const usePostLessonsRestore = <
  * @summary Update a lesson
  */
 export const putLessonsUpdate = (
-  lessonsUpdateLessonRequest: LessonsUpdateLessonRequest,
+  putLessonsUpdateBody: PutLessonsUpdateBody,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<LessonsLessonWithTranslation>(
@@ -556,7 +585,7 @@ export const putLessonsUpdate = (
       url: `/lessons/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: lessonsUpdateLessonRequest,
+      data: putLessonsUpdateBody,
     },
     options,
   );
@@ -569,14 +598,14 @@ export const getPutLessonsUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putLessonsUpdate>>,
     TError,
-    { data: LessonsUpdateLessonRequest },
+    { data: PutLessonsUpdateBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putLessonsUpdate>>,
   TError,
-  { data: LessonsUpdateLessonRequest },
+  { data: PutLessonsUpdateBody },
   TContext
 > => {
   const mutationKey = ["putLessonsUpdate"];
@@ -590,7 +619,7 @@ export const getPutLessonsUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putLessonsUpdate>>,
-    { data: LessonsUpdateLessonRequest }
+    { data: PutLessonsUpdateBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -603,7 +632,7 @@ export const getPutLessonsUpdateMutationOptions = <
 export type PutLessonsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putLessonsUpdate>>
 >;
-export type PutLessonsUpdateMutationBody = LessonsUpdateLessonRequest;
+export type PutLessonsUpdateMutationBody = PutLessonsUpdateBody;
 export type PutLessonsUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -617,7 +646,7 @@ export const usePutLessonsUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putLessonsUpdate>>,
       TError,
-      { data: LessonsUpdateLessonRequest },
+      { data: PutLessonsUpdateBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -626,7 +655,7 @@ export const usePutLessonsUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putLessonsUpdate>>,
   TError,
-  { data: LessonsUpdateLessonRequest },
+  { data: PutLessonsUpdateBody },
   TContext
 > => {
   const mutationOptions = getPutLessonsUpdateMutationOptions(options);
@@ -639,21 +668,33 @@ export const usePutLessonsUpdate = <
  */
 export const getLessonsUuid = (
   uuid: string,
+  getLessonsUuidBody: GetLessonsUuidBody,
   params?: GetLessonsUuidParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<DbLessonWithTranslation>(
-    { url: `/lessons/${uuid}`, method: "GET", params, signal },
+    {
+      url: `/lessons/${uuid}`,
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      params,
+      signal,
+    },
     options,
   );
 };
 
 export const getGetLessonsUuidQueryKey = (
   uuid?: string,
+  getLessonsUuidBody?: GetLessonsUuidBody,
   params?: GetLessonsUuidParams,
 ) => {
-  return [`/lessons/${uuid}`, ...(params ? [params] : [])] as const;
+  return [
+    `/lessons/${uuid}`,
+    ...(params ? [params] : []),
+    getLessonsUuidBody,
+  ] as const;
 };
 
 export const getGetLessonsUuidQueryOptions = <
@@ -661,6 +702,7 @@ export const getGetLessonsUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getLessonsUuidBody: GetLessonsUuidBody,
   params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
@@ -672,11 +714,13 @@ export const getGetLessonsUuidQueryOptions = <
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey =
-    queryOptions?.queryKey ?? getGetLessonsUuidQueryKey(uuid, params);
+    queryOptions?.queryKey ??
+    getGetLessonsUuidQueryKey(uuid, getLessonsUuidBody, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getLessonsUuid>>> = ({
     signal,
-  }) => getLessonsUuid(uuid, params, requestOptions, signal);
+  }) =>
+    getLessonsUuid(uuid, getLessonsUuidBody, params, requestOptions, signal);
 
   return {
     queryKey,
@@ -700,6 +744,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getLessonsUuidBody: GetLessonsUuidBody,
   params: undefined | GetLessonsUuidParams,
   options: {
     query: Partial<
@@ -724,6 +769,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getLessonsUuidBody: GetLessonsUuidBody,
   params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
@@ -748,6 +794,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getLessonsUuidBody: GetLessonsUuidBody,
   params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
@@ -768,6 +815,7 @@ export function useGetLessonsUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getLessonsUuidBody: GetLessonsUuidBody,
   params?: GetLessonsUuidParams,
   options?: {
     query?: Partial<
@@ -779,7 +827,12 @@ export function useGetLessonsUuid<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetLessonsUuidQueryOptions(uuid, params, options);
+  const queryOptions = getGetLessonsUuidQueryOptions(
+    uuid,
+    getLessonsUuidBody,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

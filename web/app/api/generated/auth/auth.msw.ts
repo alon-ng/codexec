@@ -10,7 +10,13 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { PostAuthLogout200 } from ".././model";
+import type {
+  PostAuthLogin200,
+  PostAuthLogout200,
+  PostAuthSignup201,
+} from ".././model";
+
+export const getPostAuthLoginResponseMock = (): PostAuthLogin200 => ({});
 
 export const getPostAuthLogoutResponseMock = (): PostAuthLogout200 => ({
   [faker.string.alphanumeric(5)]: faker.string.alpha({
@@ -18,22 +24,31 @@ export const getPostAuthLogoutResponseMock = (): PostAuthLogout200 => ({
   }),
 });
 
+export const getPostAuthSignupResponseMock = (): PostAuthSignup201 => ({});
+
 export const getPostAuthLoginMockHandler = (
   overrideResponse?:
-    | void
+    | PostAuthLogin200
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<void> | void),
+      ) => Promise<PostAuthLogin200> | PostAuthLogin200),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
     "*/auth/login",
     async (info) => {
       await delay(1000);
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
-      return new HttpResponse(null, { status: 200 });
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostAuthLoginResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
     },
     options,
   );
@@ -69,20 +84,27 @@ export const getPostAuthLogoutMockHandler = (
 
 export const getPostAuthSignupMockHandler = (
   overrideResponse?:
-    | void
+    | PostAuthSignup201
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<void> | void),
+      ) => Promise<PostAuthSignup201> | PostAuthSignup201),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
     "*/auth/signup",
     async (info) => {
       await delay(1000);
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
-      return new HttpResponse(null, { status: 201 });
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostAuthSignupResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
     },
     options,
   );

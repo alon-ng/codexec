@@ -1,893 +1,901 @@
-basePath: /api/v1
-definitions:
-  auth.LoginRequest:
-    properties:
-      email:
-        example: john.doe@example.com
-        type: string
-      password:
-        example: password
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  auth.SignupRequest:
-    properties:
-      email:
-        example: john.doe@example.com
-        type: string
-      first_name:
-        example: John
-        type: string
-      last_name:
-        example: Doe
-        type: string
-      password:
-        example: password
-        type: string
-    required:
-    - email
-    - first_name
-    - last_name
-    - password
-    type: object
-  courses.AddCourseTranslationRequest:
-    properties:
-      bullets:
-        example: |-
-          Aprende lo básico
-          Practica ejercicios
-        type: string
-      course_uuid:
-        type: string
-      description:
-        example: Aprende los fundamentos de Python
-        type: string
-      language:
-        example: es
-        type: string
-      name:
-        example: Introducción a Python
-        type: string
-    required:
-    - course_uuid
-    - description
-    - language
-    - name
-    type: object
-  courses.CourseFull:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      lessons:
-        items:
-          $ref: '#/definitions/lessons.LessonFull'
-        type: array
-      modified_at:
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-      translation:
-        $ref: '#/definitions/courses.CourseTranslation'
-      uuid:
-        type: string
-    required:
-    - created_at
-    - modified_at
-    - price
-    - subject
-    - translation
-    - uuid
-    type: object
-  courses.CourseTranslation:
-    properties:
-      bullets:
-        example: |-
-          Learn basics
-          Practice exercises
-        type: string
-      course_uuid:
-        type: string
-      description:
-        example: Learn Python basics
-        type: string
-      language:
-        example: en
-        type: string
-      name:
-        example: Introduction to Python
-        type: string
-      uuid:
-        type: string
-    required:
-    - course_uuid
-    - description
-    - language
-    - name
-    - uuid
-    type: object
-  courses.CourseWithTranslation:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      modified_at:
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-      translation:
-        $ref: '#/definitions/courses.CourseTranslation'
-      uuid:
-        type: string
-    required:
-    - created_at
-    - modified_at
-    - price
-    - subject
-    - translation
-    - uuid
-    type: object
-  courses.CreateCourseRequest:
-    properties:
-      bullets:
-        example: |-
-          Learn basics
-          Practice exercises
-        type: string
-      description:
-        example: Learn Python basics
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      language:
-        example: en
-        type: string
-      name:
-        example: Introduction to Python
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-    required:
-    - description
-    - language
-    - name
-    - price
-    - subject
-    type: object
-  courses.IDRequest:
-    properties:
-      uuid:
-        type: string
-    required:
-    - uuid
-    type: object
-  courses.UpdateCourseRequest:
-    properties:
-      bullets:
-        example: |-
-          Learn basics
-          Practice exercises
-        type: string
-      description:
-        example: Learn Python basics
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      language:
-        example: en
-        type: string
-      name:
-        example: Introduction to Python
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-      uuid:
-        type: string
-    required:
-    - language
-    - uuid
-    type: object
-  db.ExerciseTranslation:
-    properties:
-      description:
-        type: string
-      exercise_uuid:
-        type: string
-      language:
-        type: string
-      name:
-        type: string
-      uuid:
-        type: string
-    type: object
-  db.ExerciseType:
-    enum:
-    - quiz
-    - code
-    type: string
-    x-enum-varnames:
-    - ExerciseTypeQuiz
-    - ExerciseTypeCode
-  db.ExerciseWithTranslation:
-    properties:
-      created_at:
-        type: string
-      data:
-        type: object
-      deleted_at:
-        type: string
-      lesson_uuid:
-        type: string
-      modified_at:
-        type: string
-      order_index:
-        type: integer
-      reward:
-        type: integer
-      translation:
-        $ref: '#/definitions/db.ExerciseTranslation'
-      type:
-        $ref: '#/definitions/db.ExerciseType'
-      uuid:
-        type: string
-    type: object
-  db.LessonTranslation:
-    properties:
-      description:
-        type: string
-      language:
-        type: string
-      lesson_uuid:
-        type: string
-      name:
-        type: string
-      uuid:
-        type: string
-    type: object
-  db.LessonWithTranslation:
-    properties:
-      course_uuid:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      is_public:
-        type: boolean
-      modified_at:
-        type: string
-      order_index:
-        type: integer
-      translation:
-        $ref: '#/definitions/db.LessonTranslation'
-      uuid:
-        type: string
-    type: object
-  db.User:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      is_admin:
-        type: boolean
-      is_verified:
-        type: boolean
-      last_name:
-        type: string
-      modified_at:
-        type: string
-      password_hash:
-        type: string
-      score:
-        type: integer
-      streak:
-        type: integer
-      uuid:
-        type: string
-    type: object
-  errors.ErrorResponse:
-    properties:
-      code:
-        example: VALIDATION_ERROR
-        type: string
-      error:
-        example: Error message describing what went wrong
-        type: string
-    type: object
-  exercises.AddExerciseTranslationRequest:
-    properties:
-      description:
-        example: Imprime Hola Mundo
-        type: string
-      exercise_uuid:
-        type: string
-      language:
-        example: es
-        type: string
-      name:
-        example: Hola Mundo
-        type: string
-    required:
-    - description
-    - exercise_uuid
-    - language
-    - name
-    type: object
-  exercises.CreateExerciseRequest:
-    properties:
-      data:
-        additionalProperties: true
-        type: object
-      description:
-        example: Print Hello World
-        type: string
-      language:
-        example: en
-        type: string
-      lesson_uuid:
-        type: string
-      name:
-        example: Hello World
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      reward:
-        example: 10
-        type: integer
-      type:
-        allOf:
-        - $ref: '#/definitions/db.ExerciseType'
-        example: quiz
-    required:
-    - data
-    - description
-    - language
-    - lesson_uuid
-    - name
-    - order_index
-    - reward
-    - type
-    type: object
-  exercises.ExerciseTranslation:
-    properties:
-      description:
-        example: Print Hello World
-        type: string
-      exercise_uuid:
-        type: string
-      language:
-        example: en
-        type: string
-      name:
-        example: Hello World
-        type: string
-      uuid:
-        type: string
-    required:
-    - description
-    - exercise_uuid
-    - language
-    - name
-    - uuid
-    type: object
-  exercises.ExerciseWithTranslation:
-    properties:
-      created_at:
-        type: string
-      data:
-        type: object
-      deleted_at:
-        type: string
-      lesson_uuid:
-        type: string
-      modified_at:
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      reward:
-        example: 10
-        type: integer
-      translation:
-        $ref: '#/definitions/exercises.ExerciseTranslation'
-      type:
-        allOf:
-        - $ref: '#/definitions/db.ExerciseType'
-        example: quiz
-      uuid:
-        type: string
-    required:
-    - created_at
-    - data
-    - lesson_uuid
-    - modified_at
-    - order_index
-    - reward
-    - translation
-    - type
-    - uuid
-    type: object
-  exercises.IDRequest:
-    properties:
-      uuid:
-        type: string
-    required:
-    - uuid
-    type: object
-  exercises.UpdateExerciseRequest:
-    properties:
-      data:
-        additionalProperties: true
-        type: object
-      description:
-        example: Print Hello World
-        type: string
-      language:
-        example: en
-        type: string
-      lesson_uuid:
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
-      name:
-        example: Hello World
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      reward:
-        example: 10
-        type: integer
-      type:
-        allOf:
-        - $ref: '#/definitions/db.ExerciseType'
-        example: quiz
-      uuid:
-        type: string
-    required:
-    - language
-    - uuid
-    type: object
-  lessons.AddLessonTranslationRequest:
-    properties:
-      description:
-        example: Aprende los fundamentos de Python
-        type: string
-      language:
-        example: es
-        type: string
-      lesson_uuid:
-        type: string
-      name:
-        example: Fundamentos de Python
-        type: string
-    required:
-    - description
-    - language
-    - lesson_uuid
-    - name
-    type: object
-  lessons.CreateLessonRequest:
-    properties:
-      course_uuid:
-        type: string
-      description:
-        example: Learn Python fundamentals
-        type: string
-      is_public:
-        example: false
-        type: boolean
-      language:
-        example: en
-        type: string
-      name:
-        example: Python Basics
-        type: string
-      order_index:
-        example: 1
-        type: integer
-    required:
-    - course_uuid
-    - description
-    - language
-    - name
-    - order_index
-    type: object
-  lessons.IDRequest:
-    properties:
-      uuid:
-        type: string
-    required:
-    - uuid
-    type: object
-  lessons.LessonFull:
-    properties:
-      course_uuid:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/exercises.ExerciseWithTranslation'
-        type: array
-      is_public:
-        example: false
-        type: boolean
-      modified_at:
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      translation:
-        $ref: '#/definitions/lessons.LessonTranslation'
-      uuid:
-        type: string
-    required:
-    - course_uuid
-    - created_at
-    - modified_at
-    - order_index
-    - translation
-    - uuid
-    type: object
-  lessons.LessonTranslation:
-    properties:
-      description:
-        example: Learn Python fundamentals
-        type: string
-      language:
-        example: en
-        type: string
-      lesson_uuid:
-        type: string
-      name:
-        example: Python Basics
-        type: string
-      uuid:
-        type: string
-    required:
-    - description
-    - language
-    - lesson_uuid
-    - name
-    - uuid
-    type: object
-  lessons.LessonWithTranslation:
-    properties:
-      course_uuid:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      is_public:
-        example: false
-        type: boolean
-      modified_at:
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      translation:
-        $ref: '#/definitions/lessons.LessonTranslation'
-      uuid:
-        type: string
-    required:
-    - course_uuid
-    - created_at
-    - modified_at
-    - order_index
-    - translation
-    - uuid
-    type: object
-  lessons.UpdateLessonRequest:
-    properties:
-      description:
-        example: Learn Python fundamentals
-        type: string
-      is_public:
-        example: false
-        type: boolean
-      language:
-        example: en
-        type: string
-      name:
-        example: Python Basics
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      uuid:
-        type: string
-    required:
-    - language
-    - uuid
-    type: object
-  me.UserCourseFull:
-    properties:
-      completed_at:
-        type: string
-      course_uuid:
-        type: string
-      is_completed:
-        example: false
-        type: boolean
-      last_accessed_at:
-        type: string
-      lessons:
-        items:
-          $ref: '#/definitions/me.UserLessonStatus'
-        type: array
-      started_at:
-        type: string
-    required:
-    - course_uuid
-    type: object
-  me.UserCourseWithProgress:
-    properties:
-      completed_exercises:
-        example: 5
-        type: integer
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      modified_at:
-        type: string
-      next_exercise_name:
-        type: string
-      next_exercise_uuid:
-        type: string
-      next_lesson_name:
-        type: string
-      next_lesson_uuid:
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-      total_exercises:
-        example: 10
-        type: integer
-      translation:
-        $ref: '#/definitions/courses.CourseTranslation'
-      user_course_completed_at:
-        type: string
-      user_course_last_accessed_at:
-        type: string
-      user_course_started_at:
-        type: string
-      uuid:
-        type: string
-    required:
-    - completed_exercises
-    - created_at
-    - modified_at
-    - price
-    - subject
-    - total_exercises
-    - translation
-    - user_course_started_at
-    - uuid
-    type: object
-  me.UserExercise:
-    properties:
-      attempts:
-        example: 0
-        type: integer
-      completed_at:
-        type: string
-      exercise_uuid:
-        type: string
-      last_accessed_at:
-        type: string
-      started_at:
-        type: string
-      submission:
-        type: object
-      user_uuid:
-        type: string
-      uuid:
-        type: string
-    required:
-    - attempts
-    - exercise_uuid
-    - started_at
-    - user_uuid
-    - uuid
-    type: object
-  me.UserExerciseStatus:
-    properties:
-      completed_at:
-        type: string
-      exercise_uuid:
-        type: string
-      is_completed:
-        example: false
-        type: boolean
-      last_accessed_at:
-        type: string
-      started_at:
-        type: string
-    required:
-    - exercise_uuid
-    type: object
-  me.UserLessonStatus:
-    properties:
-      completed_at:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/me.UserExerciseStatus'
-        type: array
-      is_completed:
-        example: false
-        type: boolean
-      last_accessed_at:
-        type: string
-      lesson_uuid:
-        type: string
-      started_at:
-        type: string
-    required:
-    - lesson_uuid
-    type: object
-  users.CreateUserRequest:
-    properties:
-      email:
-        example: john.doe@example.com
-        type: string
-      first_name:
-        example: John
-        type: string
-      is_admin:
-        example: false
-        type: boolean
-      is_verified:
-        example: false
-        type: boolean
-      last_name:
-        example: Doe
-        type: string
-      password:
-        example: password
-        type: string
-    required:
-    - email
-    - first_name
-    - last_name
-    - password
-    type: object
-  users.IDRequest:
-    properties:
-      uuid:
-        type: string
-    required:
-    - uuid
-    type: object
-  users.UpdateUserRequest:
-    properties:
-      first_name:
-        example: John
-        type: string
-      last_name:
-        example: Doe
-        type: string
-      uuid:
-        type: string
-    required:
-    - uuid
-    type: object
-  users.User:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      email:
-        example: john.doe@example.com
-        type: string
-      first_name:
-        example: John
-        type: string
-      is_admin:
-        example: false
-        type: boolean
-      is_verified:
-        example: false
-        type: boolean
-      last_name:
-        example: Doe
-        type: string
-      modified_at:
-        type: string
-      score:
-        example: 0
-        type: integer
-      streak:
-        example: 0
-        type: integer
-      uuid:
-        type: string
-    required:
-    - created_at
-    - email
-    - first_name
-    - last_name
-    - modified_at
-    - uuid
-    type: object
-host: localhost:8080
+components:
+  schemas:
+    auth.LoginRequest:
+      properties:
+        email:
+          example: john.doe@example.com
+          type: string
+        password:
+          example: password
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    auth.SignupRequest:
+      properties:
+        email:
+          example: john.doe@example.com
+          type: string
+        first_name:
+          example: John
+          type: string
+        last_name:
+          example: Doe
+          type: string
+        password:
+          example: password
+          type: string
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+      type: object
+    courses.AddCourseTranslationRequest:
+      properties:
+        bullets:
+          example: |-
+            Aprende lo básico
+            Practica ejercicios
+          type: string
+        course_uuid:
+          type: string
+        description:
+          example: Aprende los fundamentos de Python
+          type: string
+        language:
+          example: es
+          type: string
+        name:
+          example: Introducción a Python
+          type: string
+      required:
+      - course_uuid
+      - description
+      - language
+      - name
+      type: object
+    courses.CourseFull:
+      properties:
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        difficulty:
+          example: 1
+          type: integer
+        discount:
+          example: 0
+          type: integer
+        is_active:
+          example: true
+          type: boolean
+        lessons:
+          items:
+            $ref: '#/components/schemas/lessons.LessonFull'
+          type: array
+          uniqueItems: false
+        modified_at:
+          type: string
+        price:
+          example: 99
+          type: integer
+        subject:
+          example: Programming
+          type: string
+        translation:
+          $ref: '#/components/schemas/courses.CourseTranslation'
+        uuid:
+          type: string
+      required:
+      - created_at
+      - modified_at
+      - price
+      - subject
+      - translation
+      - uuid
+      type: object
+    courses.CourseTranslation:
+      properties:
+        bullets:
+          example: |-
+            Learn basics
+            Practice exercises
+          type: string
+        course_uuid:
+          type: string
+        description:
+          example: Learn Python basics
+          type: string
+        language:
+          example: en
+          type: string
+        name:
+          example: Introduction to Python
+          type: string
+        uuid:
+          type: string
+      required:
+      - course_uuid
+      - description
+      - language
+      - name
+      - uuid
+      type: object
+    courses.CourseWithTranslation:
+      properties:
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        difficulty:
+          example: 1
+          type: integer
+        discount:
+          example: 0
+          type: integer
+        is_active:
+          example: true
+          type: boolean
+        modified_at:
+          type: string
+        price:
+          example: 99
+          type: integer
+        subject:
+          example: Programming
+          type: string
+        translation:
+          $ref: '#/components/schemas/courses.CourseTranslation'
+        uuid:
+          type: string
+      required:
+      - created_at
+      - modified_at
+      - price
+      - subject
+      - translation
+      - uuid
+      type: object
+    courses.CreateCourseRequest:
+      properties:
+        bullets:
+          example: |-
+            Learn basics
+            Practice exercises
+          type: string
+        description:
+          example: Learn Python basics
+          type: string
+        difficulty:
+          example: 1
+          type: integer
+        discount:
+          example: 0
+          type: integer
+        is_active:
+          example: true
+          type: boolean
+        language:
+          example: en
+          type: string
+        name:
+          example: Introduction to Python
+          type: string
+        price:
+          example: 99
+          type: integer
+        subject:
+          example: Programming
+          type: string
+      required:
+      - description
+      - language
+      - name
+      - price
+      - subject
+      type: object
+    courses.IDRequest:
+      properties:
+        uuid:
+          type: string
+      required:
+      - uuid
+      type: object
+    courses.UpdateCourseRequest:
+      properties:
+        bullets:
+          example: |-
+            Learn basics
+            Practice exercises
+          type: string
+        description:
+          example: Learn Python basics
+          type: string
+        difficulty:
+          example: 1
+          type: integer
+        discount:
+          example: 0
+          type: integer
+        is_active:
+          example: true
+          type: boolean
+        language:
+          example: en
+          type: string
+        name:
+          example: Introduction to Python
+          type: string
+        price:
+          example: 99
+          type: integer
+        subject:
+          example: Programming
+          type: string
+        uuid:
+          type: string
+      required:
+      - language
+      - uuid
+      type: object
+    db.ExerciseTranslation:
+      properties:
+        description:
+          type: string
+        exercise_uuid:
+          type: string
+        language:
+          type: string
+        name:
+          type: string
+        uuid:
+          type: string
+      type: object
+    db.ExerciseType:
+      enum:
+      - quiz
+      - code
+      type: string
+      x-enum-varnames:
+      - ExerciseTypeQuiz
+      - ExerciseTypeCode
+    db.ExerciseWithTranslation:
+      properties:
+        created_at:
+          type: string
+        data:
+          type: object
+        deleted_at:
+          type: string
+        lesson_uuid:
+          type: string
+        modified_at:
+          type: string
+        order_index:
+          type: integer
+        reward:
+          type: integer
+        translation:
+          $ref: '#/components/schemas/db.ExerciseTranslation'
+        type:
+          $ref: '#/components/schemas/db.ExerciseType'
+        uuid:
+          type: string
+      type: object
+    db.LessonTranslation:
+      properties:
+        description:
+          type: string
+        language:
+          type: string
+        lesson_uuid:
+          type: string
+        name:
+          type: string
+        uuid:
+          type: string
+      type: object
+    db.LessonWithTranslation:
+      properties:
+        course_uuid:
+          type: string
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        is_public:
+          type: boolean
+        modified_at:
+          type: string
+        order_index:
+          type: integer
+        translation:
+          $ref: '#/components/schemas/db.LessonTranslation'
+        uuid:
+          type: string
+      type: object
+    db.User:
+      properties:
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+        is_admin:
+          type: boolean
+        is_verified:
+          type: boolean
+        last_name:
+          type: string
+        modified_at:
+          type: string
+        password_hash:
+          type: string
+        score:
+          type: integer
+        streak:
+          type: integer
+        uuid:
+          type: string
+      type: object
+    errors.ErrorResponse:
+      properties:
+        code:
+          example: VALIDATION_ERROR
+          type: string
+        error:
+          example: Error message describing what went wrong
+          type: string
+      type: object
+    exercises.AddExerciseTranslationRequest:
+      properties:
+        description:
+          example: Imprime Hola Mundo
+          type: string
+        exercise_uuid:
+          type: string
+        language:
+          example: es
+          type: string
+        name:
+          example: Hola Mundo
+          type: string
+      required:
+      - description
+      - exercise_uuid
+      - language
+      - name
+      type: object
+    exercises.CreateExerciseRequest:
+      properties:
+        data:
+          additionalProperties: {}
+          type: object
+        description:
+          example: Print Hello World
+          type: string
+        language:
+          example: en
+          type: string
+        lesson_uuid:
+          type: string
+        name:
+          example: Hello World
+          type: string
+        order_index:
+          example: 1
+          type: integer
+        reward:
+          example: 10
+          type: integer
+        type:
+          $ref: '#/components/schemas/db.ExerciseType'
+      required:
+      - data
+      - description
+      - language
+      - lesson_uuid
+      - name
+      - order_index
+      - reward
+      - type
+      type: object
+    exercises.ExerciseTranslation:
+      properties:
+        description:
+          example: Print Hello World
+          type: string
+        exercise_uuid:
+          type: string
+        language:
+          example: en
+          type: string
+        name:
+          example: Hello World
+          type: string
+        uuid:
+          type: string
+      required:
+      - description
+      - exercise_uuid
+      - language
+      - name
+      - uuid
+      type: object
+    exercises.ExerciseWithTranslation:
+      properties:
+        created_at:
+          type: string
+        data:
+          type: object
+        deleted_at:
+          type: string
+        lesson_uuid:
+          type: string
+        modified_at:
+          type: string
+        order_index:
+          example: 1
+          type: integer
+        reward:
+          example: 10
+          type: integer
+        translation:
+          $ref: '#/components/schemas/exercises.ExerciseTranslation'
+        type:
+          $ref: '#/components/schemas/db.ExerciseType'
+        uuid:
+          type: string
+      required:
+      - created_at
+      - data
+      - lesson_uuid
+      - modified_at
+      - order_index
+      - reward
+      - translation
+      - type
+      - uuid
+      type: object
+    exercises.IDRequest:
+      properties:
+        uuid:
+          type: string
+      required:
+      - uuid
+      type: object
+    exercises.UpdateExerciseRequest:
+      properties:
+        data:
+          additionalProperties: {}
+          type: object
+        description:
+          example: Print Hello World
+          type: string
+        language:
+          example: en
+          type: string
+        lesson_uuid:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        name:
+          example: Hello World
+          type: string
+        order_index:
+          example: 1
+          type: integer
+        reward:
+          example: 10
+          type: integer
+        type:
+          $ref: '#/components/schemas/db.ExerciseType'
+        uuid:
+          type: string
+      required:
+      - language
+      - uuid
+      type: object
+    lessons.AddLessonTranslationRequest:
+      properties:
+        description:
+          example: Aprende los fundamentos de Python
+          type: string
+        language:
+          example: es
+          type: string
+        lesson_uuid:
+          type: string
+        name:
+          example: Fundamentos de Python
+          type: string
+      required:
+      - description
+      - language
+      - lesson_uuid
+      - name
+      type: object
+    lessons.CreateLessonRequest:
+      properties:
+        course_uuid:
+          type: string
+        description:
+          example: Learn Python fundamentals
+          type: string
+        is_public:
+          example: false
+          type: boolean
+        language:
+          example: en
+          type: string
+        name:
+          example: Python Basics
+          type: string
+        order_index:
+          example: 1
+          type: integer
+      required:
+      - course_uuid
+      - description
+      - language
+      - name
+      - order_index
+      type: object
+    lessons.IDRequest:
+      properties:
+        uuid:
+          type: string
+      required:
+      - uuid
+      type: object
+    lessons.LessonFull:
+      properties:
+        course_uuid:
+          type: string
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        exercises:
+          items:
+            $ref: '#/components/schemas/exercises.ExerciseWithTranslation'
+          type: array
+          uniqueItems: false
+        is_public:
+          example: false
+          type: boolean
+        modified_at:
+          type: string
+        order_index:
+          example: 1
+          type: integer
+        translation:
+          $ref: '#/components/schemas/lessons.LessonTranslation'
+        uuid:
+          type: string
+      required:
+      - course_uuid
+      - created_at
+      - modified_at
+      - order_index
+      - translation
+      - uuid
+      type: object
+    lessons.LessonTranslation:
+      properties:
+        description:
+          example: Learn Python fundamentals
+          type: string
+        language:
+          example: en
+          type: string
+        lesson_uuid:
+          type: string
+        name:
+          example: Python Basics
+          type: string
+        uuid:
+          type: string
+      required:
+      - description
+      - language
+      - lesson_uuid
+      - name
+      - uuid
+      type: object
+    lessons.LessonWithTranslation:
+      properties:
+        course_uuid:
+          type: string
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        is_public:
+          example: false
+          type: boolean
+        modified_at:
+          type: string
+        order_index:
+          example: 1
+          type: integer
+        translation:
+          $ref: '#/components/schemas/lessons.LessonTranslation'
+        uuid:
+          type: string
+      required:
+      - course_uuid
+      - created_at
+      - modified_at
+      - order_index
+      - translation
+      - uuid
+      type: object
+    lessons.UpdateLessonRequest:
+      properties:
+        description:
+          example: Learn Python fundamentals
+          type: string
+        is_public:
+          example: false
+          type: boolean
+        language:
+          example: en
+          type: string
+        name:
+          example: Python Basics
+          type: string
+        order_index:
+          example: 1
+          type: integer
+        uuid:
+          type: string
+      required:
+      - language
+      - uuid
+      type: object
+    me.UserCourseFull:
+      properties:
+        completed_at:
+          type: string
+        course_uuid:
+          type: string
+        is_completed:
+          example: false
+          type: boolean
+        last_accessed_at:
+          type: string
+        lessons:
+          items:
+            $ref: '#/components/schemas/me.UserLessonStatus'
+          type: array
+          uniqueItems: false
+        started_at:
+          type: string
+      required:
+      - course_uuid
+      type: object
+    me.UserCourseWithProgress:
+      properties:
+        completed_exercises:
+          example: 5
+          type: integer
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        difficulty:
+          example: 1
+          type: integer
+        discount:
+          example: 0
+          type: integer
+        is_active:
+          example: true
+          type: boolean
+        modified_at:
+          type: string
+        next_exercise_name:
+          type: string
+        next_exercise_uuid:
+          type: string
+        next_lesson_name:
+          type: string
+        next_lesson_uuid:
+          type: string
+        price:
+          example: 99
+          type: integer
+        subject:
+          example: Programming
+          type: string
+        total_exercises:
+          example: 10
+          type: integer
+        translation:
+          $ref: '#/components/schemas/courses.CourseTranslation'
+        user_course_completed_at:
+          type: string
+        user_course_last_accessed_at:
+          type: string
+        user_course_started_at:
+          type: string
+        uuid:
+          type: string
+      required:
+      - completed_exercises
+      - created_at
+      - modified_at
+      - price
+      - subject
+      - total_exercises
+      - translation
+      - user_course_started_at
+      - uuid
+      type: object
+    me.UserExercise:
+      properties:
+        attempts:
+          example: 0
+          type: integer
+        completed_at:
+          type: string
+        exercise_uuid:
+          type: string
+        last_accessed_at:
+          type: string
+        started_at:
+          type: string
+        submission:
+          type: object
+        user_uuid:
+          type: string
+        uuid:
+          type: string
+      required:
+      - attempts
+      - exercise_uuid
+      - started_at
+      - user_uuid
+      - uuid
+      type: object
+    me.UserExerciseStatus:
+      properties:
+        completed_at:
+          type: string
+        exercise_uuid:
+          type: string
+        is_completed:
+          example: false
+          type: boolean
+        last_accessed_at:
+          type: string
+        started_at:
+          type: string
+      required:
+      - exercise_uuid
+      type: object
+    me.UserLessonStatus:
+      properties:
+        completed_at:
+          type: string
+        exercises:
+          items:
+            $ref: '#/components/schemas/me.UserExerciseStatus'
+          type: array
+          uniqueItems: false
+        is_completed:
+          example: false
+          type: boolean
+        last_accessed_at:
+          type: string
+        lesson_uuid:
+          type: string
+        started_at:
+          type: string
+      required:
+      - lesson_uuid
+      type: object
+    users.CreateUserRequest:
+      properties:
+        email:
+          example: john.doe@example.com
+          type: string
+        first_name:
+          example: John
+          type: string
+        is_admin:
+          example: false
+          type: boolean
+        is_verified:
+          example: false
+          type: boolean
+        last_name:
+          example: Doe
+          type: string
+        password:
+          example: password
+          type: string
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+      type: object
+    users.IDRequest:
+      properties:
+        uuid:
+          type: string
+      required:
+      - uuid
+      type: object
+    users.UpdateUserRequest:
+      properties:
+        first_name:
+          example: John
+          type: string
+        last_name:
+          example: Doe
+          type: string
+        uuid:
+          type: string
+      required:
+      - uuid
+      type: object
+    users.User:
+      properties:
+        created_at:
+          type: string
+        deleted_at:
+          type: string
+        email:
+          example: john.doe@example.com
+          type: string
+        first_name:
+          example: John
+          type: string
+        is_admin:
+          example: false
+          type: boolean
+        is_verified:
+          example: false
+          type: boolean
+        last_name:
+          example: Doe
+          type: string
+        modified_at:
+          type: string
+        score:
+          example: 0
+          type: integer
+        streak:
+          example: 0
+          type: integer
+        uuid:
+          type: string
+      required:
+      - created_at
+      - email
+      - first_name
+      - last_name
+      - modified_at
+      - uuid
+      type: object
+  securitySchemes:
+    CookieAuth:
+      description: Authentication is performed via HTTP-only cookie named "auth_token"
+        containing a JWT token. The cookie is automatically set on successful signup/login
+        and cleared on logout.
+      in: cookie
+      name: auth_token
+      type: apiKey
+externalDocs:
+  description: ""
+  url: ""
 info:
   contact:
     email: support@swagger.io
@@ -900,143 +908,181 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Codim API
   version: "1.0"
+openapi: 3.1.0
 paths:
   /auth/login:
     post:
-      consumes:
-      - application/json
       description: Login a user. The authentication cookie (auth_token) is automatically
         set in the response.
-      parameters:
-      - description: Login request
-        in: body
-        name: request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/auth.LoginRequest'
+                description: Login request
+                summary: request
+        description: Login request
         required: true
-        schema:
-          $ref: '#/definitions/auth.LoginRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: object
           description: OK
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       summary: Login a user
       tags:
       - auth
   /auth/logout:
     post:
-      consumes:
-      - application/json
       description: Logout a user by clearing the authentication cookie
-      produces:
-      - application/json
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
           description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       summary: Logout a user
       tags:
       - auth
   /auth/signup:
     post:
-      consumes:
-      - application/json
       description: Signup a new user. The authentication cookie (auth_token) is automatically
         set in the response.
-      parameters:
-      - description: Signup request
-        in: body
-        name: request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/auth.SignupRequest'
+                description: Signup request
+                summary: request
+        description: Signup request
         required: true
-        schema:
-          $ref: '#/definitions/auth.SignupRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                type: object
           description: Created
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Conflict
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       summary: Signup a new user
       tags:
       - auth
   /courses:
     get:
-      consumes:
-      - application/json
       description: Get a paginated list of courses, optionally filtered by subject
       parameters:
-      - default: 10
-        description: 'Limit (default: 10)'
+      - description: 'Limit (default: 10)'
         in: query
         name: limit
-        type: integer
-      - default: 0
-        description: 'Offset (default: 0)'
+        schema:
+          default: 10
+          type: integer
+      - description: 'Offset (default: 0)'
         in: query
         name: offset
-        type: integer
+        schema:
+          default: 0
+          type: integer
       - description: Filter by subject
         in: query
         name: subject
-        type: string
-      - default: en
-        description: Filter by language
+        schema:
+          type: string
+      - description: Filter by language
         example: en
         in: query
         name: language
-        type: string
-      - default: true
-        description: Filter by is_active
+        schema:
+          default: en
+          type: string
+      - description: Filter by is_active
         example: true
         in: query
         name: is_active
-        type: boolean
-      produces:
-      - application/json
+        schema:
+          default: true
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/courses.CourseWithTranslation'
+                type: array
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/courses.CourseWithTranslation'
-            type: array
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: List courses
@@ -1044,43 +1090,56 @@ paths:
       - courses
   /courses/{uuid}:
     get:
-      consumes:
-      - application/json
       description: Get a single course by UUID
       parameters:
       - description: Course UUID
         in: path
         name: uuid
         required: true
-        type: string
-      - default: en
-        description: Language
+        schema:
+          type: string
+      - description: Language
         in: query
         name: language
-        type: string
-      produces:
-      - application/json
+        schema:
+          default: en
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/courses.CourseFull'
           description: OK
-          schema:
-            $ref: '#/definitions/courses.CourseFull'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Not Found
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get a course by UUID
@@ -1088,35 +1147,43 @@ paths:
       - courses
   /courses/add-translation:
     post:
-      consumes:
-      - application/json
       description: Add a new translation for an existing course
-      parameters:
-      - description: Translation data
-        in: body
-        name: translation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/courses.AddCourseTranslationRequest'
+                description: Translation data
+                summary: translation
+        description: Translation data
         required: true
-        schema:
-          $ref: '#/definitions/courses.AddCourseTranslationRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/courses.CourseTranslation'
           description: Created
-          schema:
-            $ref: '#/definitions/courses.CourseTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Add a translation to an existing course
@@ -1124,39 +1191,49 @@ paths:
       - courses
   /courses/create:
     post:
-      consumes:
-      - application/json
       description: Create a new course
-      parameters:
-      - description: Course creation data
-        in: body
-        name: course
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/courses.CreateCourseRequest'
+                description: Course creation data
+                summary: course
+        description: Course creation data
         required: true
-        schema:
-          $ref: '#/definitions/courses.CreateCourseRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/courses.CourseWithTranslation'
           description: Created
-          schema:
-            $ref: '#/definitions/courses.CourseWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Conflict
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Create a new course
@@ -1164,34 +1241,44 @@ paths:
       - courses
   /courses/delete/{uuid}:
     delete:
-      consumes:
-      - application/json
       description: Soft delete a course by UUID (sets deleted_at timestamp)
       parameters:
       - description: Course UUID
         in: path
         name: uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Delete a course
@@ -1199,35 +1286,43 @@ paths:
       - courses
   /courses/restore:
     post:
-      consumes:
-      - application/json
       description: Restore a soft-deleted course by UUID (sets deleted_at to NULL)
-      parameters:
-      - description: Course UUID
-        in: body
-        name: course
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/courses.IDRequest'
+                description: Course UUID
+                summary: course
+        description: Course UUID
         required: true
-        schema:
-          $ref: '#/definitions/courses.IDRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Restore a deleted course
@@ -1235,35 +1330,43 @@ paths:
       - courses
   /courses/update:
     put:
-      consumes:
-      - application/json
       description: Update an existing course by UUID
-      parameters:
-      - description: Course update data
-        in: body
-        name: course
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/courses.UpdateCourseRequest'
+                description: Course update data
+                summary: course
+        description: Course update data
         required: true
-        schema:
-          $ref: '#/definitions/courses.UpdateCourseRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/courses.CourseWithTranslation'
           description: OK
-          schema:
-            $ref: '#/definitions/courses.CourseWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Update a course
@@ -1271,51 +1374,64 @@ paths:
       - courses
   /exercises:
     get:
-      consumes:
-      - application/json
       description: Get a paginated list of exercises, optionally filtered by lesson
         UUID
       parameters:
-      - default: 10
-        description: 'Limit (default: 10)'
+      - description: 'Limit (default: 10)'
         in: query
         name: limit
-        type: integer
-      - default: 0
-        description: 'Offset (default: 0)'
+        schema:
+          default: 10
+          type: integer
+      - description: 'Offset (default: 0)'
         in: query
         name: offset
-        type: integer
+        schema:
+          default: 0
+          type: integer
       - description: Filter by lesson UUID
         in: query
         name: lesson_uuid
-        type: string
-      - default: en
-        description: Filter by language
+        schema:
+          type: string
+      - description: Filter by language
         in: query
         name: language
-        type: string
-      produces:
-      - application/json
+        schema:
+          default: en
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/exercises.ExerciseWithTranslation'
+                type: array
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/exercises.ExerciseWithTranslation'
-            type: array
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: List exercises
@@ -1323,44 +1439,57 @@ paths:
       - exercises
   /exercises/{uuid}:
     get:
-      consumes:
-      - application/json
       description: Get a single exercise by UUID
       parameters:
       - description: Exercise UUID
         in: path
         name: uuid
         required: true
-        type: string
-      - default: en
-        description: Language
+        schema:
+          type: string
+      - description: Language
         example: en
         in: query
         name: language
-        type: string
-      produces:
-      - application/json
+        schema:
+          default: en
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/db.ExerciseWithTranslation'
           description: OK
-          schema:
-            $ref: '#/definitions/db.ExerciseWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Not Found
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get an exercise by UUID
@@ -1368,35 +1497,43 @@ paths:
       - exercises
   /exercises/add-translation:
     post:
-      consumes:
-      - application/json
       description: Add a new translation for an existing exercise
-      parameters:
-      - description: Translation data
-        in: body
-        name: translation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/exercises.AddExerciseTranslationRequest'
+                description: Translation data
+                summary: translation
+        description: Translation data
         required: true
-        schema:
-          $ref: '#/definitions/exercises.AddExerciseTranslationRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exercises.ExerciseTranslation'
           description: Created
-          schema:
-            $ref: '#/definitions/exercises.ExerciseTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Add a translation to an existing exercise
@@ -1404,39 +1541,49 @@ paths:
       - exercises
   /exercises/create:
     post:
-      consumes:
-      - application/json
       description: Create a new exercise
-      parameters:
-      - description: Exercise creation data
-        in: body
-        name: exercise
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/exercises.CreateExerciseRequest'
+                description: Exercise creation data
+                summary: exercise
+        description: Exercise creation data
         required: true
-        schema:
-          $ref: '#/definitions/exercises.CreateExerciseRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exercises.ExerciseWithTranslation'
           description: Created
-          schema:
-            $ref: '#/definitions/exercises.ExerciseWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Conflict
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Create a new exercise
@@ -1444,34 +1591,44 @@ paths:
       - exercises
   /exercises/delete/{uuid}:
     delete:
-      consumes:
-      - application/json
       description: Soft delete an exercise by UUID (sets deleted_at timestamp)
       parameters:
       - description: Exercise UUID
         in: path
         name: uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Delete an exercise
@@ -1479,35 +1636,43 @@ paths:
       - exercises
   /exercises/restore:
     post:
-      consumes:
-      - application/json
       description: Restore a soft-deleted exercise by UUID (sets deleted_at to NULL)
-      parameters:
-      - description: Exercise UUID
-        in: body
-        name: exercise
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/exercises.IDRequest'
+                description: Exercise UUID
+                summary: exercise
+        description: Exercise UUID
         required: true
-        schema:
-          $ref: '#/definitions/exercises.IDRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Restore a deleted exercise
@@ -1515,35 +1680,43 @@ paths:
       - exercises
   /exercises/update:
     put:
-      consumes:
-      - application/json
       description: Update an existing exercise by UUID
-      parameters:
-      - description: Exercise update data
-        in: body
-        name: exercise
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/exercises.UpdateExerciseRequest'
+                description: Exercise update data
+                summary: exercise
+        description: Exercise update data
         required: true
-        schema:
-          $ref: '#/definitions/exercises.UpdateExerciseRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/db.ExerciseWithTranslation'
           description: OK
-          schema:
-            $ref: '#/definitions/db.ExerciseWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Update an exercise
@@ -1551,46 +1724,58 @@ paths:
       - exercises
   /lessons:
     get:
-      consumes:
-      - application/json
       description: Get a paginated list of lessons, optionally filtered by course
         UUID
       parameters:
-      - default: 10
-        description: 'Limit (default: 10)'
+      - description: 'Limit (default: 10)'
         in: query
         name: limit
-        type: integer
-      - default: 0
-        description: 'Offset (default: 0)'
+        schema:
+          default: 10
+          type: integer
+      - description: 'Offset (default: 0)'
         in: query
         name: offset
-        type: integer
+        schema:
+          default: 0
+          type: integer
       - description: Filter by course UUID
         in: query
         name: course_uuid
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/lessons.LessonWithTranslation'
+                type: array
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/lessons.LessonWithTranslation'
-            type: array
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: List lessons
@@ -1598,44 +1783,57 @@ paths:
       - lessons
   /lessons/{uuid}:
     get:
-      consumes:
-      - application/json
       description: Get a single lesson by UUID
       parameters:
       - description: Lesson UUID
         in: path
         name: uuid
         required: true
-        type: string
-      - default: en
-        description: Language
+        schema:
+          type: string
+      - description: Language
         example: en
         in: query
         name: language
-        type: string
-      produces:
-      - application/json
+        schema:
+          default: en
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/db.LessonWithTranslation'
           description: OK
-          schema:
-            $ref: '#/definitions/db.LessonWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Not Found
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get a lesson by UUID
@@ -1643,35 +1841,43 @@ paths:
       - lessons
   /lessons/add-translation:
     post:
-      consumes:
-      - application/json
       description: Add a new translation for an existing lesson
-      parameters:
-      - description: Translation data
-        in: body
-        name: translation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/lessons.AddLessonTranslationRequest'
+                description: Translation data
+                summary: translation
+        description: Translation data
         required: true
-        schema:
-          $ref: '#/definitions/lessons.AddLessonTranslationRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lessons.LessonTranslation'
           description: Created
-          schema:
-            $ref: '#/definitions/lessons.LessonTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Add a translation to an existing lesson
@@ -1679,39 +1885,49 @@ paths:
       - lessons
   /lessons/create:
     post:
-      consumes:
-      - application/json
       description: Create a new lesson
-      parameters:
-      - description: Lesson creation data
-        in: body
-        name: lesson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/lessons.CreateLessonRequest'
+                description: Lesson creation data
+                summary: lesson
+        description: Lesson creation data
         required: true
-        schema:
-          $ref: '#/definitions/lessons.CreateLessonRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lessons.LessonWithTranslation'
           description: Created
-          schema:
-            $ref: '#/definitions/lessons.LessonWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Conflict
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Create a new lesson
@@ -1719,34 +1935,44 @@ paths:
       - lessons
   /lessons/delete/{uuid}:
     delete:
-      consumes:
-      - application/json
       description: Soft delete a lesson by UUID (sets deleted_at timestamp)
       parameters:
       - description: Lesson UUID
         in: path
         name: uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Delete a lesson
@@ -1754,35 +1980,43 @@ paths:
       - lessons
   /lessons/restore:
     post:
-      consumes:
-      - application/json
       description: Restore a soft-deleted lesson by UUID (sets deleted_at to NULL)
-      parameters:
-      - description: Lesson UUID
-        in: body
-        name: lesson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/lessons.IDRequest'
+                description: Lesson UUID
+                summary: lesson
+        description: Lesson UUID
         required: true
-        schema:
-          $ref: '#/definitions/lessons.IDRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Restore a deleted lesson
@@ -1790,35 +2024,43 @@ paths:
       - lessons
   /lessons/update:
     put:
-      consumes:
-      - application/json
       description: Update an existing lesson by UUID
-      parameters:
-      - description: Lesson update data
-        in: body
-        name: lesson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/lessons.UpdateLessonRequest'
+                description: Lesson update data
+                summary: lesson
+        description: Lesson update data
         required: true
-        schema:
-          $ref: '#/definitions/lessons.UpdateLessonRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lessons.LessonWithTranslation'
           description: OK
-          schema:
-            $ref: '#/definitions/lessons.LessonWithTranslation'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Update a lesson
@@ -1826,28 +2068,37 @@ paths:
       - lessons
   /me:
     get:
-      consumes:
-      - application/json
       description: Get the current user from the JWT token
-      produces:
-      - application/json
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users.User'
           description: OK
-          schema:
-            $ref: '#/definitions/users.User'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get the current user from the JWT token
@@ -1855,57 +2106,71 @@ paths:
       - me
   /me/courses:
     get:
-      consumes:
-      - application/json
       description: List the user courses with progress
       parameters:
-      - default: 10
-        description: 'Limit (default: 10)'
+      - description: 'Limit (default: 10)'
         in: query
         name: limit
-        type: integer
-      - default: 0
-        description: 'Offset (default: 0)'
+        schema:
+          default: 10
+          type: integer
+      - description: 'Offset (default: 0)'
         in: query
         name: offset
-        type: integer
+        schema:
+          default: 0
+          type: integer
       - description: Filter by subject
         in: query
         name: subject
-        type: string
-      - default: en
-        description: Filter by language
+        schema:
+          type: string
+      - description: Filter by language
         example: en
         in: query
         name: language
-        type: string
-      - default: true
-        description: Filter by is_active
+        schema:
+          default: en
+          type: string
+      - description: Filter by is_active
         example: true
         in: query
         name: is_active
-        type: boolean
-      produces:
-      - application/json
+        schema:
+          default: true
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/me.UserCourseWithProgress'
+                type: array
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/me.UserCourseWithProgress'
-            type: array
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: List the user courses with progress
@@ -1913,34 +2178,44 @@ paths:
       - me
   /me/courses/{course_uuid}:
     get:
-      consumes:
-      - application/json
       description: Get the user course full
       parameters:
       - description: Course UUID
         in: path
         name: course_uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me.UserCourseFull'
           description: OK
-          schema:
-            $ref: '#/definitions/me.UserCourseFull'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get the user course full
@@ -1948,34 +2223,44 @@ paths:
       - me
   /me/exercises/{exercise_uuid}:
     get:
-      consumes:
-      - application/json
       description: Get the user exercise
       parameters:
       - description: Exercise UUID
         in: path
         name: exercise_uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me.UserExercise'
           description: OK
-          schema:
-            $ref: '#/definitions/me.UserExercise'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get the user exercise
@@ -1983,41 +2268,52 @@ paths:
       - me
   /users:
     get:
-      consumes:
-      - application/json
       description: Get a paginated list of users
       parameters:
-      - default: 10
-        description: 'Limit (default: 10)'
+      - description: 'Limit (default: 10)'
         in: query
         name: limit
-        type: integer
-      - default: 0
-        description: 'Offset (default: 0)'
+        schema:
+          default: 10
+          type: integer
+      - description: 'Offset (default: 0)'
         in: query
         name: offset
-        type: integer
-      produces:
-      - application/json
+        schema:
+          default: 0
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/users.User'
+                type: array
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/users.User'
-            type: array
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: List users
@@ -2025,38 +2321,50 @@ paths:
       - users
   /users/{uuid}:
     get:
-      consumes:
-      - application/json
       description: Get a single user by UUID
       parameters:
       - description: User UUID
         in: path
         name: uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/db.User'
           description: OK
-          schema:
-            $ref: '#/definitions/db.User'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Not Found
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Get a user by UUID
@@ -2064,35 +2372,43 @@ paths:
       - users
   /users/create:
     post:
-      consumes:
-      - application/json
       description: Create a new user (admin function, can set is_admin)
-      parameters:
-      - description: User creation data
-        in: body
-        name: user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/users.CreateUserRequest'
+                description: User creation data
+                summary: user
+        description: User creation data
         required: true
-        schema:
-          $ref: '#/definitions/users.CreateUserRequest'
-      produces:
-      - application/json
       responses:
         "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users.User'
           description: Created
-          schema:
-            $ref: '#/definitions/users.User'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Create a new user
@@ -2100,34 +2416,44 @@ paths:
       - users
   /users/delete/{uuid}:
     delete:
-      consumes:
-      - application/json
       description: Soft delete a user by UUID (sets deleted_at timestamp)
       parameters:
       - description: User UUID
         in: path
         name: uuid
         required: true
-        type: string
-      produces:
-      - application/json
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Delete a user
@@ -2135,35 +2461,43 @@ paths:
       - users
   /users/restore:
     post:
-      consumes:
-      - application/json
       description: Restore a soft-deleted user by UUID (sets deleted_at to NULL)
-      parameters:
-      - description: User UUID
-        in: body
-        name: user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/users.IDRequest'
+                description: User UUID
+                summary: user
+        description: User UUID
         required: true
-        schema:
-          $ref: '#/definitions/users.IDRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                type: string
           description: OK
-          schema:
-            type: string
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Restore a deleted user
@@ -2171,49 +2505,47 @@ paths:
       - users
   /users/update:
     put:
-      consumes:
-      - application/json
       description: Update an existing user by UUID
-      parameters:
-      - description: User update data
-        in: body
-        name: user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/users.UpdateUserRequest'
+                description: User update data
+                summary: user
+        description: User update data
         required: true
-        schema:
-          $ref: '#/definitions/users.UpdateUserRequest'
-      produces:
-      - application/json
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/db.User'
           description: OK
-          schema:
-            $ref: '#/definitions/db.User'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errors.ErrorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Update a user
       tags:
       - users
-schemes:
-- http
-- https
-securityDefinitions:
-  CookieAuth:
-    description: Authentication is performed via HTTP-only cookie named "auth_token"
-      containing a JWT token. The cookie is automatically set on successful signup/login
-      and cleared on logout.
-    in: cookie
-    name: auth_token
-    type: apiKey
-swagger: "2.0"
+servers:
+- url: localhost:8080/api/v1

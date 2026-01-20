@@ -23,11 +23,14 @@ import type {
 
 import type {
   DbUser,
+  DeleteUsersDeleteUuidBody,
   ErrorsErrorResponse,
+  GetUsersBody,
   GetUsersParams,
-  UsersCreateUserRequest,
-  UsersIDRequest,
-  UsersUpdateUserRequest,
+  GetUsersUuidBody,
+  PostUsersCreateBody,
+  PostUsersRestoreBody,
+  PutUsersUpdateBody,
   UsersUser,
 } from ".././model";
 
@@ -40,24 +43,35 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary List users
  */
 export const getUsers = (
+  getUsersBody: GetUsersBody,
   params?: GetUsersParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<UsersUser[]>(
-    { url: `/users`, method: "GET", params, signal },
+    {
+      url: `/users`,
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      params,
+      signal,
+    },
     options,
   );
 };
 
-export const getGetUsersQueryKey = (params?: GetUsersParams) => {
-  return [`/users`, ...(params ? [params] : [])] as const;
+export const getGetUsersQueryKey = (
+  getUsersBody?: GetUsersBody,
+  params?: GetUsersParams,
+) => {
+  return [`/users`, ...(params ? [params] : []), getUsersBody] as const;
 };
 
 export const getGetUsersQueryOptions = <
   TData = Awaited<ReturnType<typeof getUsers>>,
   TError = ErrorsErrorResponse,
 >(
+  getUsersBody: GetUsersBody,
   params?: GetUsersParams,
   options?: {
     query?: Partial<
@@ -68,11 +82,12 @@ export const getGetUsersQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetUsersQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetUsersQueryKey(getUsersBody, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsers>>> = ({
     signal,
-  }) => getUsers(params, requestOptions, signal);
+  }) => getUsers(getUsersBody, params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getUsers>>,
@@ -90,6 +105,7 @@ export function useGetUsers<
   TData = Awaited<ReturnType<typeof getUsers>>,
   TError = ErrorsErrorResponse,
 >(
+  getUsersBody: GetUsersBody,
   params: undefined | GetUsersParams,
   options: {
     query: Partial<
@@ -113,6 +129,7 @@ export function useGetUsers<
   TData = Awaited<ReturnType<typeof getUsers>>,
   TError = ErrorsErrorResponse,
 >(
+  getUsersBody: GetUsersBody,
   params?: GetUsersParams,
   options?: {
     query?: Partial<
@@ -136,6 +153,7 @@ export function useGetUsers<
   TData = Awaited<ReturnType<typeof getUsers>>,
   TError = ErrorsErrorResponse,
 >(
+  getUsersBody: GetUsersBody,
   params?: GetUsersParams,
   options?: {
     query?: Partial<
@@ -155,6 +173,7 @@ export function useGetUsers<
   TData = Awaited<ReturnType<typeof getUsers>>,
   TError = ErrorsErrorResponse,
 >(
+  getUsersBody: GetUsersBody,
   params?: GetUsersParams,
   options?: {
     query?: Partial<
@@ -166,7 +185,7 @@ export function useGetUsers<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetUsersQueryOptions(params, options);
+  const queryOptions = getGetUsersQueryOptions(getUsersBody, params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -183,7 +202,7 @@ export function useGetUsers<
  * @summary Create a new user
  */
 export const postUsersCreate = (
-  usersCreateUserRequest: UsersCreateUserRequest,
+  postUsersCreateBody: PostUsersCreateBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -192,7 +211,7 @@ export const postUsersCreate = (
       url: `/users/create`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: usersCreateUserRequest,
+      data: postUsersCreateBody,
       signal,
     },
     options,
@@ -206,14 +225,14 @@ export const getPostUsersCreateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postUsersCreate>>,
     TError,
-    { data: UsersCreateUserRequest },
+    { data: PostUsersCreateBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postUsersCreate>>,
   TError,
-  { data: UsersCreateUserRequest },
+  { data: PostUsersCreateBody },
   TContext
 > => {
   const mutationKey = ["postUsersCreate"];
@@ -227,7 +246,7 @@ export const getPostUsersCreateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postUsersCreate>>,
-    { data: UsersCreateUserRequest }
+    { data: PostUsersCreateBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -240,7 +259,7 @@ export const getPostUsersCreateMutationOptions = <
 export type PostUsersCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postUsersCreate>>
 >;
-export type PostUsersCreateMutationBody = UsersCreateUserRequest;
+export type PostUsersCreateMutationBody = PostUsersCreateBody;
 export type PostUsersCreateMutationError = ErrorsErrorResponse;
 
 /**
@@ -254,7 +273,7 @@ export const usePostUsersCreate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postUsersCreate>>,
       TError,
-      { data: UsersCreateUserRequest },
+      { data: PostUsersCreateBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -263,7 +282,7 @@ export const usePostUsersCreate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postUsersCreate>>,
   TError,
-  { data: UsersCreateUserRequest },
+  { data: PostUsersCreateBody },
   TContext
 > => {
   const mutationOptions = getPostUsersCreateMutationOptions(options);
@@ -276,10 +295,16 @@ export const usePostUsersCreate = <
  */
 export const deleteUsersDeleteUuid = (
   uuid: string,
+  deleteUsersDeleteUuidBody: DeleteUsersDeleteUuidBody,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<string>(
-    { url: `/users/delete/${uuid}`, method: "DELETE" },
+    {
+      url: `/users/delete/${uuid}`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: deleteUsersDeleteUuidBody,
+    },
     options,
   );
 };
@@ -291,14 +316,14 @@ export const getDeleteUsersDeleteUuidMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteUsersDeleteUuid>>,
     TError,
-    { uuid: string },
+    { uuid: string; data: DeleteUsersDeleteUuidBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteUsersDeleteUuid>>,
   TError,
-  { uuid: string },
+  { uuid: string; data: DeleteUsersDeleteUuidBody },
   TContext
 > => {
   const mutationKey = ["deleteUsersDeleteUuid"];
@@ -312,11 +337,11 @@ export const getDeleteUsersDeleteUuidMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteUsersDeleteUuid>>,
-    { uuid: string }
+    { uuid: string; data: DeleteUsersDeleteUuidBody }
   > = (props) => {
-    const { uuid } = props ?? {};
+    const { uuid, data } = props ?? {};
 
-    return deleteUsersDeleteUuid(uuid, requestOptions);
+    return deleteUsersDeleteUuid(uuid, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -325,7 +350,7 @@ export const getDeleteUsersDeleteUuidMutationOptions = <
 export type DeleteUsersDeleteUuidMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteUsersDeleteUuid>>
 >;
-
+export type DeleteUsersDeleteUuidMutationBody = DeleteUsersDeleteUuidBody;
 export type DeleteUsersDeleteUuidMutationError = ErrorsErrorResponse;
 
 /**
@@ -339,7 +364,7 @@ export const useDeleteUsersDeleteUuid = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteUsersDeleteUuid>>,
       TError,
-      { uuid: string },
+      { uuid: string; data: DeleteUsersDeleteUuidBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -348,7 +373,7 @@ export const useDeleteUsersDeleteUuid = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteUsersDeleteUuid>>,
   TError,
-  { uuid: string },
+  { uuid: string; data: DeleteUsersDeleteUuidBody },
   TContext
 > => {
   const mutationOptions = getDeleteUsersDeleteUuidMutationOptions(options);
@@ -360,7 +385,7 @@ export const useDeleteUsersDeleteUuid = <
  * @summary Restore a deleted user
  */
 export const postUsersRestore = (
-  usersIDRequest: UsersIDRequest,
+  postUsersRestoreBody: PostUsersRestoreBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -369,7 +394,7 @@ export const postUsersRestore = (
       url: `/users/restore`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: usersIDRequest,
+      data: postUsersRestoreBody,
       signal,
     },
     options,
@@ -383,14 +408,14 @@ export const getPostUsersRestoreMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postUsersRestore>>,
     TError,
-    { data: UsersIDRequest },
+    { data: PostUsersRestoreBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postUsersRestore>>,
   TError,
-  { data: UsersIDRequest },
+  { data: PostUsersRestoreBody },
   TContext
 > => {
   const mutationKey = ["postUsersRestore"];
@@ -404,7 +429,7 @@ export const getPostUsersRestoreMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postUsersRestore>>,
-    { data: UsersIDRequest }
+    { data: PostUsersRestoreBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -417,7 +442,7 @@ export const getPostUsersRestoreMutationOptions = <
 export type PostUsersRestoreMutationResult = NonNullable<
   Awaited<ReturnType<typeof postUsersRestore>>
 >;
-export type PostUsersRestoreMutationBody = UsersIDRequest;
+export type PostUsersRestoreMutationBody = PostUsersRestoreBody;
 export type PostUsersRestoreMutationError = ErrorsErrorResponse;
 
 /**
@@ -431,7 +456,7 @@ export const usePostUsersRestore = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postUsersRestore>>,
       TError,
-      { data: UsersIDRequest },
+      { data: PostUsersRestoreBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -440,7 +465,7 @@ export const usePostUsersRestore = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postUsersRestore>>,
   TError,
-  { data: UsersIDRequest },
+  { data: PostUsersRestoreBody },
   TContext
 > => {
   const mutationOptions = getPostUsersRestoreMutationOptions(options);
@@ -452,7 +477,7 @@ export const usePostUsersRestore = <
  * @summary Update a user
  */
 export const putUsersUpdate = (
-  usersUpdateUserRequest: UsersUpdateUserRequest,
+  putUsersUpdateBody: PutUsersUpdateBody,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<DbUser>(
@@ -460,7 +485,7 @@ export const putUsersUpdate = (
       url: `/users/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: usersUpdateUserRequest,
+      data: putUsersUpdateBody,
     },
     options,
   );
@@ -473,14 +498,14 @@ export const getPutUsersUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putUsersUpdate>>,
     TError,
-    { data: UsersUpdateUserRequest },
+    { data: PutUsersUpdateBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putUsersUpdate>>,
   TError,
-  { data: UsersUpdateUserRequest },
+  { data: PutUsersUpdateBody },
   TContext
 > => {
   const mutationKey = ["putUsersUpdate"];
@@ -494,7 +519,7 @@ export const getPutUsersUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putUsersUpdate>>,
-    { data: UsersUpdateUserRequest }
+    { data: PutUsersUpdateBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -507,7 +532,7 @@ export const getPutUsersUpdateMutationOptions = <
 export type PutUsersUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putUsersUpdate>>
 >;
-export type PutUsersUpdateMutationBody = UsersUpdateUserRequest;
+export type PutUsersUpdateMutationBody = PutUsersUpdateBody;
 export type PutUsersUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -521,7 +546,7 @@ export const usePutUsersUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putUsersUpdate>>,
       TError,
-      { data: UsersUpdateUserRequest },
+      { data: PutUsersUpdateBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -530,7 +555,7 @@ export const usePutUsersUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putUsersUpdate>>,
   TError,
-  { data: UsersUpdateUserRequest },
+  { data: PutUsersUpdateBody },
   TContext
 > => {
   const mutationOptions = getPutUsersUpdateMutationOptions(options);
@@ -543,17 +568,26 @@ export const usePutUsersUpdate = <
  */
 export const getUsersUuid = (
   uuid: string,
+  getUsersUuidBody: GetUsersUuidBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<DbUser>(
-    { url: `/users/${uuid}`, method: "GET", signal },
+    {
+      url: `/users/${uuid}`,
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      signal,
+    },
     options,
   );
 };
 
-export const getGetUsersUuidQueryKey = (uuid?: string) => {
-  return [`/users/${uuid}`] as const;
+export const getGetUsersUuidQueryKey = (
+  uuid?: string,
+  getUsersUuidBody?: GetUsersUuidBody,
+) => {
+  return [`/users/${uuid}`, getUsersUuidBody] as const;
 };
 
 export const getGetUsersUuidQueryOptions = <
@@ -561,6 +595,7 @@ export const getGetUsersUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getUsersUuidBody: GetUsersUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getUsersUuid>>, TError, TData>
@@ -570,11 +605,12 @@ export const getGetUsersUuidQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetUsersUuidQueryKey(uuid);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetUsersUuidQueryKey(uuid, getUsersUuidBody);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersUuid>>> = ({
     signal,
-  }) => getUsersUuid(uuid, requestOptions, signal);
+  }) => getUsersUuid(uuid, getUsersUuidBody, requestOptions, signal);
 
   return {
     queryKey,
@@ -598,6 +634,7 @@ export function useGetUsersUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getUsersUuidBody: GetUsersUuidBody,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getUsersUuid>>, TError, TData>
@@ -621,6 +658,7 @@ export function useGetUsersUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getUsersUuidBody: GetUsersUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getUsersUuid>>, TError, TData>
@@ -644,6 +682,7 @@ export function useGetUsersUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getUsersUuidBody: GetUsersUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getUsersUuid>>, TError, TData>
@@ -663,6 +702,7 @@ export function useGetUsersUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getUsersUuidBody: GetUsersUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getUsersUuid>>, TError, TData>
@@ -673,7 +713,11 @@ export function useGetUsersUuid<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetUsersUuidQueryOptions(uuid, options);
+  const queryOptions = getGetUsersUuidQueryOptions(
+    uuid,
+    getUsersUuidBody,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

@@ -23,15 +23,18 @@ import type {
 
 import type {
   DbExerciseWithTranslation,
+  DeleteExercisesDeleteUuidBody,
   ErrorsErrorResponse,
-  ExercisesAddExerciseTranslationRequest,
-  ExercisesCreateExerciseRequest,
   ExercisesExerciseTranslation,
   ExercisesExerciseWithTranslation,
-  ExercisesIDRequest,
-  ExercisesUpdateExerciseRequest,
+  GetExercisesBody,
   GetExercisesParams,
+  GetExercisesUuidBody,
   GetExercisesUuidParams,
+  PostExercisesAddTranslationBody,
+  PostExercisesCreateBody,
+  PostExercisesRestoreBody,
+  PutExercisesUpdateBody,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -43,24 +46,35 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary List exercises
  */
 export const getExercises = (
+  getExercisesBody: GetExercisesBody,
   params?: GetExercisesParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<ExercisesExerciseWithTranslation[]>(
-    { url: `/exercises`, method: "GET", params, signal },
+    {
+      url: `/exercises`,
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      params,
+      signal,
+    },
     options,
   );
 };
 
-export const getGetExercisesQueryKey = (params?: GetExercisesParams) => {
-  return [`/exercises`, ...(params ? [params] : [])] as const;
+export const getGetExercisesQueryKey = (
+  getExercisesBody?: GetExercisesBody,
+  params?: GetExercisesParams,
+) => {
+  return [`/exercises`, ...(params ? [params] : []), getExercisesBody] as const;
 };
 
 export const getGetExercisesQueryOptions = <
   TData = Awaited<ReturnType<typeof getExercises>>,
   TError = ErrorsErrorResponse,
 >(
+  getExercisesBody: GetExercisesBody,
   params?: GetExercisesParams,
   options?: {
     query?: Partial<
@@ -71,11 +85,12 @@ export const getGetExercisesQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetExercisesQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetExercisesQueryKey(getExercisesBody, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getExercises>>> = ({
     signal,
-  }) => getExercises(params, requestOptions, signal);
+  }) => getExercises(getExercisesBody, params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getExercises>>,
@@ -93,6 +108,7 @@ export function useGetExercises<
   TData = Awaited<ReturnType<typeof getExercises>>,
   TError = ErrorsErrorResponse,
 >(
+  getExercisesBody: GetExercisesBody,
   params: undefined | GetExercisesParams,
   options: {
     query: Partial<
@@ -116,6 +132,7 @@ export function useGetExercises<
   TData = Awaited<ReturnType<typeof getExercises>>,
   TError = ErrorsErrorResponse,
 >(
+  getExercisesBody: GetExercisesBody,
   params?: GetExercisesParams,
   options?: {
     query?: Partial<
@@ -139,6 +156,7 @@ export function useGetExercises<
   TData = Awaited<ReturnType<typeof getExercises>>,
   TError = ErrorsErrorResponse,
 >(
+  getExercisesBody: GetExercisesBody,
   params?: GetExercisesParams,
   options?: {
     query?: Partial<
@@ -158,6 +176,7 @@ export function useGetExercises<
   TData = Awaited<ReturnType<typeof getExercises>>,
   TError = ErrorsErrorResponse,
 >(
+  getExercisesBody: GetExercisesBody,
   params?: GetExercisesParams,
   options?: {
     query?: Partial<
@@ -169,7 +188,11 @@ export function useGetExercises<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetExercisesQueryOptions(params, options);
+  const queryOptions = getGetExercisesQueryOptions(
+    getExercisesBody,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -186,7 +209,7 @@ export function useGetExercises<
  * @summary Add a translation to an existing exercise
  */
 export const postExercisesAddTranslation = (
-  exercisesAddExerciseTranslationRequest: ExercisesAddExerciseTranslationRequest,
+  postExercisesAddTranslationBody: PostExercisesAddTranslationBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -195,7 +218,7 @@ export const postExercisesAddTranslation = (
       url: `/exercises/add-translation`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: exercisesAddExerciseTranslationRequest,
+      data: postExercisesAddTranslationBody,
       signal,
     },
     options,
@@ -209,14 +232,14 @@ export const getPostExercisesAddTranslationMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postExercisesAddTranslation>>,
     TError,
-    { data: ExercisesAddExerciseTranslationRequest },
+    { data: PostExercisesAddTranslationBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postExercisesAddTranslation>>,
   TError,
-  { data: ExercisesAddExerciseTranslationRequest },
+  { data: PostExercisesAddTranslationBody },
   TContext
 > => {
   const mutationKey = ["postExercisesAddTranslation"];
@@ -230,7 +253,7 @@ export const getPostExercisesAddTranslationMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postExercisesAddTranslation>>,
-    { data: ExercisesAddExerciseTranslationRequest }
+    { data: PostExercisesAddTranslationBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -244,7 +267,7 @@ export type PostExercisesAddTranslationMutationResult = NonNullable<
   Awaited<ReturnType<typeof postExercisesAddTranslation>>
 >;
 export type PostExercisesAddTranslationMutationBody =
-  ExercisesAddExerciseTranslationRequest;
+  PostExercisesAddTranslationBody;
 export type PostExercisesAddTranslationMutationError = ErrorsErrorResponse;
 
 /**
@@ -258,7 +281,7 @@ export const usePostExercisesAddTranslation = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postExercisesAddTranslation>>,
       TError,
-      { data: ExercisesAddExerciseTranslationRequest },
+      { data: PostExercisesAddTranslationBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -267,7 +290,7 @@ export const usePostExercisesAddTranslation = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postExercisesAddTranslation>>,
   TError,
-  { data: ExercisesAddExerciseTranslationRequest },
+  { data: PostExercisesAddTranslationBody },
   TContext
 > => {
   const mutationOptions =
@@ -280,7 +303,7 @@ export const usePostExercisesAddTranslation = <
  * @summary Create a new exercise
  */
 export const postExercisesCreate = (
-  exercisesCreateExerciseRequest: ExercisesCreateExerciseRequest,
+  postExercisesCreateBody: PostExercisesCreateBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -289,7 +312,7 @@ export const postExercisesCreate = (
       url: `/exercises/create`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: exercisesCreateExerciseRequest,
+      data: postExercisesCreateBody,
       signal,
     },
     options,
@@ -303,14 +326,14 @@ export const getPostExercisesCreateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postExercisesCreate>>,
     TError,
-    { data: ExercisesCreateExerciseRequest },
+    { data: PostExercisesCreateBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postExercisesCreate>>,
   TError,
-  { data: ExercisesCreateExerciseRequest },
+  { data: PostExercisesCreateBody },
   TContext
 > => {
   const mutationKey = ["postExercisesCreate"];
@@ -324,7 +347,7 @@ export const getPostExercisesCreateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postExercisesCreate>>,
-    { data: ExercisesCreateExerciseRequest }
+    { data: PostExercisesCreateBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -337,7 +360,7 @@ export const getPostExercisesCreateMutationOptions = <
 export type PostExercisesCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postExercisesCreate>>
 >;
-export type PostExercisesCreateMutationBody = ExercisesCreateExerciseRequest;
+export type PostExercisesCreateMutationBody = PostExercisesCreateBody;
 export type PostExercisesCreateMutationError = ErrorsErrorResponse;
 
 /**
@@ -351,7 +374,7 @@ export const usePostExercisesCreate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postExercisesCreate>>,
       TError,
-      { data: ExercisesCreateExerciseRequest },
+      { data: PostExercisesCreateBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -360,7 +383,7 @@ export const usePostExercisesCreate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postExercisesCreate>>,
   TError,
-  { data: ExercisesCreateExerciseRequest },
+  { data: PostExercisesCreateBody },
   TContext
 > => {
   const mutationOptions = getPostExercisesCreateMutationOptions(options);
@@ -373,10 +396,16 @@ export const usePostExercisesCreate = <
  */
 export const deleteExercisesDeleteUuid = (
   uuid: string,
+  deleteExercisesDeleteUuidBody: DeleteExercisesDeleteUuidBody,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<string>(
-    { url: `/exercises/delete/${uuid}`, method: "DELETE" },
+    {
+      url: `/exercises/delete/${uuid}`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: deleteExercisesDeleteUuidBody,
+    },
     options,
   );
 };
@@ -388,14 +417,14 @@ export const getDeleteExercisesDeleteUuidMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteExercisesDeleteUuid>>,
     TError,
-    { uuid: string },
+    { uuid: string; data: DeleteExercisesDeleteUuidBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteExercisesDeleteUuid>>,
   TError,
-  { uuid: string },
+  { uuid: string; data: DeleteExercisesDeleteUuidBody },
   TContext
 > => {
   const mutationKey = ["deleteExercisesDeleteUuid"];
@@ -409,11 +438,11 @@ export const getDeleteExercisesDeleteUuidMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteExercisesDeleteUuid>>,
-    { uuid: string }
+    { uuid: string; data: DeleteExercisesDeleteUuidBody }
   > = (props) => {
-    const { uuid } = props ?? {};
+    const { uuid, data } = props ?? {};
 
-    return deleteExercisesDeleteUuid(uuid, requestOptions);
+    return deleteExercisesDeleteUuid(uuid, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -422,7 +451,8 @@ export const getDeleteExercisesDeleteUuidMutationOptions = <
 export type DeleteExercisesDeleteUuidMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteExercisesDeleteUuid>>
 >;
-
+export type DeleteExercisesDeleteUuidMutationBody =
+  DeleteExercisesDeleteUuidBody;
 export type DeleteExercisesDeleteUuidMutationError = ErrorsErrorResponse;
 
 /**
@@ -436,7 +466,7 @@ export const useDeleteExercisesDeleteUuid = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteExercisesDeleteUuid>>,
       TError,
-      { uuid: string },
+      { uuid: string; data: DeleteExercisesDeleteUuidBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -445,7 +475,7 @@ export const useDeleteExercisesDeleteUuid = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteExercisesDeleteUuid>>,
   TError,
-  { uuid: string },
+  { uuid: string; data: DeleteExercisesDeleteUuidBody },
   TContext
 > => {
   const mutationOptions = getDeleteExercisesDeleteUuidMutationOptions(options);
@@ -457,7 +487,7 @@ export const useDeleteExercisesDeleteUuid = <
  * @summary Restore a deleted exercise
  */
 export const postExercisesRestore = (
-  exercisesIDRequest: ExercisesIDRequest,
+  postExercisesRestoreBody: PostExercisesRestoreBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -466,7 +496,7 @@ export const postExercisesRestore = (
       url: `/exercises/restore`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: exercisesIDRequest,
+      data: postExercisesRestoreBody,
       signal,
     },
     options,
@@ -480,14 +510,14 @@ export const getPostExercisesRestoreMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postExercisesRestore>>,
     TError,
-    { data: ExercisesIDRequest },
+    { data: PostExercisesRestoreBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postExercisesRestore>>,
   TError,
-  { data: ExercisesIDRequest },
+  { data: PostExercisesRestoreBody },
   TContext
 > => {
   const mutationKey = ["postExercisesRestore"];
@@ -501,7 +531,7 @@ export const getPostExercisesRestoreMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postExercisesRestore>>,
-    { data: ExercisesIDRequest }
+    { data: PostExercisesRestoreBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -514,7 +544,7 @@ export const getPostExercisesRestoreMutationOptions = <
 export type PostExercisesRestoreMutationResult = NonNullable<
   Awaited<ReturnType<typeof postExercisesRestore>>
 >;
-export type PostExercisesRestoreMutationBody = ExercisesIDRequest;
+export type PostExercisesRestoreMutationBody = PostExercisesRestoreBody;
 export type PostExercisesRestoreMutationError = ErrorsErrorResponse;
 
 /**
@@ -528,7 +558,7 @@ export const usePostExercisesRestore = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postExercisesRestore>>,
       TError,
-      { data: ExercisesIDRequest },
+      { data: PostExercisesRestoreBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -537,7 +567,7 @@ export const usePostExercisesRestore = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postExercisesRestore>>,
   TError,
-  { data: ExercisesIDRequest },
+  { data: PostExercisesRestoreBody },
   TContext
 > => {
   const mutationOptions = getPostExercisesRestoreMutationOptions(options);
@@ -549,7 +579,7 @@ export const usePostExercisesRestore = <
  * @summary Update an exercise
  */
 export const putExercisesUpdate = (
-  exercisesUpdateExerciseRequest: ExercisesUpdateExerciseRequest,
+  putExercisesUpdateBody: PutExercisesUpdateBody,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<DbExerciseWithTranslation>(
@@ -557,7 +587,7 @@ export const putExercisesUpdate = (
       url: `/exercises/update`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: exercisesUpdateExerciseRequest,
+      data: putExercisesUpdateBody,
     },
     options,
   );
@@ -570,14 +600,14 @@ export const getPutExercisesUpdateMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putExercisesUpdate>>,
     TError,
-    { data: ExercisesUpdateExerciseRequest },
+    { data: PutExercisesUpdateBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putExercisesUpdate>>,
   TError,
-  { data: ExercisesUpdateExerciseRequest },
+  { data: PutExercisesUpdateBody },
   TContext
 > => {
   const mutationKey = ["putExercisesUpdate"];
@@ -591,7 +621,7 @@ export const getPutExercisesUpdateMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putExercisesUpdate>>,
-    { data: ExercisesUpdateExerciseRequest }
+    { data: PutExercisesUpdateBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -604,7 +634,7 @@ export const getPutExercisesUpdateMutationOptions = <
 export type PutExercisesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof putExercisesUpdate>>
 >;
-export type PutExercisesUpdateMutationBody = ExercisesUpdateExerciseRequest;
+export type PutExercisesUpdateMutationBody = PutExercisesUpdateBody;
 export type PutExercisesUpdateMutationError = ErrorsErrorResponse;
 
 /**
@@ -618,7 +648,7 @@ export const usePutExercisesUpdate = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putExercisesUpdate>>,
       TError,
-      { data: ExercisesUpdateExerciseRequest },
+      { data: PutExercisesUpdateBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -627,7 +657,7 @@ export const usePutExercisesUpdate = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putExercisesUpdate>>,
   TError,
-  { data: ExercisesUpdateExerciseRequest },
+  { data: PutExercisesUpdateBody },
   TContext
 > => {
   const mutationOptions = getPutExercisesUpdateMutationOptions(options);
@@ -640,21 +670,33 @@ export const usePutExercisesUpdate = <
  */
 export const getExercisesUuid = (
   uuid: string,
+  getExercisesUuidBody: GetExercisesUuidBody,
   params?: GetExercisesUuidParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<DbExerciseWithTranslation>(
-    { url: `/exercises/${uuid}`, method: "GET", params, signal },
+    {
+      url: `/exercises/${uuid}`,
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      params,
+      signal,
+    },
     options,
   );
 };
 
 export const getGetExercisesUuidQueryKey = (
   uuid?: string,
+  getExercisesUuidBody?: GetExercisesUuidBody,
   params?: GetExercisesUuidParams,
 ) => {
-  return [`/exercises/${uuid}`, ...(params ? [params] : [])] as const;
+  return [
+    `/exercises/${uuid}`,
+    ...(params ? [params] : []),
+    getExercisesUuidBody,
+  ] as const;
 };
 
 export const getGetExercisesUuidQueryOptions = <
@@ -662,6 +704,7 @@ export const getGetExercisesUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getExercisesUuidBody: GetExercisesUuidBody,
   params?: GetExercisesUuidParams,
   options?: {
     query?: Partial<
@@ -677,11 +720,19 @@ export const getGetExercisesUuidQueryOptions = <
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey =
-    queryOptions?.queryKey ?? getGetExercisesUuidQueryKey(uuid, params);
+    queryOptions?.queryKey ??
+    getGetExercisesUuidQueryKey(uuid, getExercisesUuidBody, params);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof getExercisesUuid>>
-  > = ({ signal }) => getExercisesUuid(uuid, params, requestOptions, signal);
+  > = ({ signal }) =>
+    getExercisesUuid(
+      uuid,
+      getExercisesUuidBody,
+      params,
+      requestOptions,
+      signal,
+    );
 
   return {
     queryKey,
@@ -705,6 +756,7 @@ export function useGetExercisesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getExercisesUuidBody: GetExercisesUuidBody,
   params: undefined | GetExercisesUuidParams,
   options: {
     query: Partial<
@@ -733,6 +785,7 @@ export function useGetExercisesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getExercisesUuidBody: GetExercisesUuidBody,
   params?: GetExercisesUuidParams,
   options?: {
     query?: Partial<
@@ -761,6 +814,7 @@ export function useGetExercisesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getExercisesUuidBody: GetExercisesUuidBody,
   params?: GetExercisesUuidParams,
   options?: {
     query?: Partial<
@@ -785,6 +839,7 @@ export function useGetExercisesUuid<
   TError = ErrorsErrorResponse,
 >(
   uuid: string,
+  getExercisesUuidBody: GetExercisesUuidBody,
   params?: GetExercisesUuidParams,
   options?: {
     query?: Partial<
@@ -800,7 +855,12 @@ export function useGetExercisesUuid<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetExercisesUuidQueryOptions(uuid, params, options);
+  const queryOptions = getGetExercisesUuidQueryOptions(
+    uuid,
+    getExercisesUuidBody,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
