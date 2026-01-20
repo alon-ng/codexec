@@ -56,6 +56,107 @@ definitions:
     - language
     - name
     type: object
+  courses.CourseFull:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      lessons:
+        items:
+          $ref: '#/definitions/lessons.LessonFull'
+        type: array
+      modified_at:
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+      translation:
+        $ref: '#/definitions/courses.CourseTranslation'
+      uuid:
+        type: string
+    required:
+    - created_at
+    - modified_at
+    - price
+    - subject
+    - translation
+    - uuid
+    type: object
+  courses.CourseTranslation:
+    properties:
+      bullets:
+        example: |-
+          Learn basics
+          Practice exercises
+        type: string
+      course_uuid:
+        type: string
+      description:
+        example: Learn Python basics
+        type: string
+      language:
+        example: en
+        type: string
+      name:
+        example: Introduction to Python
+        type: string
+      uuid:
+        type: string
+    required:
+    - course_uuid
+    - description
+    - language
+    - name
+    - uuid
+    type: object
+  courses.CourseWithTranslation:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      modified_at:
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+      translation:
+        $ref: '#/definitions/courses.CourseTranslation'
+      uuid:
+        type: string
+    required:
+    - created_at
+    - modified_at
+    - price
+    - subject
+    - translation
+    - uuid
+    type: object
   courses.CreateCourseRequest:
     properties:
       bullets:
@@ -138,71 +239,6 @@ definitions:
     - language
     - uuid
     type: object
-  db.CourseFull:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        type: integer
-      discount:
-        type: integer
-      is_active:
-        type: boolean
-      lessons:
-        items:
-          $ref: '#/definitions/db.LessonFull'
-        type: array
-      modified_at:
-        type: string
-      price:
-        type: integer
-      subject:
-        type: string
-      translation:
-        $ref: '#/definitions/db.CourseTranslation'
-      uuid:
-        type: string
-    type: object
-  db.CourseTranslation:
-    properties:
-      bullets:
-        type: string
-      course_uuid:
-        type: string
-      description:
-        type: string
-      language:
-        type: string
-      name:
-        type: string
-      uuid:
-        type: string
-    type: object
-  db.CourseWithTranslation:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        type: integer
-      discount:
-        type: integer
-      is_active:
-        type: boolean
-      modified_at:
-        type: string
-      price:
-        type: integer
-      subject:
-        type: string
-      translation:
-        $ref: '#/definitions/db.CourseTranslation'
-      uuid:
-        type: string
-    type: object
   db.ExerciseTranslation:
     properties:
       description:
@@ -244,29 +280,6 @@ definitions:
         $ref: '#/definitions/db.ExerciseTranslation'
       type:
         $ref: '#/definitions/db.ExerciseType'
-      uuid:
-        type: string
-    type: object
-  db.LessonFull:
-    properties:
-      course_uuid:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/db.ExerciseWithTranslation'
-        type: array
-      is_public:
-        type: boolean
-      modified_at:
-        type: string
-      order_index:
-        type: integer
-      translation:
-        $ref: '#/definitions/db.LessonTranslation'
       uuid:
         type: string
     type: object
@@ -327,113 +340,6 @@ definitions:
       streak:
         type: integer
       uuid:
-        type: string
-    type: object
-  db.UserCourseFull:
-    properties:
-      completed_at:
-        type: string
-      course_uuid:
-        type: string
-      is_completed:
-        type: boolean
-      last_accessed_at:
-        type: string
-      lessons:
-        items:
-          $ref: '#/definitions/db.UserLessonStatus'
-        type: array
-      started_at:
-        type: string
-    type: object
-  db.UserCourseWithProgress:
-    properties:
-      completed_exercises:
-        type: integer
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        type: integer
-      discount:
-        type: integer
-      is_active:
-        type: boolean
-      modified_at:
-        type: string
-      next_exercise_name:
-        type: string
-      next_exercise_uuid:
-        type: string
-      next_lesson_name:
-        type: string
-      next_lesson_uuid:
-        type: string
-      price:
-        type: integer
-      subject:
-        type: string
-      total_exercises:
-        type: integer
-      translation:
-        $ref: '#/definitions/db.CourseTranslation'
-      user_course_completed_at:
-        type: string
-      user_course_last_accessed_at:
-        type: string
-      user_course_started_at:
-        type: string
-      uuid:
-        type: string
-    type: object
-  db.UserExercise:
-    properties:
-      attempts:
-        type: integer
-      completed_at:
-        type: string
-      exercise_uuid:
-        type: string
-      last_accessed_at:
-        type: string
-      started_at:
-        type: string
-      submission:
-        type: object
-      user_uuid:
-        type: string
-      uuid:
-        type: string
-    type: object
-  db.UserExerciseStatus:
-    properties:
-      completed_at:
-        type: string
-      exercise_uuid:
-        type: string
-      is_completed:
-        type: boolean
-      last_accessed_at:
-        type: string
-      started_at:
-        type: string
-    type: object
-  db.UserLessonStatus:
-    properties:
-      completed_at:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/db.UserExerciseStatus'
-        type: array
-      is_completed:
-        type: boolean
-      last_accessed_at:
-        type: string
-      lesson_uuid:
-        type: string
-      started_at:
         type: string
     type: object
   errors.ErrorResponse:
@@ -499,6 +405,65 @@ definitions:
     - order_index
     - reward
     - type
+    type: object
+  exercises.ExerciseTranslation:
+    properties:
+      description:
+        example: Print Hello World
+        type: string
+      exercise_uuid:
+        type: string
+      language:
+        example: en
+        type: string
+      name:
+        example: Hello World
+        type: string
+      uuid:
+        type: string
+    required:
+    - description
+    - exercise_uuid
+    - language
+    - name
+    - uuid
+    type: object
+  exercises.ExerciseWithTranslation:
+    properties:
+      created_at:
+        type: string
+      data:
+        type: object
+      deleted_at:
+        type: string
+      lesson_uuid:
+        type: string
+      modified_at:
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      reward:
+        example: 10
+        type: integer
+      translation:
+        $ref: '#/definitions/exercises.ExerciseTranslation'
+      type:
+        allOf:
+        - $ref: '#/definitions/db.ExerciseType'
+        example: quiz
+      uuid:
+        type: string
+    required:
+    - created_at
+    - data
+    - lesson_uuid
+    - modified_at
+    - order_index
+    - reward
+    - translation
+    - type
+    - uuid
     type: object
   exercises.IDRequest:
     properties:
@@ -592,6 +557,88 @@ definitions:
     required:
     - uuid
     type: object
+  lessons.LessonFull:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/exercises.ExerciseWithTranslation'
+        type: array
+      is_public:
+        example: false
+        type: boolean
+      modified_at:
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      translation:
+        $ref: '#/definitions/lessons.LessonTranslation'
+      uuid:
+        type: string
+    required:
+    - course_uuid
+    - created_at
+    - modified_at
+    - order_index
+    - translation
+    - uuid
+    type: object
+  lessons.LessonTranslation:
+    properties:
+      description:
+        example: Learn Python fundamentals
+        type: string
+      language:
+        example: en
+        type: string
+      lesson_uuid:
+        type: string
+      name:
+        example: Python Basics
+        type: string
+      uuid:
+        type: string
+    required:
+    - description
+    - language
+    - lesson_uuid
+    - name
+    - uuid
+    type: object
+  lessons.LessonWithTranslation:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      is_public:
+        example: false
+        type: boolean
+      modified_at:
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      translation:
+        $ref: '#/definitions/lessons.LessonTranslation'
+      uuid:
+        type: string
+    required:
+    - course_uuid
+    - created_at
+    - modified_at
+    - order_index
+    - translation
+    - uuid
+    type: object
   lessons.UpdateLessonRequest:
     properties:
       description:
@@ -614,6 +661,146 @@ definitions:
     required:
     - language
     - uuid
+    type: object
+  me.UserCourseFull:
+    properties:
+      completed_at:
+        type: string
+      course_uuid:
+        type: string
+      is_completed:
+        example: false
+        type: boolean
+      last_accessed_at:
+        type: string
+      lessons:
+        items:
+          $ref: '#/definitions/me.UserLessonStatus'
+        type: array
+      started_at:
+        type: string
+    required:
+    - course_uuid
+    type: object
+  me.UserCourseWithProgress:
+    properties:
+      completed_exercises:
+        example: 5
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      modified_at:
+        type: string
+      next_exercise_name:
+        type: string
+      next_exercise_uuid:
+        type: string
+      next_lesson_name:
+        type: string
+      next_lesson_uuid:
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+      total_exercises:
+        example: 10
+        type: integer
+      translation:
+        $ref: '#/definitions/courses.CourseTranslation'
+      user_course_completed_at:
+        type: string
+      user_course_last_accessed_at:
+        type: string
+      user_course_started_at:
+        type: string
+      uuid:
+        type: string
+    required:
+    - completed_exercises
+    - created_at
+    - modified_at
+    - price
+    - subject
+    - total_exercises
+    - translation
+    - user_course_started_at
+    - uuid
+    type: object
+  me.UserExercise:
+    properties:
+      attempts:
+        example: 0
+        type: integer
+      completed_at:
+        type: string
+      exercise_uuid:
+        type: string
+      last_accessed_at:
+        type: string
+      started_at:
+        type: string
+      submission:
+        type: object
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    required:
+    - attempts
+    - exercise_uuid
+    - started_at
+    - user_uuid
+    - uuid
+    type: object
+  me.UserExerciseStatus:
+    properties:
+      completed_at:
+        type: string
+      exercise_uuid:
+        type: string
+      is_completed:
+        example: false
+        type: boolean
+      last_accessed_at:
+        type: string
+      started_at:
+        type: string
+    required:
+    - exercise_uuid
+    type: object
+  me.UserLessonStatus:
+    properties:
+      completed_at:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/me.UserExerciseStatus'
+        type: array
+      is_completed:
+        example: false
+        type: boolean
+      last_accessed_at:
+        type: string
+      lesson_uuid:
+        type: string
+      started_at:
+        type: string
+    required:
+    - lesson_uuid
     type: object
   users.CreateUserRequest:
     properties:
@@ -659,6 +846,45 @@ definitions:
       uuid:
         type: string
     required:
+    - uuid
+    type: object
+  users.User:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        example: john.doe@example.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      is_admin:
+        example: false
+        type: boolean
+      is_verified:
+        example: false
+        type: boolean
+      last_name:
+        example: Doe
+        type: string
+      modified_at:
+        type: string
+      score:
+        example: 0
+        type: integer
+      streak:
+        example: 0
+        type: integer
+      uuid:
+        type: string
+    required:
+    - created_at
+    - email
+    - first_name
+    - last_name
+    - modified_at
     - uuid
     type: object
 host: localhost:8080
@@ -797,7 +1023,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.CourseWithTranslation'
+              $ref: '#/definitions/courses.CourseWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -838,7 +1064,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.CourseFull'
+            $ref: '#/definitions/courses.CourseFull'
         "400":
           description: Bad Request
           schema:
@@ -878,7 +1104,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.CourseTranslation'
+            $ref: '#/definitions/courses.CourseTranslation'
         "400":
           description: Bad Request
           schema:
@@ -914,7 +1140,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.CourseWithTranslation'
+            $ref: '#/definitions/courses.CourseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1025,7 +1251,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.CourseWithTranslation'
+            $ref: '#/definitions/courses.CourseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1076,7 +1302,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.ExerciseWithTranslation'
+              $ref: '#/definitions/exercises.ExerciseWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -1158,7 +1384,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.ExerciseTranslation'
+            $ref: '#/definitions/exercises.ExerciseTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1194,7 +1420,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.ExerciseWithTranslation'
+            $ref: '#/definitions/exercises.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1351,7 +1577,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.LessonWithTranslation'
+              $ref: '#/definitions/lessons.LessonWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -1433,7 +1659,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.LessonTranslation'
+            $ref: '#/definitions/lessons.LessonTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1469,7 +1695,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.LessonWithTranslation'
+            $ref: '#/definitions/lessons.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1580,7 +1806,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.LessonWithTranslation'
+            $ref: '#/definitions/lessons.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1609,7 +1835,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.User'
+            $ref: '#/definitions/users.User'
         "400":
           description: Bad Request
           schema:
@@ -1666,7 +1892,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.UserCourseWithProgress'
+              $ref: '#/definitions/me.UserCourseWithProgress'
             type: array
         "400":
           description: Bad Request
@@ -1702,7 +1928,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.UserCourseFull'
+            $ref: '#/definitions/me.UserCourseFull'
         "400":
           description: Bad Request
           schema:
@@ -1737,7 +1963,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.UserExercise'
+            $ref: '#/definitions/me.UserExercise'
         "400":
           description: Bad Request
           schema:
@@ -1778,7 +2004,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/db.User'
+              $ref: '#/definitions/users.User'
             type: array
         "400":
           description: Bad Request
@@ -1854,7 +2080,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.User'
+            $ref: '#/definitions/users.User'
         "400":
           description: Bad Request
           schema:

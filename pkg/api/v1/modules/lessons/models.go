@@ -1,6 +1,11 @@
 package lessons
 
-import "github.com/google/uuid"
+import (
+	"codim/pkg/api/v1/modules/exercises"
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type CreateLessonRequest struct {
 	CourseUuid  uuid.UUID `json:"course_uuid" binding:"required"`
@@ -32,4 +37,33 @@ type AddLessonTranslationRequest struct {
 	Language    string    `json:"language" binding:"required" example:"es"`
 	Name        string    `json:"name" binding:"required" example:"Fundamentos de Python"`
 	Description string    `json:"description" binding:"required" example:"Aprende los fundamentos de Python"`
+}
+
+// Response types
+type Lesson struct {
+	Uuid       uuid.UUID  `json:"uuid" binding:"required"`
+	CreatedAt  time.Time  `json:"created_at" binding:"required"`
+	ModifiedAt time.Time  `json:"modified_at" binding:"required"`
+	DeletedAt  *time.Time `json:"deleted_at,omitempty"`
+	CourseUuid uuid.UUID  `json:"course_uuid" binding:"required"`
+	OrderIndex int16      `json:"order_index" binding:"required" example:"1"`
+	IsPublic   bool       `json:"is_public" example:"false"`
+}
+
+type LessonTranslation struct {
+	Uuid        uuid.UUID `json:"uuid" binding:"required"`
+	LessonUuid  uuid.UUID `json:"lesson_uuid" binding:"required"`
+	Language    string    `json:"language" binding:"required" example:"en"`
+	Name        string    `json:"name" binding:"required" example:"Python Basics"`
+	Description string    `json:"description" binding:"required" example:"Learn Python fundamentals"`
+}
+
+type LessonWithTranslation struct {
+	Lesson
+	Translation LessonTranslation `json:"translation" binding:"required"`
+}
+
+type LessonFull struct {
+	LessonWithTranslation
+	Exercises []exercises.ExerciseWithTranslation `json:"exercises"`
 }

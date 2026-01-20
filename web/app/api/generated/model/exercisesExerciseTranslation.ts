@@ -6,11 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface LessonsUpdateRequest {
-  description?: string;
-  is_public?: boolean;
-  language?: string;
-  name?: string;
-  order_index?: number;
+export interface ExercisesExerciseTranslation {
+  description: string;
+  exercise_uuid: string;
+  language: string;
+  name: string;
   uuid: string;
 }

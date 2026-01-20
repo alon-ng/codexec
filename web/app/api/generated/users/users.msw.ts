@@ -10,46 +10,27 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { DbUser } from ".././model";
+import type { DbUser, UsersUser } from ".././model";
 
-export const getGetUsersResponseMock = (): DbUser[] =>
+export const getGetUsersResponseMock = (): UsersUser[] =>
   Array.from(
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
   ).map(() => ({
-    created_at: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
+    created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
     deleted_at: faker.helpers.arrayElement([
       faker.string.alpha({ length: { min: 10, max: 20 } }),
       undefined,
     ]),
-    email: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    first_name: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
+    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    first_name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     is_admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     is_verified: faker.helpers.arrayElement([
       faker.datatype.boolean(),
       undefined,
     ]),
-    last_name: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    modified_at: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    password_hash: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
+    last_name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
     score: faker.helpers.arrayElement([
       faker.number.int({ min: undefined, max: undefined }),
       undefined,
@@ -58,48 +39,26 @@ export const getGetUsersResponseMock = (): DbUser[] =>
       faker.number.int({ min: undefined, max: undefined }),
       undefined,
     ]),
-    uuid: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
+    uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
   }));
 
 export const getPostUsersCreateResponseMock = (
-  overrideResponse: Partial<DbUser> = {},
-): DbUser => ({
-  created_at: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
+  overrideResponse: Partial<UsersUser> = {},
+): UsersUser => ({
+  created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  email: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  first_name: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
+  email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  first_name: faker.string.alpha({ length: { min: 10, max: 20 } }),
   is_admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
   is_verified: faker.helpers.arrayElement([
     faker.datatype.boolean(),
     undefined,
   ]),
-  last_name: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  modified_at: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  password_hash: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
+  last_name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   score: faker.helpers.arrayElement([
     faker.number.int({ min: undefined, max: undefined }),
     undefined,
@@ -108,10 +67,7 @@ export const getPostUsersCreateResponseMock = (
     faker.number.int({ min: undefined, max: undefined }),
     undefined,
   ]),
-  uuid: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
+  uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
   ...overrideResponse,
 });
 
@@ -225,10 +181,10 @@ export const getGetUsersUuidResponseMock = (
 
 export const getGetUsersMockHandler = (
   overrideResponse?:
-    | DbUser[]
+    | UsersUser[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<DbUser[]> | DbUser[]),
+      ) => Promise<UsersUser[]> | UsersUser[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -253,10 +209,10 @@ export const getGetUsersMockHandler = (
 
 export const getPostUsersCreateMockHandler = (
   overrideResponse?:
-    | DbUser
+    | UsersUser
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<DbUser> | DbUser),
+      ) => Promise<UsersUser> | UsersUser),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(

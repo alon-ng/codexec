@@ -5,13 +5,11 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import type { DbUserExerciseStatus } from "./dbUserExerciseStatus";
 
-export interface DbUserLessonStatus {
+export interface MeUserExerciseStatus {
   completed_at?: string;
-  exercises?: DbUserExerciseStatus[];
+  exercise_uuid: string;
   is_completed?: boolean;
   last_accessed_at?: string;
-  lesson_uuid?: string;
   started_at?: string;
 }

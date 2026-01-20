@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course  body      CreateCourseRequest  true  "Course creation data"
-// @Success      201     {object}  db.CourseWithTranslation
+// @Success      201     {object}  CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      409     {object}  errors.ErrorResponse
@@ -57,7 +57,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course  body      UpdateCourseRequest  true  "Course update data"
-// @Success      200     {object}  db.CourseWithTranslation
+// @Success      200     {object}  CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -156,7 +156,7 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Param        subject query     string  false  "Filter by subject"
 // @Param        language query     string  false  "Filter by language"  default(en) example(en)
 // @Param        is_active query     bool    false  "Filter by is_active"  default(true) example(true)
-// @Success      200     {array}   db.CourseWithTranslation
+// @Success      200     {array}   CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -186,7 +186,7 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        uuid  		path      string  true   "Course UUID"
 // @Param        language 	query     string  false  "Language"  default(en)
-// @Success      200   {object}  db.CourseFull
+// @Success      200   {object}  CourseFull
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse
@@ -227,7 +227,7 @@ func (c *Controller) Get(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        translation  body      AddCourseTranslationRequest  true  "Translation data"
-// @Success      201          {object}  db.CourseTranslation
+// @Success      201          {object}  CourseTranslation
 // @Failure      400          {object}  errors.ErrorResponse
 // @Failure      401          {object}  errors.ErrorResponse
 // @Failure      500          {object}  errors.ErrorResponse

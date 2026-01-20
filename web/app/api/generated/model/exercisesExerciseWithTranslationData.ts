@@ -6,8 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UsersUpdateRequest {
-  first_name?: string;
-  last_name?: string;
-  uuid: string;
-}
+export type ExercisesExerciseWithTranslationData = { [key: string]: unknown };

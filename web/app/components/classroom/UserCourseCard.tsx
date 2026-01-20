@@ -1,4 +1,4 @@
-import type { DbUserCourseWithProgress } from "~/api/generated/model";
+import type { MeUserCourseWithProgress } from "~/api/generated/model";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import Blob from "~/assets/blob.svg?react";
 import { Skeleton } from "../ui/skeleton";
 
 export interface UserCourseCardProps {
-    course?: Required<DbUserCourseWithProgress>;
+    course?: MeUserCourseWithProgress;
 }
 
 export default function UserCourseCard({ course }: UserCourseCardProps) {

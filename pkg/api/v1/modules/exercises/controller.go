@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise  body      CreateExerciseRequest  true  "Exercise creation data"
-// @Success      201       {object}  db.ExerciseWithTranslation
+// @Success      201       {object}  ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      409       {object}  errors.ErrorResponse
@@ -155,7 +155,7 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Param        offset      query     int      false  "Offset (default: 0)"  default(0)
 // @Param        lesson_uuid query     string   false  "Filter by lesson UUID"
 // @Param        language    query     string   false  "Filter by language"  default(en)
-// @Success      200         {array}   db.ExerciseWithTranslation
+// @Success      200         {array}   ExerciseWithTranslation
 // @Failure      400         {object}  errors.ErrorResponse
 // @Failure      401         {object}  errors.ErrorResponse
 // @Failure      500         {object}  errors.ErrorResponse
@@ -226,7 +226,7 @@ func (c *Controller) Get(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        translation  body      AddExerciseTranslationRequest  true  "Translation data"
-// @Success      201          {object}  db.ExerciseTranslation
+// @Success      201          {object}  ExerciseTranslation
 // @Failure      400          {object}  errors.ErrorResponse
 // @Failure      401          {object}  errors.ErrorResponse
 // @Failure      500          {object}  errors.ErrorResponse

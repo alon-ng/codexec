@@ -6,4 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type DbUserExerciseSubmission = { [key: string]: unknown };
+export interface LessonsLessonTranslation {
+  description: string;
+  language: string;
+  lesson_uuid: string;
+  name: string;
+  uuid: string;
+}

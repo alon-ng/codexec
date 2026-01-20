@@ -19,12 +19,12 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  DbUser,
-  DbUserCourseFull,
-  DbUserCourseWithProgress,
-  DbUserExercise,
   ErrorsErrorResponse,
   GetMeCoursesParams,
+  MeUserCourseFull,
+  MeUserCourseWithProgress,
+  MeUserExercise,
+  UsersUser,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -39,7 +39,10 @@ export const getMe = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbUser>({ url: `/me`, method: "GET", signal }, options);
+  return customInstance<UsersUser>(
+    { url: `/me`, method: "GET", signal },
+    options,
+  );
 };
 
 export const getGetMeQueryKey = () => {
@@ -170,7 +173,7 @@ export const getMeCourses = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbUserCourseWithProgress[]>(
+  return customInstance<MeUserCourseWithProgress[]>(
     { url: `/me/courses`, method: "GET", params, signal },
     options,
   );
@@ -313,7 +316,7 @@ export const getMeCoursesCourseUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbUserCourseFull>(
+  return customInstance<MeUserCourseFull>(
     { url: `/me/courses/${courseUuid}`, method: "GET", signal },
     options,
   );
@@ -486,7 +489,7 @@ export const getMeExercisesExerciseUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbUserExercise>(
+  return customInstance<MeUserExercise>(
     { url: `/me/exercises/${exerciseUuid}`, method: "GET", signal },
     options,
   );

@@ -5,26 +5,26 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import type { DbCourseTranslation } from "./dbCourseTranslation";
+import type { CoursesCourseTranslation } from "./coursesCourseTranslation";
 
-export interface DbUserCourseWithProgress {
-  completed_exercises?: number;
-  created_at?: string;
+export interface MeUserCourseWithProgress {
+  completed_exercises: number;
+  created_at: string;
   deleted_at?: string;
   difficulty?: number;
   discount?: number;
   is_active?: boolean;
-  modified_at?: string;
+  modified_at: string;
   next_exercise_name?: string;
   next_exercise_uuid?: string;
   next_lesson_name?: string;
   next_lesson_uuid?: string;
-  price?: number;
-  subject?: string;
-  total_exercises?: number;
-  translation?: DbCourseTranslation;
+  price: number;
+  subject: string;
+  total_exercises: number;
+  translation: CoursesCourseTranslation;
   user_course_completed_at?: string;
   user_course_last_accessed_at?: string;
-  user_course_started_at?: string;
-  uuid?: string;
+  user_course_started_at: string;
+  uuid: string;
 }

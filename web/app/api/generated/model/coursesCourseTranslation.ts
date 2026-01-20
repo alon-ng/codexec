@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface DbCourseTranslation {
+export interface CoursesCourseTranslation {
   bullets?: string;
-  course_uuid?: string;
-  description?: string;
-  language?: string;
-  name?: string;
-  uuid?: string;
+  course_uuid: string;
+  description: string;
+  language: string;
+  name: string;
+  uuid: string;
 }

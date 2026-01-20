@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useGetMeCoursesCourseUuid } from "~/api/generated/me/me";
 import { useGetCoursesUuid } from "~/api/generated/courses/courses";
-import type { DbUserExerciseStatus } from "~/api/generated/model";
+import type { MeUserExerciseStatus } from "~/api/generated/model";
 import PageHeader, { type BreadcrumbProps } from "~/components/PageHeader";
 import LessonSidebar from "~/components/classroom/LessonSidebar";
 import ExerciseContent from "~/components/classroom/ExerciseContent";
@@ -72,11 +72,11 @@ export default function Classroom() {
 
         // Helper function to find first incomplete exercise in a lesson
         const findFirstIncompleteExercise = (
-            lessonExercises: DbUserExerciseStatus[] | undefined
+            lessonExercises: MeUserExerciseStatus[] | undefined
         ) => {
             if (!lessonExercises || lessonExercises.length === 0) return null;
 
-            const incomplete = lessonExercises.find((ex: DbUserExerciseStatus) => !ex.is_completed);
+            const incomplete = lessonExercises.find((ex: MeUserExerciseStatus) => !ex.is_completed);
             if (incomplete) return incomplete;
 
             // If all completed, return the last one

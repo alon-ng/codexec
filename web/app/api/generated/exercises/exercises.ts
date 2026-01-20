@@ -22,11 +22,12 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  DbExerciseTranslation,
   DbExerciseWithTranslation,
   ErrorsErrorResponse,
   ExercisesAddExerciseTranslationRequest,
   ExercisesCreateExerciseRequest,
+  ExercisesExerciseTranslation,
+  ExercisesExerciseWithTranslation,
   ExercisesIDRequest,
   ExercisesUpdateExerciseRequest,
   GetExercisesParams,
@@ -46,7 +47,7 @@ export const getExercises = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbExerciseWithTranslation[]>(
+  return customInstance<ExercisesExerciseWithTranslation[]>(
     { url: `/exercises`, method: "GET", params, signal },
     options,
   );
@@ -189,7 +190,7 @@ export const postExercisesAddTranslation = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbExerciseTranslation>(
+  return customInstance<ExercisesExerciseTranslation>(
     {
       url: `/exercises/add-translation`,
       method: "POST",
@@ -283,7 +284,7 @@ export const postExercisesCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbExerciseWithTranslation>(
+  return customInstance<ExercisesExerciseWithTranslation>(
     {
       url: `/exercises/create`,
       method: "POST",

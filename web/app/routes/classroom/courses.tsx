@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import PageHeader, { type BreadcrumbProps } from "~/components/PageHeader";
 import { toast } from "sonner";
 import UserCourseCard from "~/components/classroom/UserCourseCard";
-import type { DbUserCourseWithProgress } from "~/api/generated/model";
 import { useCallback, useEffect, useRef } from "react";
 import { blurInVariants } from "~/utils/animations";
 import { motion } from "motion/react";
@@ -71,7 +70,7 @@ export default function UserCourses() {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pb-8">
         {courses.map((course, index) => (
           <motion.div key={`${course.uuid}-${index}`} variants={blurInVariants(index % LIMIT * 0.1)} initial="hidden" animate="visible">
-            <UserCourseCard course={course as Required<DbUserCourseWithProgress>} />
+            <UserCourseCard course={course} />
           </motion.div>
         ))}
 

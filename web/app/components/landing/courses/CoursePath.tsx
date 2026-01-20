@@ -1,12 +1,12 @@
 import { cn } from "~/lib/utils";
 import { Check, Lock, LockOpen } from "lucide-react";
-import type { DbCourseFull, DbLessonFull } from "~/api/generated/model";
+import type { CoursesCourseFull, LessonsLessonFull } from "~/api/generated/model";
 import { useLanguage } from "~/lib/useLanguage";
 import { motion } from "motion/react";
 import { blurInVariants } from "~/utils/animations";
 
 interface CoursePathProps {
-    course: Required<DbCourseFull>;
+    course: CoursesCourseFull;
 }
 
 const GLOBAL_ANIMATION_DELAY = 0.3;
@@ -61,7 +61,7 @@ function RowConnector({ isEvenRow, isRTL, animationDelay }: RowConnectorProps) {
 }
 
 interface LessonNodeProps {
-    lesson: DbLessonFull;
+    lesson: LessonsLessonFull;
     globalIndex: number;
     isCompleted: boolean;
     showLeftLine: boolean;
@@ -127,7 +127,7 @@ function LessonNode({
 }
 
 interface CourseRowProps {
-    rowLessons: DbLessonFull[];
+    rowLessons: LessonsLessonFull[];
     rowIndex: number;
     totalRows: number;
     isRTL: boolean;
@@ -223,7 +223,7 @@ function CourseRow({ rowLessons, rowIndex, totalRows, isRTL }: CourseRowProps) {
 
 export default function CoursePath({ course }: CoursePathProps) {
     const { isRTL } = useLanguage();
-    const lessons = course.lessons;
+    const lessons = course.lessons || [];
     const rows = chunkArray(lessons, LESSONS_PER_ROW);
 
     return (

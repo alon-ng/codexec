@@ -12,7 +12,6 @@ import { Button } from "~/components/base/Button";
 import { motion } from "motion/react";
 import { blurInVariants } from "~/utils/animations";
 import CoursePath from "~/components/landing/courses/CoursePath";
-import type { DbCourseFull } from "~/api/generated/model";
 
 export default function Course({ params }: Route.ComponentProps) {
     const { t, i18n } = useTranslation();
@@ -84,7 +83,7 @@ export default function Course({ params }: Route.ComponentProps) {
                     </Card>
                 </motion.div>
             </div>
-            <CoursePath course={data as Required<DbCourseFull>} />
+            <CoursePath course={data} />
         </div >
     );
 }

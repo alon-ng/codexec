@@ -28,6 +28,7 @@ import type {
   UsersCreateUserRequest,
   UsersIDRequest,
   UsersUpdateUserRequest,
+  UsersUser,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -43,7 +44,7 @@ export const getUsers = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbUser[]>(
+  return customInstance<UsersUser[]>(
     { url: `/users`, method: "GET", params, signal },
     options,
   );
@@ -186,7 +187,7 @@ export const postUsersCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbUser>(
+  return customInstance<UsersUser>(
     {
       url: `/users/create`,
       method: "POST",

@@ -25,7 +25,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Success      200   {object}  db.User
+// @Success      200   {object}  users.User
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
@@ -53,7 +53,7 @@ func (c *Controller) Me(ctx *gin.Context) {
 // @Param        subject 	query    string  false  "Filter by subject"
 // @Param        language 	query    string  false  "Filter by language"  default(en) 	example(en)
 // @Param        is_active 	query    bool    false  "Filter by is_active" default(true) example(true)
-// @Success      200     {array}   db.UserCourseWithProgress
+// @Success      200     {array}   UserCourseWithProgress
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -83,7 +83,7 @@ func (c *Controller) ListUserCoursesWithProgress(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course_uuid path string true "Course UUID"
-// @Success      200     {object}  db.UserCourseFull
+// @Success      200     {object}  UserCourseFull
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -108,7 +108,7 @@ func (c *Controller) GetUserCourseFull(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise_uuid path string true "Exercise UUID"
-// @Success      200     {object}  db.UserExercise
+// @Success      200     {object}  UserExercise
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse

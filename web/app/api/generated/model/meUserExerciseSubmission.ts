@@ -6,4 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export type ExercisesUpdateRequestData = { [key: string]: unknown };
+export type MeUserExerciseSubmission = { [key: string]: unknown };

@@ -22,7 +22,6 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  DbLessonTranslation,
   DbLessonWithTranslation,
   ErrorsErrorResponse,
   GetLessonsParams,
@@ -30,6 +29,8 @@ import type {
   LessonsAddLessonTranslationRequest,
   LessonsCreateLessonRequest,
   LessonsIDRequest,
+  LessonsLessonTranslation,
+  LessonsLessonWithTranslation,
   LessonsUpdateLessonRequest,
 } from ".././model";
 
@@ -46,7 +47,7 @@ export const getLessons = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbLessonWithTranslation[]>(
+  return customInstance<LessonsLessonWithTranslation[]>(
     { url: `/lessons`, method: "GET", params, signal },
     options,
   );
@@ -189,7 +190,7 @@ export const postLessonsAddTranslation = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbLessonTranslation>(
+  return customInstance<LessonsLessonTranslation>(
     {
       url: `/lessons/add-translation`,
       method: "POST",
@@ -282,7 +283,7 @@ export const postLessonsCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbLessonWithTranslation>(
+  return customInstance<LessonsLessonWithTranslation>(
     {
       url: `/lessons/create`,
       method: "POST",
@@ -550,7 +551,7 @@ export const putLessonsUpdate = (
   lessonsUpdateLessonRequest: LessonsUpdateLessonRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<DbLessonWithTranslation>(
+  return customInstance<LessonsLessonWithTranslation>(
     {
       url: `/lessons/update`,
       method: "PUT",

@@ -23,12 +23,12 @@ import type {
 
 import type {
   CoursesAddCourseTranslationRequest,
+  CoursesCourseFull,
+  CoursesCourseTranslation,
+  CoursesCourseWithTranslation,
   CoursesCreateCourseRequest,
   CoursesIDRequest,
   CoursesUpdateCourseRequest,
-  DbCourseFull,
-  DbCourseTranslation,
-  DbCourseWithTranslation,
   ErrorsErrorResponse,
   GetCoursesParams,
   GetCoursesUuidParams,
@@ -47,7 +47,7 @@ export const getCourses = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbCourseWithTranslation[]>(
+  return customInstance<CoursesCourseWithTranslation[]>(
     { url: `/courses`, method: "GET", params, signal },
     options,
   );
@@ -190,7 +190,7 @@ export const postCoursesAddTranslation = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbCourseTranslation>(
+  return customInstance<CoursesCourseTranslation>(
     {
       url: `/courses/add-translation`,
       method: "POST",
@@ -283,7 +283,7 @@ export const postCoursesCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbCourseWithTranslation>(
+  return customInstance<CoursesCourseWithTranslation>(
     {
       url: `/courses/create`,
       method: "POST",
@@ -551,7 +551,7 @@ export const putCoursesUpdate = (
   coursesUpdateCourseRequest: CoursesUpdateCourseRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<DbCourseWithTranslation>(
+  return customInstance<CoursesCourseWithTranslation>(
     {
       url: `/courses/update`,
       method: "PUT",
@@ -643,7 +643,7 @@ export const getCoursesUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<DbCourseFull>(
+  return customInstance<CoursesCourseFull>(
     { url: `/courses/${uuid}`, method: "GET", params, signal },
     options,
   );

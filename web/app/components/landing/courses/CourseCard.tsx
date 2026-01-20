@@ -1,5 +1,4 @@
-
-import type { DbCourseWithTranslation } from "~/api/generated/model";
+import type { CoursesCourseWithTranslation } from "~/api/generated/model";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { courseIcons } from "~/utils/course";
@@ -10,7 +9,7 @@ import { useNavigate } from "react-router";
 import Blob from "~/assets/blob.svg?react";
 
 export interface CourseCardProps {
-    course?: Required<DbCourseWithTranslation>
+    course?: CoursesCourseWithTranslation;
 }
 
 export default function CourseCard({ course }: CourseCardProps) {

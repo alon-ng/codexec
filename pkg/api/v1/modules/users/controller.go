@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        user  body      CreateUserRequest  true  "User creation data"
-// @Success      201   {object}  db.User
+// @Success      201   {object}  User
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
@@ -152,7 +152,7 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        limit   query     int     false  "Limit (default: 10)"  default(10)
 // @Param        offset  query     int     false  "Offset (default: 0)"  default(0)
-// @Success      200     {array}   db.User
+// @Success      200     {array}   User
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
