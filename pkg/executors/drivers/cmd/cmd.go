@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"codim/pkg/executors/drivers/models"
+	"codim/pkg/fs"
 	"context"
 	"fmt"
 	"os/exec"
@@ -12,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string, jobID uuid.UUID, src models.Directory, entryPoint string) (models.ExecuteResponse, error) {
+func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string, jobID uuid.UUID, src fs.Directory, entryPoint string) (models.ExecuteResponse, error) {
 	jobIDStr := jobID.String()
 	jobPath := fmt.Sprintf("/jobs/%s", jobIDStr)
 
@@ -56,11 +57,11 @@ func CreateJobDirectory(ctx context.Context, cmdPrefix string, basePath string) 
 	return nil
 }
 
-func WriteFiles(ctx context.Context, cmdPrefix string, basePath string, dir models.Directory) error {
+func WriteFiles(ctx context.Context, cmdPrefix string, basePath string, dir fs.Directory) error {
 	return WriteDirectory(ctx, cmdPrefix, basePath, dir)
 }
 
-func WriteDirectory(ctx context.Context, cmdPrefix string, basePath string, dir models.Directory) error {
+func WriteDirectory(ctx context.Context, cmdPrefix string, basePath string, dir fs.Directory) error {
 	// Write files in current directory
 	for _, file := range dir.Files {
 		filePath := fmt.Sprintf("%s/%s%s", basePath, file.Name, file.Ext)

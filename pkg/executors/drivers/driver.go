@@ -4,6 +4,7 @@ import (
 	"codim/pkg/executors/drivers/models"
 	"codim/pkg/executors/drivers/node"
 	"codim/pkg/executors/drivers/python"
+	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
 	"fmt"
@@ -12,7 +13,7 @@ import (
 )
 
 type Driver interface {
-	Execute(ctx context.Context, jobID uuid.UUID, src models.Directory, entryPoint string) (models.ExecuteResponse, error)
+	Execute(ctx context.Context, jobID uuid.UUID, src fs.Directory, entryPoint string) (models.ExecuteResponse, error)
 	SetCmdPrefix(prefix string) error
 	CmdPrefix() string
 }

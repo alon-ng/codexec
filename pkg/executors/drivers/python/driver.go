@@ -3,6 +3,7 @@ package python
 import (
 	"codim/pkg/executors/drivers/cmd"
 	"codim/pkg/executors/drivers/models"
+	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
 
@@ -76,7 +77,7 @@ func New(cmdPrefix string, logger *logger.Logger) *Driver {
 	}
 }
 
-func (d *Driver) Execute(ctx context.Context, jobID uuid.UUID, src models.Directory, entryPoint string) (models.ExecuteResponse, error) {
+func (d *Driver) Execute(ctx context.Context, jobID uuid.UUID, src fs.Directory, entryPoint string) (models.ExecuteResponse, error) {
 	return cmd.Execute(ctx, d.cmdPrefix, nsjailConfigTemplate, jobID, src, entryPoint)
 }
 

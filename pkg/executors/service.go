@@ -3,6 +3,7 @@ package executors
 import (
 	"codim/pkg/executors/drivers"
 	"codim/pkg/executors/drivers/models"
+	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
 	"encoding/json"
@@ -13,9 +14,9 @@ import (
 )
 
 type ExecutionRequest struct {
-	JobID      uuid.UUID        `json:"job_id"`
-	Source     models.Directory `json:"src"`
-	EntryPoint string           `json:"entry_point"`
+	JobID      uuid.UUID    `json:"job_id"`
+	Source     fs.Directory `json:"src"`
+	EntryPoint string       `json:"entry_point"`
 }
 
 type Service struct {
