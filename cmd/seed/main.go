@@ -26,7 +26,7 @@ func main() {
 		cfg.API.JwtRenewalThreshold,
 	)
 
-	seed(context.Background(), queries, authProvider)
+	seed(context.Background(), queries, pool, authProvider)
 }
 
 func initializeQueries(cfg config.Config) (*db.Queries, *pgxpool.Pool) {

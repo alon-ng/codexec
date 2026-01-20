@@ -56,7 +56,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        user  body      UpdateUserRequest  true  "User update data"
-// @Success      200   {object}  db.User
+// @Success      200   {object}  User
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
@@ -181,7 +181,7 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        uuid  path      string  true  "User UUID"
-// @Success      200   {object}  db.User
+// @Success      200   {object}  User
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse

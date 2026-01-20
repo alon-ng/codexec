@@ -184,7 +184,7 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        uuid       path      string  true  	"Lesson UUID"
 // @Param        language   query     string  false  	"Language"  	default(en) example(en)
-// @Success      200   {object}  db.LessonWithTranslation
+// @Success      200   {object}  LessonWithTranslation
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse

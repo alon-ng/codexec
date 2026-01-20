@@ -57,7 +57,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise  body      UpdateExerciseRequest  true  "Exercise update data"
-// @Success      200       {object}  db.ExerciseWithTranslation
+// @Success      200       {object}  ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      500       {object}  errors.ErrorResponse
@@ -185,7 +185,7 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        uuid  		path      string  true  	"Exercise UUID"
 // @Param        language   query     string  false  	"Language"  	default(en) example(en)
-// @Success      200   {object}  db.ExerciseWithTranslation
+// @Success      200   {object}  ExerciseWithTranslation
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse

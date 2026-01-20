@@ -51,6 +51,7 @@ type Querier interface {
 	HardDeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 	HardDeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	HardDeleteUser(ctx context.Context, argUuid uuid.UUID) error
+	InitUserCourse(ctx context.Context, arg InitUserCourseParams) (InitUserCourseRow, error)
 	ListCourses(ctx context.Context, arg ListCoursesParams) ([]ListCoursesRow, error)
 	ListExercises(ctx context.Context, arg ListExercisesParams) ([]ListExercisesRow, error)
 	ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error)

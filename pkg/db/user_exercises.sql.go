@@ -144,20 +144,30 @@ func (q *Queries) ResetUserExercise(ctx context.Context, arg ResetUserExercisePa
 
 const updateUserExerciseSubmission = `-- name: UpdateUserExerciseSubmission :one
 UPDATE "user_exercises"
-SET "submission" = COALESCE($3, "submission"),
+SET "submission" = COALESCE($4, "submission"),
     "last_accessed_at" = NOW()
-WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
-RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at
+FROM "exercises"
+WHERE "user_uuid" = $1 
+AND "exercise_uuid" = $2 
+AND "exercises"."type" = $3 
+AND "exercises"."uuid" = "user_exercises"."exercise_uuid"
+RETURNING user_exercises.uuid, user_exercises.started_at, user_exercises.last_accessed_at, user_exercises.user_uuid, user_exercises.exercise_uuid, user_exercises.submission, user_exercises.attempts, user_exercises.completed_at
 `
 
 type UpdateUserExerciseSubmissionParams struct {
 	UserUuid     uuid.UUID        `json:"user_uuid"`
 	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Type         ExerciseType     `json:"type"`
 	Submission   *json.RawMessage `json:"submission"`
 }
 
 func (q *Queries) UpdateUserExerciseSubmission(ctx context.Context, arg UpdateUserExerciseSubmissionParams) (UserExercise, error) {
-	row := q.db.QueryRow(ctx, updateUserExerciseSubmission, arg.UserUuid, arg.ExerciseUuid, arg.Submission)
+	row := q.db.QueryRow(ctx, updateUserExerciseSubmission,
+		arg.UserUuid,
+		arg.ExerciseUuid,
+		arg.Type,
+		arg.Submission,
+	)
 	var i UserExercise
 	err := row.Scan(
 		&i.Uuid,

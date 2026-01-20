@@ -54,8 +54,8 @@ type Exercise struct {
 	LessonUuid uuid.UUID       `json:"lesson_uuid" binding:"required"`
 	OrderIndex int16           `json:"order_index" binding:"required" example:"1"`
 	Reward     int16           `json:"reward" binding:"required" example:"10"`
-	Type        db.ExerciseType `json:"type" binding:"required" example:"quiz"`
-	Data        json.RawMessage `json:"data" binding:"required"`
+	Type       db.ExerciseType `json:"type" binding:"required" example:"quiz"`
+	Data       json.RawMessage `json:"data" binding:"required"`
 }
 
 type ExerciseTranslation struct {

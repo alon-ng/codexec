@@ -19,8 +19,12 @@ LIMIT 1;
 UPDATE "user_exercises"
 SET "submission" = COALESCE(sqlc.narg('submission'), "submission"),
     "last_accessed_at" = NOW()
-WHERE "user_uuid" = $1 AND "exercise_uuid" = $2
-RETURNING *;
+FROM "exercises"
+WHERE "user_uuid" = $1 
+AND "exercise_uuid" = $2 
+AND "exercises"."type" = $3 
+AND "exercises"."uuid" = "user_exercises"."exercise_uuid"
+RETURNING "user_exercises".*;
 
 -- name: UpdateUserExerciseSubmissionWithAttempts :one
 UPDATE "user_exercises"

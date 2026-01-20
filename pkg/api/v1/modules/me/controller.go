@@ -2,6 +2,7 @@ package me
 
 import (
 	e "codim/pkg/api/v1/errors"
+	"codim/pkg/api/v1/modules/progress"
 	"codim/pkg/utils/logger"
 	"net/http"
 
@@ -14,7 +15,7 @@ type Controller struct {
 	log *logger.Logger
 }
 
-func NewController(svc *Service, log *logger.Logger) *Controller {
+func NewController(svc *Service, progressSvc *progress.Service, log *logger.Logger) *Controller {
 	return &Controller{svc: svc, log: log}
 }
 
@@ -53,7 +54,7 @@ func (c *Controller) Me(ctx *gin.Context) {
 // @Param        subject 	query    string  false  "Filter by subject"
 // @Param        language 	query    string  false  "Filter by language"  default(en) 	example(en)
 // @Param        is_active 	query    bool    false  "Filter by is_active" default(true) example(true)
-// @Success      200     {array}   UserCourseWithProgress
+// @Success      200     {array}   progress.UserCourseWithProgress
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -83,7 +84,7 @@ func (c *Controller) ListUserCoursesWithProgress(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course_uuid path string true "Course UUID"
-// @Success      200     {object}  UserCourseFull
+// @Success      200     {object}  progress.UserCourseFull
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -108,7 +109,7 @@ func (c *Controller) GetUserCourseFull(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise_uuid path string true "Exercise UUID"
-// @Success      200     {object}  UserExercise
+// @Success      200     {object}  progress.UserExercise
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -123,4 +124,36 @@ func (c *Controller) GetUserExercise(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, userExercise)
+}
+
+// SaveUserExerciseSubmission godoc
+// @Summary      Save the user exercise submission
+// @Description  Save the user exercise submission
+// @Tags         me
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        exercise_uuid path string true "Exercise UUID"
+// @Param        submission body SaveUserExerciseSubmissionRequest true "Submission"
+// @Success      200     {string}  string  "OK"
+// @Failure      400     {object}  errors.ErrorResponse
+// @Failure      401     {object}  errors.ErrorResponse
+// @Failure      500     {object}  errors.ErrorResponse
+// @Router       /me/exercises/{exercise_uuid} [put]
+func (c *Controller) SaveUserExerciseSubmission(ctx *gin.Context) {
+	meUUID := uuid.MustParse(ctx.GetString("user_uuid"))
+	exerciseUUID := uuid.MustParse(ctx.Param("exercise_uuid"))
+	var req SaveUserExerciseSubmissionRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
+		return
+	}
+
+	err := c.svc.SaveUserExerciseSubmission(ctx.Request.Context(), meUUID, exerciseUUID, req)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }

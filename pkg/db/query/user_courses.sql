@@ -1,3 +1,52 @@
+-- name: InitUserCourse :one
+WITH course_lessons AS (
+    SELECT "uuid" AS "lesson_uuid"
+    FROM "lessons"
+    WHERE "lessons"."course_uuid" = $2
+      AND "deleted_at" IS NULL
+    ORDER BY "order_index" ASC
+),
+course_exercises AS (
+    SELECT "uuid" AS "exercise_uuid"
+    FROM "exercises"
+    WHERE "lesson_uuid" IN (SELECT "lesson_uuid" FROM course_lessons)
+      AND "deleted_at" IS NULL
+    ORDER BY "order_index" ASC
+),
+inserted_user_course AS (
+    INSERT INTO "user_courses" (
+        "user_uuid",
+        "course_uuid",
+        "completed_at"
+    ) VALUES (
+        $1, $2, NULL
+    )
+    RETURNING *
+),
+inserted_user_lessons AS (
+    INSERT INTO "user_lessons" (
+        "user_uuid",
+        "lesson_uuid",
+        "completed_at"
+    )
+    SELECT $1, "lesson_uuid", NULL
+    FROM course_lessons
+    RETURNING *
+),
+inserted_user_exercises AS (
+    INSERT INTO "user_exercises" (
+        "user_uuid",
+        "exercise_uuid",
+        "submission",
+        "attempts",
+        "completed_at"
+    )
+    SELECT $1, "exercise_uuid", '{}'::jsonb, 0, NULL
+    FROM course_exercises
+    RETURNING *
+)
+SELECT * FROM inserted_user_course;
+
 -- name: CreateUserCourse :one
 INSERT INTO "user_courses" (
   "user_uuid", 

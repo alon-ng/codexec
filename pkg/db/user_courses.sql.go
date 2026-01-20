@@ -52,6 +52,84 @@ func (q *Queries) DeleteUserCourse(ctx context.Context, argUuid uuid.UUID) error
 	return err
 }
 
+const initUserCourse = `-- name: InitUserCourse :one
+WITH course_lessons AS (
+    SELECT "uuid" AS "lesson_uuid"
+    FROM "lessons"
+    WHERE "lessons"."course_uuid" = $2
+      AND "deleted_at" IS NULL
+    ORDER BY "order_index" ASC
+),
+course_exercises AS (
+    SELECT "uuid" AS "exercise_uuid"
+    FROM "exercises"
+    WHERE "lesson_uuid" IN (SELECT "lesson_uuid" FROM course_lessons)
+      AND "deleted_at" IS NULL
+    ORDER BY "order_index" ASC
+),
+inserted_user_course AS (
+    INSERT INTO "user_courses" (
+        "user_uuid",
+        "course_uuid",
+        "completed_at"
+    ) VALUES (
+        $1, $2, NULL
+    )
+    RETURNING uuid, started_at, last_accessed_at, user_uuid, course_uuid, completed_at
+),
+inserted_user_lessons AS (
+    INSERT INTO "user_lessons" (
+        "user_uuid",
+        "lesson_uuid",
+        "completed_at"
+    )
+    SELECT $1, "lesson_uuid", NULL
+    FROM course_lessons
+    RETURNING uuid, started_at, last_accessed_at, user_uuid, lesson_uuid, completed_at
+),
+inserted_user_exercises AS (
+    INSERT INTO "user_exercises" (
+        "user_uuid",
+        "exercise_uuid",
+        "submission",
+        "attempts",
+        "completed_at"
+    )
+    SELECT $1, "exercise_uuid", '{}'::jsonb, 0, NULL
+    FROM course_exercises
+    RETURNING uuid, started_at, last_accessed_at, user_uuid, exercise_uuid, submission, attempts, completed_at
+)
+SELECT uuid, started_at, last_accessed_at, user_uuid, course_uuid, completed_at FROM inserted_user_course
+`
+
+type InitUserCourseParams struct {
+	UserUuid   uuid.UUID `json:"user_uuid"`
+	CourseUuid uuid.UUID `json:"course_uuid"`
+}
+
+type InitUserCourseRow struct {
+	Uuid           uuid.UUID  `json:"uuid"`
+	StartedAt      time.Time  `json:"started_at"`
+	LastAccessedAt *time.Time `json:"last_accessed_at"`
+	UserUuid       uuid.UUID  `json:"user_uuid"`
+	CourseUuid     uuid.UUID  `json:"course_uuid"`
+	CompletedAt    *time.Time `json:"completed_at"`
+}
+
+func (q *Queries) InitUserCourse(ctx context.Context, arg InitUserCourseParams) (InitUserCourseRow, error) {
+	row := q.db.QueryRow(ctx, initUserCourse, arg.UserUuid, arg.CourseUuid)
+	var i InitUserCourseRow
+	err := row.Scan(
+		&i.Uuid,
+		&i.StartedAt,
+		&i.LastAccessedAt,
+		&i.UserUuid,
+		&i.CourseUuid,
+		&i.CompletedAt,
+	)
+	return i, err
+}
+
 const listUserCoursesWithProgress = `-- name: ListUserCoursesWithProgress :many
 WITH course_exercise_counts AS (
     SELECT 
