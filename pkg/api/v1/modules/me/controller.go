@@ -109,7 +109,7 @@ func (c *Controller) GetUserCourseFull(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise_uuid path string true "Exercise UUID"
-// @Success      200     {object}  progress.UserExercise
+// @Success      200     {object}  UserExercise
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse

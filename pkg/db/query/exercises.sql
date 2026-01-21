@@ -18,9 +18,10 @@ INSERT INTO "exercises" (
   "order_index",
   "reward",
   "type",
-  "data"
+  "code_data",
+  "quiz_data"
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
 RETURNING *;
 
@@ -29,7 +30,8 @@ UPDATE "exercises"
 SET "order_index" = COALESCE(sqlc.narg('order_index'), "order_index"),
     "reward" = COALESCE(sqlc.narg('reward'), "reward"),
     "type" = COALESCE(sqlc.narg('type'), "type"),
-    "data" = COALESCE(sqlc.narg('data'), "data"),
+    "code_data" = COALESCE(sqlc.narg('code_data'), "code_data"),
+    "quiz_data" = COALESCE(sqlc.narg('quiz_data'), "quiz_data"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
 RETURNING *;

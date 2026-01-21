@@ -90,7 +90,8 @@ CREATE TABLE IF NOT EXISTS "exercises" (
     "order_index"	SMALLINT		NOT NULL,
     "reward"	    SMALLINT		NOT NULL,
     "type"          exercise_type   NOT NULL,
-    "data"		    JSONB			NOT NULL,
+    "code_data"     JSONB           NULL,
+    "quiz_data"     JSONB           NULL,
     CONSTRAINT fk_exercises_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE
 );
 
@@ -106,6 +107,8 @@ CREATE TABLE IF NOT EXISTS "exercise_translations" (
     "language"      VARCHAR(2)      NOT NULL,
     "name"          VARCHAR(255)    NOT NULL,
     "description"   TEXT            NOT NULL,
+    "code_data"     JSONB           NULL,
+    "quiz_data"     JSONB           NULL,
     CONSTRAINT fk_exercise_translations_exercise FOREIGN KEY ("exercise_uuid") REFERENCES "exercises"("uuid") ON DELETE CASCADE
 );
 

@@ -9,6 +9,7 @@
     "classroom": "כיתה"
   },
   "common": {
+    "run": "הרץ",
     "email": "דואר אלקטרוני",
     "password": "סיסמה",
     "firstName": "שם פרטי",
@@ -68,6 +69,8 @@
     "durationNote": "שעות לימוד"
   },
   "classroom": {
-    "continueWhereYouLeftOff": "המשך מאיפה שסיימת"
+    "continueWhereYouLeftOff": "המשך מאיפה שסיימת",
+    "instructions": "הוראות",
+    "codeEditor": "עורך קוד"
   }
 }

@@ -5,29 +5,29 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
 import type {
   ErrorsErrorResponse,
-  GetMeBody,
-  GetMeCoursesBody,
-  GetMeCoursesCourseUuidBody,
   GetMeCoursesParams,
-  GetMeExercisesExerciseUuidBody,
-  MeUserCourseFull,
-  MeUserCourseWithProgress,
+  MeSaveUserExerciseSubmissionRequest,
   MeUserExercise,
+  ProgressUserCourseFull,
+  ProgressUserCourseWithProgress,
   UsersUser,
 } from ".././model";
 
@@ -40,44 +40,35 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Get the current user from the JWT token
  */
 export const getMe = (
-  getMeBody: GetMeBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<UsersUser>(
-    {
-      url: `/me`,
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      signal,
-    },
+    { url: `/me`, method: "GET", signal },
     options,
   );
 };
 
-export const getGetMeQueryKey = (getMeBody?: GetMeBody) => {
-  return [`/me`, getMeBody] as const;
+export const getGetMeQueryKey = () => {
+  return [`/me`] as const;
 };
 
 export const getGetMeQueryOptions = <
   TData = Awaited<ReturnType<typeof getMe>>,
   TError = ErrorsErrorResponse,
->(
-  getMeBody: GetMeBody,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetMeQueryKey(getMeBody);
+  const queryKey = queryOptions?.queryKey ?? getGetMeQueryKey();
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({
     signal,
-  }) => getMe(getMeBody, requestOptions, signal);
+  }) => getMe(requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getMe>>,
@@ -93,7 +84,6 @@ export function useGetMe<
   TData = Awaited<ReturnType<typeof getMe>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeBody: GetMeBody,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>
@@ -116,7 +106,6 @@ export function useGetMe<
   TData = Awaited<ReturnType<typeof getMe>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeBody: GetMeBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>
@@ -139,7 +128,6 @@ export function useGetMe<
   TData = Awaited<ReturnType<typeof getMe>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeBody: GetMeBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>
@@ -158,7 +146,6 @@ export function useGetMe<
   TData = Awaited<ReturnType<typeof getMe>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeBody: GetMeBody,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>
@@ -169,7 +156,7 @@ export function useGetMe<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetMeQueryOptions(getMeBody, options);
+  const queryOptions = getGetMeQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -186,39 +173,24 @@ export function useGetMe<
  * @summary List the user courses with progress
  */
 export const getMeCourses = (
-  getMeCoursesBody: GetMeCoursesBody,
   params?: GetMeCoursesParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<MeUserCourseWithProgress[]>(
-    {
-      url: `/me/courses`,
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      params,
-      signal,
-    },
+  return customInstance<ProgressUserCourseWithProgress[]>(
+    { url: `/me/courses`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetMeCoursesQueryKey = (
-  getMeCoursesBody?: GetMeCoursesBody,
-  params?: GetMeCoursesParams,
-) => {
-  return [
-    `/me/courses`,
-    ...(params ? [params] : []),
-    getMeCoursesBody,
-  ] as const;
+export const getGetMeCoursesQueryKey = (params?: GetMeCoursesParams) => {
+  return [`/me/courses`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMeCoursesQueryOptions = <
   TData = Awaited<ReturnType<typeof getMeCourses>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeCoursesBody: GetMeCoursesBody,
   params?: GetMeCoursesParams,
   options?: {
     query?: Partial<
@@ -229,12 +201,11 @@ export const getGetMeCoursesQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetMeCoursesQueryKey(getMeCoursesBody, params);
+  const queryKey = queryOptions?.queryKey ?? getGetMeCoursesQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeCourses>>> = ({
     signal,
-  }) => getMeCourses(getMeCoursesBody, params, requestOptions, signal);
+  }) => getMeCourses(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getMeCourses>>,
@@ -252,7 +223,6 @@ export function useGetMeCourses<
   TData = Awaited<ReturnType<typeof getMeCourses>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeCoursesBody: GetMeCoursesBody,
   params: undefined | GetMeCoursesParams,
   options: {
     query: Partial<
@@ -276,7 +246,6 @@ export function useGetMeCourses<
   TData = Awaited<ReturnType<typeof getMeCourses>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeCoursesBody: GetMeCoursesBody,
   params?: GetMeCoursesParams,
   options?: {
     query?: Partial<
@@ -300,7 +269,6 @@ export function useGetMeCourses<
   TData = Awaited<ReturnType<typeof getMeCourses>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeCoursesBody: GetMeCoursesBody,
   params?: GetMeCoursesParams,
   options?: {
     query?: Partial<
@@ -320,7 +288,6 @@ export function useGetMeCourses<
   TData = Awaited<ReturnType<typeof getMeCourses>>,
   TError = ErrorsErrorResponse,
 >(
-  getMeCoursesBody: GetMeCoursesBody,
   params?: GetMeCoursesParams,
   options?: {
     query?: Partial<
@@ -332,11 +299,7 @@ export function useGetMeCourses<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetMeCoursesQueryOptions(
-    getMeCoursesBody,
-    params,
-    options,
-  );
+  const queryOptions = getGetMeCoursesQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -354,26 +317,17 @@ export function useGetMeCourses<
  */
 export const getMeCoursesCourseUuid = (
   courseUuid: string,
-  getMeCoursesCourseUuidBody: GetMeCoursesCourseUuidBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<MeUserCourseFull>(
-    {
-      url: `/me/courses/${courseUuid}`,
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      signal,
-    },
+  return customInstance<ProgressUserCourseFull>(
+    { url: `/me/courses/${courseUuid}`, method: "GET", signal },
     options,
   );
 };
 
-export const getGetMeCoursesCourseUuidQueryKey = (
-  courseUuid?: string,
-  getMeCoursesCourseUuidBody?: GetMeCoursesCourseUuidBody,
-) => {
-  return [`/me/courses/${courseUuid}`, getMeCoursesCourseUuidBody] as const;
+export const getGetMeCoursesCourseUuidQueryKey = (courseUuid?: string) => {
+  return [`/me/courses/${courseUuid}`] as const;
 };
 
 export const getGetMeCoursesCourseUuidQueryOptions = <
@@ -381,7 +335,6 @@ export const getGetMeCoursesCourseUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   courseUuid: string,
-  getMeCoursesCourseUuidBody: GetMeCoursesCourseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -396,18 +349,12 @@ export const getGetMeCoursesCourseUuidQueryOptions = <
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey =
-    queryOptions?.queryKey ??
-    getGetMeCoursesCourseUuidQueryKey(courseUuid, getMeCoursesCourseUuidBody);
+    queryOptions?.queryKey ?? getGetMeCoursesCourseUuidQueryKey(courseUuid);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof getMeCoursesCourseUuid>>
   > = ({ signal }) =>
-    getMeCoursesCourseUuid(
-      courseUuid,
-      getMeCoursesCourseUuidBody,
-      requestOptions,
-      signal,
-    );
+    getMeCoursesCourseUuid(courseUuid, requestOptions, signal);
 
   return {
     queryKey,
@@ -431,7 +378,6 @@ export function useGetMeCoursesCourseUuid<
   TError = ErrorsErrorResponse,
 >(
   courseUuid: string,
-  getMeCoursesCourseUuidBody: GetMeCoursesCourseUuidBody,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -459,7 +405,6 @@ export function useGetMeCoursesCourseUuid<
   TError = ErrorsErrorResponse,
 >(
   courseUuid: string,
-  getMeCoursesCourseUuidBody: GetMeCoursesCourseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -487,7 +432,6 @@ export function useGetMeCoursesCourseUuid<
   TError = ErrorsErrorResponse,
 >(
   courseUuid: string,
-  getMeCoursesCourseUuidBody: GetMeCoursesCourseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -511,7 +455,6 @@ export function useGetMeCoursesCourseUuid<
   TError = ErrorsErrorResponse,
 >(
   courseUuid: string,
-  getMeCoursesCourseUuidBody: GetMeCoursesCourseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -528,7 +471,6 @@ export function useGetMeCoursesCourseUuid<
 } {
   const queryOptions = getGetMeCoursesCourseUuidQueryOptions(
     courseUuid,
-    getMeCoursesCourseUuidBody,
     options,
   );
 
@@ -548,29 +490,19 @@ export function useGetMeCoursesCourseUuid<
  */
 export const getMeExercisesExerciseUuid = (
   exerciseUuid: string,
-  getMeExercisesExerciseUuidBody: GetMeExercisesExerciseUuidBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<MeUserExercise>(
-    {
-      url: `/me/exercises/${exerciseUuid}`,
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      signal,
-    },
+    { url: `/me/exercises/${exerciseUuid}`, method: "GET", signal },
     options,
   );
 };
 
 export const getGetMeExercisesExerciseUuidQueryKey = (
   exerciseUuid?: string,
-  getMeExercisesExerciseUuidBody?: GetMeExercisesExerciseUuidBody,
 ) => {
-  return [
-    `/me/exercises/${exerciseUuid}`,
-    getMeExercisesExerciseUuidBody,
-  ] as const;
+  return [`/me/exercises/${exerciseUuid}`] as const;
 };
 
 export const getGetMeExercisesExerciseUuidQueryOptions = <
@@ -578,7 +510,6 @@ export const getGetMeExercisesExerciseUuidQueryOptions = <
   TError = ErrorsErrorResponse,
 >(
   exerciseUuid: string,
-  getMeExercisesExerciseUuidBody: GetMeExercisesExerciseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -594,20 +525,12 @@ export const getGetMeExercisesExerciseUuidQueryOptions = <
 
   const queryKey =
     queryOptions?.queryKey ??
-    getGetMeExercisesExerciseUuidQueryKey(
-      exerciseUuid,
-      getMeExercisesExerciseUuidBody,
-    );
+    getGetMeExercisesExerciseUuidQueryKey(exerciseUuid);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof getMeExercisesExerciseUuid>>
   > = ({ signal }) =>
-    getMeExercisesExerciseUuid(
-      exerciseUuid,
-      getMeExercisesExerciseUuidBody,
-      requestOptions,
-      signal,
-    );
+    getMeExercisesExerciseUuid(exerciseUuid, requestOptions, signal);
 
   return {
     queryKey,
@@ -631,7 +554,6 @@ export function useGetMeExercisesExerciseUuid<
   TError = ErrorsErrorResponse,
 >(
   exerciseUuid: string,
-  getMeExercisesExerciseUuidBody: GetMeExercisesExerciseUuidBody,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -659,7 +581,6 @@ export function useGetMeExercisesExerciseUuid<
   TError = ErrorsErrorResponse,
 >(
   exerciseUuid: string,
-  getMeExercisesExerciseUuidBody: GetMeExercisesExerciseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -687,7 +608,6 @@ export function useGetMeExercisesExerciseUuid<
   TError = ErrorsErrorResponse,
 >(
   exerciseUuid: string,
-  getMeExercisesExerciseUuidBody: GetMeExercisesExerciseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -711,7 +631,6 @@ export function useGetMeExercisesExerciseUuid<
   TError = ErrorsErrorResponse,
 >(
   exerciseUuid: string,
-  getMeExercisesExerciseUuidBody: GetMeExercisesExerciseUuidBody,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -728,7 +647,6 @@ export function useGetMeExercisesExerciseUuid<
 } {
   const queryOptions = getGetMeExercisesExerciseUuidQueryOptions(
     exerciseUuid,
-    getMeExercisesExerciseUuidBody,
     options,
   );
 
@@ -741,3 +659,96 @@ export function useGetMeExercisesExerciseUuid<
 
   return query;
 }
+
+/**
+ * Save the user exercise submission
+ * @summary Save the user exercise submission
+ */
+export const putMeExercisesExerciseUuid = (
+  exerciseUuid: string,
+  meSaveUserExerciseSubmissionRequest: MeSaveUserExerciseSubmissionRequest,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<string>(
+    {
+      url: `/me/exercises/${exerciseUuid}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: meSaveUserExerciseSubmissionRequest,
+    },
+    options,
+  );
+};
+
+export const getPutMeExercisesExerciseUuidMutationOptions = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putMeExercisesExerciseUuid>>,
+    TError,
+    { exerciseUuid: string; data: MeSaveUserExerciseSubmissionRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putMeExercisesExerciseUuid>>,
+  TError,
+  { exerciseUuid: string; data: MeSaveUserExerciseSubmissionRequest },
+  TContext
+> => {
+  const mutationKey = ["putMeExercisesExerciseUuid"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putMeExercisesExerciseUuid>>,
+    { exerciseUuid: string; data: MeSaveUserExerciseSubmissionRequest }
+  > = (props) => {
+    const { exerciseUuid, data } = props ?? {};
+
+    return putMeExercisesExerciseUuid(exerciseUuid, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutMeExercisesExerciseUuidMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putMeExercisesExerciseUuid>>
+>;
+export type PutMeExercisesExerciseUuidMutationBody =
+  MeSaveUserExerciseSubmissionRequest;
+export type PutMeExercisesExerciseUuidMutationError = ErrorsErrorResponse;
+
+/**
+ * @summary Save the user exercise submission
+ */
+export const usePutMeExercisesExerciseUuid = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putMeExercisesExerciseUuid>>,
+      TError,
+      { exerciseUuid: string; data: MeSaveUserExerciseSubmissionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putMeExercisesExerciseUuid>>,
+  TError,
+  { exerciseUuid: string; data: MeSaveUserExerciseSubmissionRequest },
+  TContext
+> => {
+  const mutationOptions = getPutMeExercisesExerciseUuidMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};

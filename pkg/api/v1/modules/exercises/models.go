@@ -2,33 +2,31 @@ package exercises
 
 import (
 	"codim/pkg/db"
-	"encoding/json"
+	"codim/pkg/fs"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type CreateExerciseRequest struct {
-	LessonUuid  uuid.UUID              `json:"lesson_uuid" binding:"required"`
-	Type        db.ExerciseType        `json:"type" binding:"required" example:"quiz"`
-	OrderIndex  int16                  `json:"order_index" binding:"required" example:"1"`
-	Reward      int16                  `json:"reward" binding:"required" example:"10"`
-	Data        map[string]interface{} `json:"data" binding:"required"`
-	Language    string                 `json:"language" binding:"required" example:"en"`
-	Name        string                 `json:"name" binding:"required" example:"Hello World"`
-	Description string                 `json:"description" binding:"required" example:"Print Hello World"`
+	LessonUuid  uuid.UUID       `json:"lesson_uuid" binding:"required"`
+	Type        db.ExerciseType `json:"type" binding:"required" example:"quiz"`
+	OrderIndex  int16           `json:"order_index" binding:"required" example:"1"`
+	Reward      int16           `json:"reward" binding:"required" example:"10"`
+	Language    string          `json:"language" binding:"required" example:"en"`
+	Name        string          `json:"name" binding:"required" example:"Hello World"`
+	Description string          `json:"description" binding:"required" example:"Print Hello World"`
 }
 
 type UpdateExerciseRequest struct {
-	Uuid        uuid.UUID               `json:"uuid" binding:"required"`
-	Language    string                  `json:"language" binding:"required" example:"en"`
-	LessonUuid  *uuid.UUID              `json:"lesson_uuid" example:"123e4567-e89b-12d3-a456-426614174000"`
-	OrderIndex  *int16                  `json:"order_index" example:"1"`
-	Reward      *int16                  `json:"reward" example:"10"`
-	Type        *db.ExerciseType        `json:"type" example:"quiz"`
-	Data        *map[string]interface{} `json:"data"`
-	Name        *string                 `json:"name" example:"Hello World"`
-	Description *string                 `json:"description" example:"Print Hello World"`
+	Uuid        uuid.UUID        `json:"uuid" binding:"required"`
+	Language    string           `json:"language" binding:"required" example:"en"`
+	LessonUuid  *uuid.UUID       `json:"lesson_uuid" example:"123e4567-e89b-12d3-a456-426614174000"`
+	OrderIndex  *int16           `json:"order_index" example:"1"`
+	Reward      *int16           `json:"reward" example:"10"`
+	Type        *db.ExerciseType `json:"type" example:"quiz"`
+	Name        *string          `json:"name" example:"Hello World"`
+	Description *string          `json:"description" example:"Print Hello World"`
 }
 
 type ListExercisesRequest struct {
@@ -45,25 +43,42 @@ type AddExerciseTranslationRequest struct {
 	Description  string    `json:"description" binding:"required" example:"Imprime Hola Mundo"`
 }
 
+type ExerciseCodeData = fs.Directory
+type ExerciseQuizData = map[string]interface{}
+
+type ExerciseTranslationCodeData struct {
+	Instructions string `json:"instructions" binding:"required" example:"<p>Hello! Start writing your exercise instructions here...</p>"`
+}
+
+type ExerciseTranslationQuizData struct {
+	Questions []struct {
+		Question string   `json:"question" binding:"required" example:"What is the capital of France?"`
+		Answers  []string `json:"answers" binding:"required" example:"[Paris, London, Berlin, Madrid]"`
+	} `json:"questions" binding:"required"`
+}
+
 // Response types
 type Exercise struct {
-	Uuid       uuid.UUID       `json:"uuid" binding:"required"`
-	CreatedAt  time.Time       `json:"created_at" binding:"required"`
-	ModifiedAt time.Time       `json:"modified_at" binding:"required"`
-	DeletedAt  *time.Time      `json:"deleted_at,omitempty"`
-	LessonUuid uuid.UUID       `json:"lesson_uuid" binding:"required"`
-	OrderIndex int16           `json:"order_index" binding:"required" example:"1"`
-	Reward     int16           `json:"reward" binding:"required" example:"10"`
-	Type       db.ExerciseType `json:"type" binding:"required" example:"quiz"`
-	Data       json.RawMessage `json:"data" binding:"required"`
+	Uuid       uuid.UUID         `json:"uuid" binding:"required"`
+	CreatedAt  time.Time         `json:"created_at" binding:"required"`
+	ModifiedAt time.Time         `json:"modified_at" binding:"required"`
+	DeletedAt  *time.Time        `json:"deleted_at,omitempty"`
+	LessonUuid uuid.UUID         `json:"lesson_uuid" binding:"required"`
+	OrderIndex int16             `json:"order_index" binding:"required" example:"1"`
+	Reward     int16             `json:"reward" binding:"required" example:"10"`
+	Type       db.ExerciseType   `json:"type" binding:"required" example:"quiz"`
+	CodeData   *ExerciseCodeData `json:"code_data,omitempty"`
+	QuizData   *ExerciseQuizData `json:"quiz_data,omitempty"`
 }
 
 type ExerciseTranslation struct {
-	Uuid         uuid.UUID `json:"uuid" binding:"required"`
-	ExerciseUuid uuid.UUID `json:"exercise_uuid" binding:"required"`
-	Language     string    `json:"language" binding:"required" example:"en"`
-	Name         string    `json:"name" binding:"required" example:"Hello World"`
-	Description  string    `json:"description" binding:"required" example:"Print Hello World"`
+	Uuid         uuid.UUID                    `json:"uuid" binding:"required"`
+	ExerciseUuid uuid.UUID                    `json:"exercise_uuid" binding:"required"`
+	Language     string                       `json:"language" binding:"required" example:"en"`
+	Name         string                       `json:"name" binding:"required" example:"Hello World"`
+	Description  string                       `json:"description" binding:"required" example:"Print Hello World"`
+	CodeData     *ExerciseTranslationCodeData `json:"code_data,omitempty"`
+	QuizData     *ExerciseTranslationQuizData `json:"quiz_data,omitempty"`
 }
 
 type ExerciseWithTranslation struct {

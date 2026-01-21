@@ -2,7 +2,6 @@ package courses
 
 import (
 	e "codim/pkg/api/v1/errors"
-	"codim/pkg/api/v1/modules/exercises"
 	"codim/pkg/api/v1/modules/lessons"
 	"codim/pkg/db"
 	"context"
@@ -24,7 +23,7 @@ func NewService(q *db.Queries, p *pgxpool.Pool) *Service {
 }
 
 // Conversion functions
-func toCourse(d db.Course) Course {
+func ToCourse(d db.Course) (Course, error) {
 	return Course{
 		Uuid:       d.Uuid,
 		CreatedAt:  d.CreatedAt,
@@ -35,10 +34,10 @@ func toCourse(d db.Course) Course {
 		Discount:   d.Discount,
 		IsActive:   d.IsActive,
 		Difficulty: d.Difficulty,
-	}
+	}, nil
 }
 
-func toCourseTranslation(d db.CourseTranslation) CourseTranslation {
+func ToCourseTranslation(d db.CourseTranslation) (CourseTranslation, error) {
 	return CourseTranslation{
 		Uuid:        d.Uuid,
 		CourseUuid:  d.CourseUuid,
@@ -46,96 +45,44 @@ func toCourseTranslation(d db.CourseTranslation) CourseTranslation {
 		Name:        d.Name,
 		Description: d.Description,
 		Bullets:     d.Bullets,
-	}
+	}, nil
 }
 
-func toCourseWithTranslation(d db.CourseWithTranslation) CourseWithTranslation {
+func ToCourseWithTranslation(d db.CourseWithTranslation) (CourseWithTranslation, error) {
+	course, err := ToCourse(d.Course)
+	if err != nil {
+		return CourseWithTranslation{}, err
+	}
+
+	translation, err := ToCourseTranslation(d.Translation)
+	if err != nil {
+		return CourseWithTranslation{}, err
+	}
+
 	return CourseWithTranslation{
-		Course:      toCourse(d.Course),
-		Translation: toCourseTranslation(d.Translation),
-	}
+		Course:      course,
+		Translation: translation,
+	}, nil
 }
 
-func toCourseFull(d db.CourseFull) CourseFull {
-	lessons := make([]lessons.LessonFull, len(d.Lessons))
+func ToCourseFull(d db.CourseFull) (CourseFull, error) {
+	courseWithTranslation, err := ToCourseWithTranslation(d.CourseWithTranslation)
+	if err != nil {
+		return CourseFull{}, err
+	}
+
+	lessonsList := make([]lessons.LessonFull, len(d.Lessons))
 	for i, lesson := range d.Lessons {
-		lessons[i] = toLessonFull(lesson)
+		lessonFull, err := lessons.ToLessonFull(lesson)
+		if err != nil {
+			return CourseFull{}, err
+		}
+		lessonsList[i] = lessonFull
 	}
 	return CourseFull{
-		CourseWithTranslation: toCourseWithTranslation(d.CourseWithTranslation),
-		Lessons:                lessons,
-	}
-}
-
-func toLessonFull(d db.LessonFull) lessons.LessonFull {
-	exerciseList := make([]exercises.ExerciseWithTranslation, len(d.Exercises))
-	for i, exercise := range d.Exercises {
-		exerciseList[i] = toExerciseWithTranslation(exercise)
-	}
-	return lessons.LessonFull{
-		LessonWithTranslation: toLessonWithTranslation(d.LessonWithTranslation),
-		Exercises:              exerciseList,
-	}
-}
-
-func toLessonWithTranslation(d db.LessonWithTranslation) lessons.LessonWithTranslation {
-	return lessons.LessonWithTranslation{
-		Lesson:      toLesson(d.Lesson),
-		Translation: toLessonTranslation(d.Translation),
-	}
-}
-
-func toLesson(d db.Lesson) lessons.Lesson {
-	return lessons.Lesson{
-		Uuid:       d.Uuid,
-		CreatedAt:  d.CreatedAt,
-		ModifiedAt: d.ModifiedAt,
-		DeletedAt:  d.DeletedAt,
-		CourseUuid: d.CourseUuid,
-		OrderIndex: d.OrderIndex,
-		IsPublic:   d.IsPublic,
-	}
-}
-
-func toLessonTranslation(d db.LessonTranslation) lessons.LessonTranslation {
-	return lessons.LessonTranslation{
-		Uuid:        d.Uuid,
-		LessonUuid:  d.LessonUuid,
-		Language:    d.Language,
-		Name:        d.Name,
-		Description: d.Description,
-	}
-}
-
-func toExerciseWithTranslation(d db.ExerciseWithTranslation) exercises.ExerciseWithTranslation {
-	return exercises.ExerciseWithTranslation{
-		Exercise:    toExercise(d.Exercise),
-		Translation: toExerciseTranslation(d.Translation),
-	}
-}
-
-func toExercise(d db.Exercise) exercises.Exercise {
-	return exercises.Exercise{
-		Uuid:       d.Uuid,
-		CreatedAt:  d.CreatedAt,
-		ModifiedAt: d.ModifiedAt,
-		DeletedAt:  d.DeletedAt,
-		LessonUuid: d.LessonUuid,
-		OrderIndex: d.OrderIndex,
-		Reward:     d.Reward,
-		Type:       d.Type,
-		Data:       d.Data,
-	}
-}
-
-func toExerciseTranslation(d db.ExerciseTranslation) exercises.ExerciseTranslation {
-	return exercises.ExerciseTranslation{
-		Uuid:         d.Uuid,
-		ExerciseUuid: d.ExerciseUuid,
-		Language:     d.Language,
-		Name:         d.Name,
-		Description:  d.Description,
-	}
+		CourseWithTranslation: courseWithTranslation,
+		Lessons:               lessonsList,
+	}, nil
 }
 
 func (s *Service) Create(ctx context.Context, req CreateCourseRequest) (CourseWithTranslation, *e.APIError) {
@@ -176,10 +123,14 @@ func (s *Service) Create(ctx context.Context, req CreateCourseRequest) (CourseWi
 		return CourseWithTranslation{}, e.NewAPIError(err, ErrCourseCreationFailed)
 	}
 
-	return toCourseWithTranslation(db.CourseWithTranslation{
+	courseWithTranslation, err := ToCourseWithTranslation(db.CourseWithTranslation{
 		Course:      course,
 		Translation: translation,
-	}), nil
+	})
+	if err != nil {
+		return CourseWithTranslation{}, e.NewAPIError(err, ErrCourseCreationFailed)
+	}
+	return courseWithTranslation, nil
 }
 
 func (s *Service) Update(ctx context.Context, req UpdateCourseRequest) (CourseWithTranslation, *e.APIError) {
@@ -220,10 +171,14 @@ func (s *Service) Update(ctx context.Context, req UpdateCourseRequest) (CourseWi
 		return CourseWithTranslation{}, e.NewAPIError(err, ErrCourseUpdateFailed)
 	}
 
-	return toCourseWithTranslation(db.CourseWithTranslation{
+	courseWithTranslation, err := ToCourseWithTranslation(db.CourseWithTranslation{
 		Course:      course,
 		Translation: translation,
-	}), nil
+	})
+	if err != nil {
+		return CourseWithTranslation{}, e.NewAPIError(err, ErrCourseUpdateFailed)
+	}
+	return courseWithTranslation, nil
 }
 
 func (s *Service) Delete(ctx context.Context, id uuid.UUID) *e.APIError {
@@ -250,7 +205,11 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID, language string) (Cours
 		}
 		return CourseFull{}, e.NewAPIError(err, ErrCourseGetFailed)
 	}
-	return toCourseFull(course), nil
+	courseFull, err := ToCourseFull(course)
+	if err != nil {
+		return CourseFull{}, e.NewAPIError(err, ErrCourseGetFailed)
+	}
+	return courseFull, nil
 }
 
 func (s *Service) List(ctx context.Context, req ListCoursesRequest) ([]CourseWithTranslation, *e.APIError) {
@@ -268,7 +227,11 @@ func (s *Service) List(ctx context.Context, req ListCoursesRequest) ([]CourseWit
 
 	coursesWithTranslation := make([]CourseWithTranslation, len(courses))
 	for i, course := range courses {
-		coursesWithTranslation[i] = toCourseWithTranslation(course.ToCourseWithTranslation())
+		courseWithTranslation, err := ToCourseWithTranslation(course.ToCourseWithTranslation())
+		if err != nil {
+			return nil, e.NewAPIError(err, ErrCourseListFailed)
+		}
+		coursesWithTranslation[i] = courseWithTranslation
 	}
 
 	return coursesWithTranslation, nil
@@ -290,5 +253,9 @@ func (s *Service) AddTranslation(ctx context.Context, req AddCourseTranslationRe
 		return CourseTranslation{}, e.NewAPIError(err, ErrCourseAddTranslationFailed)
 	}
 
-	return toCourseTranslation(translation), nil
+	courseTranslation, err := ToCourseTranslation(translation)
+	if err != nil {
+		return CourseTranslation{}, e.NewAPIError(err, ErrCourseAddTranslationFailed)
+	}
+	return courseTranslation, nil
 }

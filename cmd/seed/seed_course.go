@@ -2,6 +2,7 @@ package main
 
 import (
 	"codim/pkg/db"
+	"codim/pkg/fs"
 	"context"
 	"encoding/json"
 	"log"
@@ -9,10 +10,62 @@ import (
 	"github.com/google/uuid"
 )
 
+func createCodeData(fileName string, fileContent string) *json.RawMessage {
+	dir := fs.Directory{
+		Name:        "root",
+		Directories: []fs.Directory{},
+		Files: []fs.File{
+			{
+				Name:    fileName,
+				Ext:     getFileExtension(fileName),
+				Content: fileContent,
+			},
+		},
+	}
+	data, _ := json.Marshal(dir)
+	result := json.RawMessage(data)
+	return &result
+}
+
+func createQuizData() *json.RawMessage {
+	data := json.RawMessage(`{}`)
+	return &data
+}
+
+func createTranslationCodeData(text string) *json.RawMessage {
+	data := map[string]interface{}{
+		"text": text,
+	}
+	result, _ := json.Marshal(data)
+	raw := json.RawMessage(result)
+	return &raw
+}
+
+func createTranslationQuizData(questions []map[string]interface{}) *json.RawMessage {
+	data := map[string]interface{}{
+		"questions": questions,
+	}
+	result, _ := json.Marshal(data)
+	raw := json.RawMessage(result)
+	return &raw
+}
+
+func getFileExtension(fileName string) string {
+	if len(fileName) > 3 && fileName[len(fileName)-3:] == ".js" {
+		return "js"
+	}
+	if len(fileName) > 3 && fileName[len(fileName)-3:] == ".py" {
+		return "py"
+	}
+	return ""
+}
+
 type Translation struct {
 	Name        string
 	Description string
 	Bullets     string
+	CodeData    *json.RawMessage
+	QuizData    *json.RawMessage
 }
 
 type ExerciseSeed struct {
@@ -35,6 +88,11 @@ type CourseSeed struct {
 	Difficulty   int16
 	Translations map[string]Translation
 	Lessons      []LessonSeed
+}
+
+func createRawMessage(data []byte) *json.RawMessage {
+	result := json.RawMessage(data)
+	return &result
 }
 
 func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
@@ -70,8 +128,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 						Reward: 10,
 						Data:   map[string]interface{}{"code": "print('Hello World')", "task": "Print Hello World"},
 						Translations: map[string]Translation{
-							"en": {Name: "Hello World", Description: "Your first program."},
-							"he": {Name: "שלום עולם", Description: "התוכנית הראשונה שלך."},
+							"en": {
+								Name:        "Hello World",
+								Description: "Your first program.",
+								CodeData:    createRawMessage([]byte(`{"instructions": "<div>Print <code>Hello World</code> to the console.</div>"}`)),
+							},
+							"he": {
+								Name:        "שלום עולם",
+								Description: "התוכנית הראשונה שלך.",
+								CodeData:    createRawMessage([]byte(`{"instructions": "<div>הדפס <code>Hello World</code> לקונסול.</div>"}`)),
+							},
 						},
 					},
 					{
@@ -298,13 +364,29 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 		}
 
 		for j, eSeed := range lSeed.Exercises {
-			dataJSON, _ := json.Marshal(eSeed.Data)
+			var codeData *json.RawMessage
+			var quizData *json.RawMessage
+
+			if eSeed.Type == db.ExerciseTypeCode {
+				// Extract code from Data if available, otherwise use default
+				codeContent := "print('Hello World')"
+				if code, ok := eSeed.Data["code"].(string); ok {
+					codeContent = code
+				}
+				codeData = createCodeData("main.py", codeContent)
+				quizData = nil
+			} else {
+				codeData = nil
+				quizData = createQuizData()
+			}
+
 			e, err := queries.CreateExercise(ctx, db.CreateExerciseParams{
 				LessonUuid: l.Uuid,
 				OrderIndex: int16(j + 1),
 				Reward:     eSeed.Reward,
 				Type:       eSeed.Type,
-				Data:       dataJSON,
+				CodeData:   codeData,
+				QuizData:   quizData,
 			})
 			if err != nil {
 				log.Fatalf("Failed to create exercise: %v", err)
@@ -316,6 +398,8 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 					Language:     lang,
 					Name:         trans.Name,
 					Description:  trans.Description,
+					CodeData:     trans.CodeData,
+					QuizData:     trans.QuizData,
 				})
 				if err != nil {
 					log.Fatalf("Failed to create exercise translation (%s): %v", lang, err)

@@ -77,23 +77,26 @@ type CourseTranslation struct {
 }
 
 type Exercise struct {
-	Uuid       uuid.UUID       `json:"uuid"`
-	CreatedAt  time.Time       `json:"created_at"`
-	ModifiedAt time.Time       `json:"modified_at"`
-	DeletedAt  *time.Time      `json:"deleted_at"`
-	LessonUuid uuid.UUID       `json:"lesson_uuid"`
-	OrderIndex int16           `json:"order_index"`
-	Reward     int16           `json:"reward"`
-	Type       ExerciseType    `json:"type"`
-	Data       json.RawMessage `json:"data"`
+	Uuid       uuid.UUID        `json:"uuid"`
+	CreatedAt  time.Time        `json:"created_at"`
+	ModifiedAt time.Time        `json:"modified_at"`
+	DeletedAt  *time.Time       `json:"deleted_at"`
+	LessonUuid uuid.UUID        `json:"lesson_uuid"`
+	OrderIndex int16            `json:"order_index"`
+	Reward     int16            `json:"reward"`
+	Type       ExerciseType     `json:"type"`
+	CodeData   *json.RawMessage `json:"code_data"`
+	QuizData   *json.RawMessage `json:"quiz_data"`
 }
 
 type ExerciseTranslation struct {
-	Uuid         uuid.UUID `json:"uuid"`
-	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
-	Language     string    `json:"language"`
-	Name         string    `json:"name"`
-	Description  string    `json:"description"`
+	Uuid         uuid.UUID        `json:"uuid"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Language     string           `json:"language"`
+	Name         string           `json:"name"`
+	Description  string           `json:"description"`
+	CodeData     *json.RawMessage `json:"code_data"`
+	QuizData     *json.RawMessage `json:"quiz_data"`
 }
 
 type Lesson struct {

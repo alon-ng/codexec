@@ -13,7 +13,7 @@ export interface MeUserExercise {
   exercise_uuid: string;
   last_accessed_at?: string;
   started_at: string;
-  submission?: MeUserExerciseSubmission;
+  submission: MeUserExerciseSubmission;
   user_uuid: string;
   uuid: string;
 }

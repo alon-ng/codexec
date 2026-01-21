@@ -9,6 +9,7 @@
         "classroom": "Classroom"
     },
     "common": {
+        "run": "Run",
         "email": "Email",
         "password": "Password",
         "firstName": "First Name",
@@ -68,6 +69,8 @@
         "durationNote": "hours total"
     },
     "classroom": {
-        "continueWhereYouLeftOff": "Continue where you left off"
+        "continueWhereYouLeftOff": "Continue where you left off",
+        "instructions": "Instructions",
+        "codeEditor": "Code Editor"
     }
 }

@@ -1,14 +1,15 @@
 import { Link } from "react-router";
 import { CheckCircle2, Circle } from "lucide-react";
 import { cn } from "~/lib/utils";
-import type { DbUserExerciseStatus } from "~/api/generated/model";
+import type { ExercisesExerciseWithTranslation, MeUserExerciseStatus } from "~/api/generated/model";
 
 export interface ExerciseListItemProps {
-  exercise: DbUserExerciseStatus;
+  exercise: MeUserExerciseStatus;
   courseUuid: string;
   lessonUuid: string;
   exerciseIndex: number;
   isSelected: boolean;
+  exerciseData?: ExercisesExerciseWithTranslation;
 }
 
 export default function ExerciseListItem({
@@ -17,6 +18,7 @@ export default function ExerciseListItem({
   lessonUuid,
   exerciseIndex,
   isSelected,
+  exerciseData,
 }: ExerciseListItemProps) {
   const isExerciseCompleted = exercise.is_completed;
 
@@ -33,7 +35,7 @@ export default function ExerciseListItem({
       ) : (
         <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
       )}
-      <span className="text-sm">{`Exercise ${exerciseIndex + 1}`}</span>
+      <span className="text-sm">{exerciseData?.translation.name || `Exercise ${exerciseIndex + 1}`}</span>
     </Link>
   );
 }

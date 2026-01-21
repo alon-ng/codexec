@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { useGetMeExercisesExerciseUuid } from "~/api/generated/me/me";
-import ExerciseView from "./ExerciseView";
-import type { DbExerciseWithTranslation } from "~/api/generated/model";
+import type { ExercisesExerciseWithTranslation } from "~/api/generated/model";
+import ExerciseCode from "./ExerciseCode";
+import ExerciseQuiz from "./ExerciseQuiz";
 
 export interface ExerciseContentProps {
-  exercise?: DbExerciseWithTranslation;
+  exercise?: ExercisesExerciseWithTranslation;
   exerciseUuid?: string;
-  language?: string;
+  language: string;
   onCodeChange?: (value: string | undefined) => void;
   onSubmit?: () => void;
 }
@@ -15,13 +16,12 @@ export interface ExerciseContentProps {
 export default function ExerciseContent({
   exercise,
   exerciseUuid,
-  language = "en",
+  language,
   onCodeChange,
   onSubmit,
 }: ExerciseContentProps) {
   const { t } = useTranslation();
 
-  // Fetch user exercise data
   const {
     data: userExerciseData,
     isLoading: isLoadingUserExercise,
@@ -40,7 +40,7 @@ export default function ExerciseContent({
     );
   }
 
-  if (!exercise) {
+  if (!exercise || !userExerciseData) {
     if (exerciseUuid) {
       return (
         <div className="flex flex-col h-full items-center justify-center">
@@ -57,26 +57,22 @@ export default function ExerciseContent({
     );
   }
 
-  // Use user's submission code if available, otherwise use exercise default
-  let codeValue = "";
-
-  if (userExerciseData?.submission && typeof userExerciseData.submission === "object" && "code" in userExerciseData.submission) {
-    codeValue = String(userExerciseData.submission.code);
-  } else if (
-    exercise.data &&
-    typeof exercise.data === "object" &&
-    "code" in exercise.data
-  ) {
-    codeValue = String(exercise.data.code);
-  }
-
   return (
-    <ExerciseView
-      exercise={exercise}
-      language={language}
-      initialCode={codeValue}
-      onCodeChange={onCodeChange}
-      onSubmit={onSubmit}
-    />
+    <div className="flex flex-col h-full gap-4">
+      {exercise.type === "code" ? (
+        <ExerciseCode
+          exercise={exercise}
+          language={language}
+          userExercise={userExerciseData}
+          onChange={onCodeChange}
+        />
+      ) : (
+        <ExerciseQuiz
+          exercise={exercise}
+          language={language}
+          onChange={onCodeChange}
+        />
+      )}
+    </div>
   );
 }

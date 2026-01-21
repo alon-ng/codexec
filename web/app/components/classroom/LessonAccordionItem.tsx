@@ -6,18 +6,18 @@ import {
 import { CheckCircle2, Circle } from "lucide-react";
 import { cn } from "~/lib/utils";
 import ExerciseListItem from "./ExerciseListItem";
-import type { DbUserLessonStatus } from "~/api/generated/model";
-import type { DbLessonFull } from "~/api/generated/model";
+import type { MeUserLessonStatus } from "~/api/generated/model";
+import type { LessonsLessonFull } from "~/api/generated/model";
 import { blurInVariants } from "~/utils/animations";
 import { motion } from "motion/react";
 
 export interface LessonAccordionItemProps {
-  lesson: DbUserLessonStatus;
+  lesson: MeUserLessonStatus;
   lessonIndex: number;
   courseUuid: string;
   selectedLessonUuid?: string;
   selectedExerciseUuid?: string;
-  lessonData?: DbLessonFull;
+  lessonData?: LessonsLessonFull;
 }
 
 export default function LessonAccordionItem({
@@ -34,6 +34,10 @@ export default function LessonAccordionItem({
 
   const lessonName = lessonData?.translation?.name || `Lesson ${lessonIndex + 1}`;
 
+  function getExerciseData(exerciseUuid: string) {
+    return lessonData?.exercises?.find((e) => e.uuid === exerciseUuid);
+  }
+
   return (
     <motion.div variants={blurInVariants(lessonIndex * 0.1)} initial="hidden" animate="visible">
       <AccordionItem
@@ -42,7 +46,7 @@ export default function LessonAccordionItem({
         className="border-b"
       >
         <AccordionTrigger
-          className={cn("hover:no-underline", isSelected && "font-semibold")}
+          className={cn("hover:no-underline cursor-pointer", isSelected && "font-semibold")}
         >
           <div className="flex items-center gap-2 flex-1">
             {isLessonCompleted ? (
@@ -54,11 +58,12 @@ export default function LessonAccordionItem({
           </div>
         </AccordionTrigger>
         <AccordionContent>
-          <div className="flex flex-col gap-1 pl-6">
+          <div className="flex flex-col gap-1 ps-6">
             {exercises.map((exercise, exIndex) => (
               <ExerciseListItem
                 key={exercise.exercise_uuid || exIndex}
                 exercise={exercise}
+                exerciseData={getExerciseData(exercise.exercise_uuid)}
                 courseUuid={courseUuid}
                 lessonUuid={lesson.lesson_uuid!}
                 exerciseIndex={exIndex}

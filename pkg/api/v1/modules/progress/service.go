@@ -35,9 +35,14 @@ func (s *Service) InitUserCourse(ctx context.Context, userUuid uuid.UUID, course
 }
 
 // Conversion functions
-func toUserCourseWithProgress(d db.UserCourseWithProgress) UserCourseWithProgress {
+func toUserCourseWithProgress(d db.UserCourseWithProgress) (UserCourseWithProgress, error) {
+	courseWithTranslation, err := courses.ToCourseWithTranslation(d.CourseWithTranslation)
+	if err != nil {
+		return UserCourseWithProgress{}, err
+	}
+
 	return UserCourseWithProgress{
-		CourseWithTranslation:    toCourseWithTranslation(d.CourseWithTranslation),
+		CourseWithTranslation:    courseWithTranslation,
 		UserCourseStartedAt:      d.UserCourseStartedAt,
 		UserCourseLastAccessedAt: d.UserCourseLastAccessedAt,
 		UserCourseCompletedAt:    d.UserCourseCompletedAt,
@@ -47,39 +52,7 @@ func toUserCourseWithProgress(d db.UserCourseWithProgress) UserCourseWithProgres
 		NextLessonName:           d.NextLessonName,
 		NextExerciseUuid:         d.NextExerciseUuid,
 		NextExerciseName:         d.NextExerciseName,
-	}
-}
-
-func toCourseWithTranslation(d db.CourseWithTranslation) courses.CourseWithTranslation {
-	return courses.CourseWithTranslation{
-		Course:      toCourse(d.Course),
-		Translation: toCourseTranslation(d.Translation),
-	}
-}
-
-func toCourse(d db.Course) courses.Course {
-	return courses.Course{
-		Uuid:       d.Uuid,
-		CreatedAt:  d.CreatedAt,
-		ModifiedAt: d.ModifiedAt,
-		DeletedAt:  d.DeletedAt,
-		Subject:    d.Subject,
-		Price:      d.Price,
-		Discount:   d.Discount,
-		IsActive:   d.IsActive,
-		Difficulty: d.Difficulty,
-	}
-}
-
-func toCourseTranslation(d db.CourseTranslation) courses.CourseTranslation {
-	return courses.CourseTranslation{
-		Uuid:        d.Uuid,
-		CourseUuid:  d.CourseUuid,
-		Language:    d.Language,
-		Name:        d.Name,
-		Description: d.Description,
-		Bullets:     d.Bullets,
-	}
+	}, nil
 }
 
 func toUserCourseFull(d db.UserCourseFull) UserCourseFull {
@@ -150,7 +123,11 @@ func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.U
 
 	userCoursesWithProgress := make([]UserCourseWithProgress, len(userCourses))
 	for i, userCourse := range userCourses {
-		userCoursesWithProgress[i] = toUserCourseWithProgress(userCourse.ToUserCourseWithProgress())
+		userCourseWithProgress, err := toUserCourseWithProgress(userCourse.ToUserCourseWithProgress())
+		if err != nil {
+			return nil, e.NewAPIError(err, ErrGetUserCoursesWithProgressFailed)
+		}
+		userCoursesWithProgress[i] = userCourseWithProgress
 	}
 
 	return userCoursesWithProgress, nil

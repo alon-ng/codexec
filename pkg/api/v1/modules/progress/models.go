@@ -64,7 +64,7 @@ type UserExercise struct {
 	LastAccessedAt *time.Time      `json:"last_accessed_at,omitempty"`
 	UserUuid       uuid.UUID       `json:"user_uuid" binding:"required"`
 	ExerciseUuid   uuid.UUID       `json:"exercise_uuid" binding:"required"`
-	Submission     json.RawMessage `json:"submission,omitempty"`
+	Submission     json.RawMessage `json:"submission" binding:"required"`
 	Attempts       int32           `json:"attempts" binding:"required" example:"0"`
 	CompletedAt    *time.Time      `json:"completed_at,omitempty"`
 }

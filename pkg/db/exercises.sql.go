@@ -31,19 +31,21 @@ INSERT INTO "exercises" (
   "order_index",
   "reward",
   "type",
-  "data"
+  "code_data",
+  "quiz_data"
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
-RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data
+RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, code_data, quiz_data
 `
 
 type CreateExerciseParams struct {
-	LessonUuid uuid.UUID       `json:"lesson_uuid"`
-	OrderIndex int16           `json:"order_index"`
-	Reward     int16           `json:"reward"`
-	Type       ExerciseType    `json:"type"`
-	Data       json.RawMessage `json:"data"`
+	LessonUuid uuid.UUID        `json:"lesson_uuid"`
+	OrderIndex int16            `json:"order_index"`
+	Reward     int16            `json:"reward"`
+	Type       ExerciseType     `json:"type"`
+	CodeData   *json.RawMessage `json:"code_data"`
+	QuizData   *json.RawMessage `json:"quiz_data"`
 }
 
 func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error) {
@@ -52,7 +54,8 @@ func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) 
 		arg.OrderIndex,
 		arg.Reward,
 		arg.Type,
-		arg.Data,
+		arg.CodeData,
+		arg.QuizData,
 	)
 	var i Exercise
 	err := row.Scan(
@@ -64,7 +67,8 @@ func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) 
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,
-		&i.Data,
+		&i.CodeData,
+		&i.QuizData,
 	)
 	return i, err
 }
@@ -81,7 +85,7 @@ func (q *Queries) DeleteExercise(ctx context.Context, argUuid uuid.UUID) error {
 }
 
 const getExercise = `-- name: GetExercise :one
-SELECT exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data, exercise_translations.uuid, exercise_uuid, language, name, description FROM "exercises"
+SELECT exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, exercises.code_data, exercises.quiz_data, exercise_translations.uuid, exercise_uuid, language, name, description, exercise_translations.code_data, exercise_translations.quiz_data FROM "exercises"
 JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $2
 WHERE "exercises"."uuid" = $1 AND "exercises"."deleted_at" IS NULL 
 LIMIT 1
@@ -93,20 +97,23 @@ type GetExerciseParams struct {
 }
 
 type GetExerciseRow struct {
-	Uuid         uuid.UUID       `json:"uuid"`
-	CreatedAt    time.Time       `json:"created_at"`
-	ModifiedAt   time.Time       `json:"modified_at"`
-	DeletedAt    *time.Time      `json:"deleted_at"`
-	LessonUuid   uuid.UUID       `json:"lesson_uuid"`
-	OrderIndex   int16           `json:"order_index"`
-	Reward       int16           `json:"reward"`
-	Type         ExerciseType    `json:"type"`
-	Data         json.RawMessage `json:"data"`
-	Uuid_2       uuid.UUID       `json:"uuid_2"`
-	ExerciseUuid uuid.UUID       `json:"exercise_uuid"`
-	Language     string          `json:"language"`
-	Name         string          `json:"name"`
-	Description  string          `json:"description"`
+	Uuid         uuid.UUID        `json:"uuid"`
+	CreatedAt    time.Time        `json:"created_at"`
+	ModifiedAt   time.Time        `json:"modified_at"`
+	DeletedAt    *time.Time       `json:"deleted_at"`
+	LessonUuid   uuid.UUID        `json:"lesson_uuid"`
+	OrderIndex   int16            `json:"order_index"`
+	Reward       int16            `json:"reward"`
+	Type         ExerciseType     `json:"type"`
+	CodeData     *json.RawMessage `json:"code_data"`
+	QuizData     *json.RawMessage `json:"quiz_data"`
+	Uuid_2       uuid.UUID        `json:"uuid_2"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Language     string           `json:"language"`
+	Name         string           `json:"name"`
+	Description  string           `json:"description"`
+	CodeData_2   *json.RawMessage `json:"code_data_2"`
+	QuizData_2   *json.RawMessage `json:"quiz_data_2"`
 }
 
 func (q *Queries) GetExercise(ctx context.Context, arg GetExerciseParams) (GetExerciseRow, error) {
@@ -121,12 +128,15 @@ func (q *Queries) GetExercise(ctx context.Context, arg GetExerciseParams) (GetEx
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,
-		&i.Data,
+		&i.CodeData,
+		&i.QuizData,
 		&i.Uuid_2,
 		&i.ExerciseUuid,
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.CodeData_2,
+		&i.QuizData_2,
 	)
 	return i, err
 }
@@ -142,7 +152,7 @@ func (q *Queries) HardDeleteExercise(ctx context.Context, argUuid uuid.UUID) err
 }
 
 const listExercises = `-- name: ListExercises :many
-SELECT exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data, exercise_translations.uuid, exercise_uuid, language, name, description FROM "exercises"
+SELECT exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, exercises.code_data, exercises.quiz_data, exercise_translations.uuid, exercise_uuid, language, name, description, exercise_translations.code_data, exercise_translations.quiz_data FROM "exercises"
 JOIN "exercise_translations" ON "exercises"."uuid" = "exercise_translations"."exercise_uuid" AND "exercise_translations"."language" = $3
 WHERE "exercises"."deleted_at" IS NULL
 AND   ($4::uuid IS NULL OR "lesson_uuid" = $4)
@@ -158,20 +168,23 @@ type ListExercisesParams struct {
 }
 
 type ListExercisesRow struct {
-	Uuid         uuid.UUID       `json:"uuid"`
-	CreatedAt    time.Time       `json:"created_at"`
-	ModifiedAt   time.Time       `json:"modified_at"`
-	DeletedAt    *time.Time      `json:"deleted_at"`
-	LessonUuid   uuid.UUID       `json:"lesson_uuid"`
-	OrderIndex   int16           `json:"order_index"`
-	Reward       int16           `json:"reward"`
-	Type         ExerciseType    `json:"type"`
-	Data         json.RawMessage `json:"data"`
-	Uuid_2       uuid.UUID       `json:"uuid_2"`
-	ExerciseUuid uuid.UUID       `json:"exercise_uuid"`
-	Language     string          `json:"language"`
-	Name         string          `json:"name"`
-	Description  string          `json:"description"`
+	Uuid         uuid.UUID        `json:"uuid"`
+	CreatedAt    time.Time        `json:"created_at"`
+	ModifiedAt   time.Time        `json:"modified_at"`
+	DeletedAt    *time.Time       `json:"deleted_at"`
+	LessonUuid   uuid.UUID        `json:"lesson_uuid"`
+	OrderIndex   int16            `json:"order_index"`
+	Reward       int16            `json:"reward"`
+	Type         ExerciseType     `json:"type"`
+	CodeData     *json.RawMessage `json:"code_data"`
+	QuizData     *json.RawMessage `json:"quiz_data"`
+	Uuid_2       uuid.UUID        `json:"uuid_2"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Language     string           `json:"language"`
+	Name         string           `json:"name"`
+	Description  string           `json:"description"`
+	CodeData_2   *json.RawMessage `json:"code_data_2"`
+	QuizData_2   *json.RawMessage `json:"quiz_data_2"`
 }
 
 func (q *Queries) ListExercises(ctx context.Context, arg ListExercisesParams) ([]ListExercisesRow, error) {
@@ -197,12 +210,15 @@ func (q *Queries) ListExercises(ctx context.Context, arg ListExercisesParams) ([
 			&i.OrderIndex,
 			&i.Reward,
 			&i.Type,
-			&i.Data,
+			&i.CodeData,
+			&i.QuizData,
 			&i.Uuid_2,
 			&i.ExerciseUuid,
 			&i.Language,
 			&i.Name,
 			&i.Description,
+			&i.CodeData_2,
+			&i.QuizData_2,
 		); err != nil {
 			return nil, err
 		}
@@ -230,10 +246,11 @@ UPDATE "exercises"
 SET "order_index" = COALESCE($2, "order_index"),
     "reward" = COALESCE($3, "reward"),
     "type" = COALESCE($4, "type"),
-    "data" = COALESCE($5, "data"),
+    "code_data" = COALESCE($5, "code_data"),
+    "quiz_data" = COALESCE($6, "quiz_data"),
     "modified_at" = NOW()
 WHERE "uuid" = $1
-RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data
+RETURNING uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, code_data, quiz_data
 `
 
 type UpdateExerciseParams struct {
@@ -241,7 +258,8 @@ type UpdateExerciseParams struct {
 	OrderIndex *int16           `json:"order_index"`
 	Reward     *int16           `json:"reward"`
 	Type       *ExerciseType    `json:"type"`
-	Data       *json.RawMessage `json:"data"`
+	CodeData   *json.RawMessage `json:"code_data"`
+	QuizData   *json.RawMessage `json:"quiz_data"`
 }
 
 func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) (Exercise, error) {
@@ -250,7 +268,8 @@ func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) 
 		arg.OrderIndex,
 		arg.Reward,
 		arg.Type,
-		arg.Data,
+		arg.CodeData,
+		arg.QuizData,
 	)
 	var i Exercise
 	err := row.Scan(
@@ -262,7 +281,8 @@ func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) 
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,
-		&i.Data,
+		&i.CodeData,
+		&i.QuizData,
 	)
 	return i, err
 }

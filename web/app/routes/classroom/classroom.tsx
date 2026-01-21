@@ -197,7 +197,7 @@ export default function Classroom() {
                     <ExerciseContent
                         exercise={selectedExerciseData}
                         exerciseUuid={exerciseUuid}
-                        language={i18n.language}
+                        language={courseData.subject}
                         onCodeChange={handleCodeChange}
                         onSubmit={handleExerciseSubmit}
                     />

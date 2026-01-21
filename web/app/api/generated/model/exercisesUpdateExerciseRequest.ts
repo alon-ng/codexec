@@ -5,11 +5,9 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import type { ExercisesUpdateExerciseRequestData } from "./exercisesUpdateExerciseRequestData";
 import type { DbExerciseType } from "./dbExerciseType";
 
 export interface ExercisesUpdateExerciseRequest {
-  data?: ExercisesUpdateExerciseRequestData;
   description?: string;
   language: string;
   lesson_uuid?: string;

@@ -57,7 +57,8 @@ func (q *Queries) GetCourseFull(ctx context.Context, u uuid.UUID, language strin
 					OrderIndex: *e.ExerciseOrderIndex,
 					Reward:     *e.ExerciseReward,
 					Type:       *e.ExerciseType,
-					Data:       *e.ExerciseData,
+					CodeData:   e.ExerciseCodeData,
+					QuizData:   e.ExerciseQuizData,
 				},
 				Translation: ExerciseTranslation{
 					Uuid:         *e.ExerciseTranslationUuid,
@@ -65,6 +66,8 @@ func (q *Queries) GetCourseFull(ctx context.Context, u uuid.UUID, language strin
 					Language:     *e.ExerciseTranslationLanguage,
 					Name:         *e.ExerciseName,
 					Description:  *e.ExerciseDescription,
+					CodeData:     e.ExerciseTranslationCodeData,
+					QuizData:     e.ExerciseTranslationQuizData,
 				},
 			})
 		}

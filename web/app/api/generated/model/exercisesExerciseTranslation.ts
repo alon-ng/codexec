@@ -5,11 +5,15 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
+import type { ExercisesExerciseTranslationCodeData } from "./exercisesExerciseTranslationCodeData";
+import type { ExercisesExerciseTranslationQuizData } from "./exercisesExerciseTranslationQuizData";
 
 export interface ExercisesExerciseTranslation {
+  code_data?: ExercisesExerciseTranslationCodeData;
   description: string;
   exercise_uuid: string;
   language: string;
   name: string;
+  quiz_data?: ExercisesExerciseTranslationQuizData;
   uuid: string;
 }

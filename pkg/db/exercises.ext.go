@@ -16,7 +16,8 @@ func (g *GetExerciseRow) ToExerciseWithTranslation() ExerciseWithTranslation {
 			OrderIndex: g.OrderIndex,
 			Reward:     g.Reward,
 			Type:       g.Type,
-			Data:       g.Data,
+			CodeData:   g.CodeData,
+			QuizData:   g.QuizData,
 		},
 		Translation: ExerciseTranslation{
 			Uuid:         g.Uuid_2,
@@ -24,6 +25,8 @@ func (g *GetExerciseRow) ToExerciseWithTranslation() ExerciseWithTranslation {
 			Language:     g.Language,
 			Name:         g.Name,
 			Description:  g.Description,
+			CodeData:     g.CodeData_2,
+			QuizData:     g.QuizData_2,
 		},
 	}
 }
@@ -39,7 +42,8 @@ func (l *ListExercisesRow) ToExerciseWithTranslation() ExerciseWithTranslation {
 			OrderIndex: l.OrderIndex,
 			Reward:     l.Reward,
 			Type:       l.Type,
-			Data:       l.Data,
+			CodeData:   l.CodeData,
+			QuizData:   l.QuizData,
 		},
 		Translation: ExerciseTranslation{
 			Uuid:         l.Uuid_2,
@@ -47,6 +51,8 @@ func (l *ListExercisesRow) ToExerciseWithTranslation() ExerciseWithTranslation {
 			Language:     l.Language,
 			Name:         l.Name,
 			Description:  l.Description,
+			CodeData:     l.CodeData_2,
+			QuizData:     l.QuizData_2,
 		},
 	}
 }

@@ -1677,7 +1677,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/progress.UserExercise"
+                            "$ref": "#/definitions/me.UserExercise"
                         }
                     },
                     "400": {
@@ -2487,7 +2487,6 @@ const docTemplate = `{
         "exercises.CreateExerciseRequest": {
             "type": "object",
             "required": [
-                "data",
                 "description",
                 "language",
                 "lesson_uuid",
@@ -2497,10 +2496,6 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
-                "data": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
                 "description": {
                     "type": "string",
                     "example": "Print Hello World"
@@ -2534,6 +2529,35 @@ const docTemplate = `{
                 }
             }
         },
+        "exercises.ExerciseCodeData": {
+            "type": "object",
+            "required": [
+                "directories",
+                "files",
+                "name"
+            ],
+            "properties": {
+                "directories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fs.Directory"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fs.File"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "exercises.ExerciseQuizData": {
+            "type": "object",
+            "additionalProperties": true
+        },
         "exercises.ExerciseTranslation": {
             "type": "object",
             "required": [
@@ -2544,6 +2568,9 @@ const docTemplate = `{
                 "uuid"
             ],
             "properties": {
+                "code_data": {
+                    "$ref": "#/definitions/exercises.ExerciseTranslationCodeData"
+                },
                 "description": {
                     "type": "string",
                     "example": "Print Hello World"
@@ -2559,8 +2586,59 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Hello World"
                 },
+                "quiz_data": {
+                    "$ref": "#/definitions/exercises.ExerciseTranslationQuizData"
+                },
                 "uuid": {
                     "type": "string"
+                }
+            }
+        },
+        "exercises.ExerciseTranslationCodeData": {
+            "type": "object",
+            "required": [
+                "instructions"
+            ],
+            "properties": {
+                "instructions": {
+                    "type": "string",
+                    "example": "\u003cp\u003eHello! Start writing your exercise instructions here...\u003c/p\u003e"
+                }
+            }
+        },
+        "exercises.ExerciseTranslationQuizData": {
+            "type": "object",
+            "required": [
+                "questions"
+            ],
+            "properties": {
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "answers",
+                            "question"
+                        ],
+                        "properties": {
+                            "answers": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "example": [
+                                    "[Paris",
+                                    " London",
+                                    " Berlin",
+                                    " Madrid]"
+                                ]
+                            },
+                            "question": {
+                                "type": "string",
+                                "example": "What is the capital of France?"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -2568,7 +2646,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "created_at",
-                "data",
                 "lesson_uuid",
                 "modified_at",
                 "order_index",
@@ -2578,11 +2655,11 @@ const docTemplate = `{
                 "uuid"
             ],
             "properties": {
+                "code_data": {
+                    "$ref": "#/definitions/exercises.ExerciseCodeData"
+                },
                 "created_at": {
                     "type": "string"
-                },
-                "data": {
-                    "type": "object"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -2596,6 +2673,9 @@ const docTemplate = `{
                 "order_index": {
                     "type": "integer",
                     "example": 1
+                },
+                "quiz_data": {
+                    "$ref": "#/definitions/exercises.ExerciseQuizData"
                 },
                 "reward": {
                     "type": "integer",
@@ -2635,10 +2715,6 @@ const docTemplate = `{
                 "uuid"
             ],
             "properties": {
-                "data": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
                 "description": {
                     "type": "string",
                     "example": "Print Hello World"
@@ -2672,6 +2748,50 @@ const docTemplate = `{
                     "example": "quiz"
                 },
                 "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "fs.Directory": {
+            "type": "object",
+            "required": [
+                "directories",
+                "files",
+                "name"
+            ],
+            "properties": {
+                "directories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fs.Directory"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fs.File"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "fs.File": {
+            "type": "object",
+            "required": [
+                "content",
+                "ext",
+                "name"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "ext": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -2914,6 +3034,44 @@ const docTemplate = `{
                 }
             }
         },
+        "me.UserExercise": {
+            "type": "object",
+            "required": [
+                "attempts",
+                "exercise_uuid",
+                "started_at",
+                "submission",
+                "user_uuid",
+                "uuid"
+            ],
+            "properties": {
+                "attempts": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "exercise_uuid": {
+                    "type": "string"
+                },
+                "last_accessed_at": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "submission": {
+                    "type": "object"
+                },
+                "user_uuid": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
         "progress.UserCourseFull": {
             "type": "object",
             "required": [
@@ -3017,43 +3175,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_course_started_at": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "progress.UserExercise": {
-            "type": "object",
-            "required": [
-                "attempts",
-                "exercise_uuid",
-                "started_at",
-                "user_uuid",
-                "uuid"
-            ],
-            "properties": {
-                "attempts": {
-                    "type": "integer",
-                    "example": 0
-                },
-                "completed_at": {
-                    "type": "string"
-                },
-                "exercise_uuid": {
-                    "type": "string"
-                },
-                "last_accessed_at": {
-                    "type": "string"
-                },
-                "started_at": {
-                    "type": "string"
-                },
-                "submission": {
-                    "type": "object"
-                },
-                "user_uuid": {
                     "type": "string"
                 },
                 "uuid": {

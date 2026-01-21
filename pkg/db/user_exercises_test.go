@@ -120,6 +120,7 @@ func TestUpdateUserExercise(t *testing.T) {
 		UserUuid:     userUuid,
 		ExerciseUuid: exerciseUuid,
 		Submission:   &updatedSubmission,
+		Type:         db.ExerciseTypeQuiz,
 	}
 
 	updatedUserExercise, err := testQueries.UpdateUserExerciseSubmission(context.Background(), updateParams)

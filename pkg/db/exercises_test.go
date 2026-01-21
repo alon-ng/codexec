@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"codim/pkg/db"
+	"codim/pkg/fs"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,20 +12,89 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// createCodeData creates a Directory structure for code exercises
+func createCodeData(fileName string, fileContent string) *json.RawMessage {
+	dir := fs.Directory{
+		Name:        "root",
+		Directories: []fs.Directory{},
+		Files: []fs.File{
+			{
+				Name:    fileName,
+				Ext:     getFileExtension(fileName),
+				Content: fileContent,
+			},
+		},
+	}
+	data, _ := json.Marshal(dir)
+	result := json.RawMessage(data)
+	return &result
+}
+
+// createQuizData creates an empty quiz_data structure
+func createQuizData() *json.RawMessage {
+	data := json.RawMessage(`{}`)
+	return &data
+}
+
+// createTranslationCodeData creates code_data for exercise translations
+func createTranslationCodeData(text string) *json.RawMessage {
+	data := map[string]interface{}{
+		"text": text,
+	}
+	result, _ := json.Marshal(data)
+	raw := json.RawMessage(result)
+	return &raw
+}
+
+// createTranslationQuizData creates quiz_data for exercise translations
+func createTranslationQuizData(questions []map[string]interface{}) *json.RawMessage {
+	data := map[string]interface{}{
+		"questions": questions,
+	}
+	result, _ := json.Marshal(data)
+	raw := json.RawMessage(result)
+	return &raw
+}
+
+func getFileExtension(fileName string) string {
+	if len(fileName) > 3 && fileName[len(fileName)-3:] == ".js" {
+		return "js"
+	}
+	if len(fileName) > 3 && fileName[len(fileName)-3:] == ".py" {
+		return "py"
+	}
+	return ""
+}
+
 func createRandomExercise(t *testing.T, lesson *db.LessonWithTranslation) db.ExerciseWithTranslation {
+	return createRandomExerciseWithType(t, lesson, db.ExerciseTypeQuiz)
+}
+
+func createRandomExerciseWithType(t *testing.T, lesson *db.LessonWithTranslation, exerciseType db.ExerciseType) db.ExerciseWithTranslation {
 	if lesson == nil {
 		l := createRandomLesson(t, nil)
 		lesson = &l
 	}
 
 	rnd := getRandomInt()
-	testData := json.RawMessage(fmt.Sprintf(`{"answer": "Test Answer", "question": "Test Question %d"}`, rnd))
+	var codeData *json.RawMessage
+	var quizData *json.RawMessage
+
+	if exerciseType == db.ExerciseTypeCode {
+		codeData = createCodeData("main.py", "print('Hello World')")
+		quizData = nil
+	} else {
+		codeData = nil
+		quizData = createQuizData()
+	}
+
 	params := db.CreateExerciseParams{
 		LessonUuid: lesson.Uuid,
 		OrderIndex: 1,
 		Reward:     10,
-		Type:       db.ExerciseTypeQuiz,
-		Data:       testData,
+		Type:       exerciseType,
+		CodeData:   codeData,
+		QuizData:   quizData,
 	}
 
 	exercise, err := testQueries.CreateExercise(context.Background(), params)
@@ -35,18 +105,37 @@ func createRandomExercise(t *testing.T, lesson *db.LessonWithTranslation) db.Exe
 	require.Equal(t, params.OrderIndex, exercise.OrderIndex)
 	require.Equal(t, params.Reward, exercise.Reward)
 	require.Equal(t, params.Type, exercise.Type)
-	require.Equal(t, params.Data, exercise.Data)
+	require.Equal(t, params.CodeData, exercise.CodeData)
+	require.Equal(t, params.QuizData, exercise.QuizData)
 
 	require.NotZero(t, exercise.Uuid)
 	require.NotZero(t, exercise.CreatedAt)
 	require.NotZero(t, exercise.ModifiedAt)
 	require.Nil(t, exercise.DeletedAt)
 
+	var translationCodeData *json.RawMessage
+	var translationQuizData *json.RawMessage
+
+	if exerciseType == db.ExerciseTypeCode {
+		translationCodeData = createTranslationCodeData(fmt.Sprintf("Complete the exercise: Test Description %d", rnd))
+		translationQuizData = nil
+	} else {
+		translationCodeData = nil
+		translationQuizData = createTranslationQuizData([]map[string]interface{}{
+			{
+				"answers":  []string{"Answer 1", "Answer 2", "Answer 3"},
+				"question": fmt.Sprintf("Test Question %d", rnd),
+			},
+		})
+	}
+
 	translationParams := db.CreateExerciseTranslationParams{
 		ExerciseUuid: exercise.Uuid,
 		Language:     "en",
 		Name:         fmt.Sprintf("Test Exercise %d", rnd),
 		Description:  fmt.Sprintf("Test Description %d", rnd),
+		CodeData:     translationCodeData,
+		QuizData:     translationQuizData,
 	}
 
 	exerciseTranslation, err := testQueries.CreateExerciseTranslation(context.Background(), translationParams)
@@ -57,6 +146,8 @@ func createRandomExercise(t *testing.T, lesson *db.LessonWithTranslation) db.Exe
 	require.Equal(t, translationParams.Language, exerciseTranslation.Language)
 	require.Equal(t, translationParams.Name, exerciseTranslation.Name)
 	require.Equal(t, translationParams.Description, exerciseTranslation.Description)
+	assertJSONEqual(t, translationParams.CodeData, exerciseTranslation.CodeData, "CodeData")
+	assertJSONEqual(t, translationParams.QuizData, exerciseTranslation.QuizData, "QuizData")
 
 	return db.ExerciseWithTranslation{
 		Exercise:    exercise,
@@ -74,7 +165,6 @@ func assertExerciseWithTranslationEqual(t *testing.T, expectedExercise db.Exerci
 		OrderIndex:   gotExercise.OrderIndex,
 		Reward:       gotExercise.Reward,
 		Type:         gotExercise.Type,
-		Data:         gotExercise.Data,
 		ExerciseUuid: gotExercise.Translation.ExerciseUuid,
 		Language:     gotExercise.Translation.Language,
 		Name:         gotExercise.Translation.Name,
@@ -93,7 +183,6 @@ func assertExerciseListEqual(t *testing.T, expectedExercise db.ExerciseWithTrans
 		OrderIndex:   gotExercise.OrderIndex,
 		Reward:       gotExercise.Reward,
 		Type:         gotExercise.Type,
-		Data:         gotExercise.Data,
 		ExerciseUuid: gotExercise.ExerciseUuid,
 		Language:     gotExercise.Language,
 		Name:         gotExercise.Name,
@@ -110,7 +199,6 @@ func assertExerciseEqual(t *testing.T, expectedExercise db.ExerciseWithTranslati
 	require.Equal(t, expectedExercise.OrderIndex, gotExercise.OrderIndex)
 	require.Equal(t, expectedExercise.Reward, gotExercise.Reward)
 	require.Equal(t, expectedExercise.Type, gotExercise.Type)
-	require.Equal(t, expectedExercise.Data, gotExercise.Data)
 	require.Equal(t, expectedExercise.Translation.Name, gotExercise.Name)
 	require.Equal(t, expectedExercise.Translation.Description, gotExercise.Description)
 	require.Equal(t, expectedExercise.Translation.Language, gotExercise.Language)
@@ -143,7 +231,6 @@ func TestUpdateExercise(t *testing.T) {
 	exercise := createRandomExercise(t, &lesson)
 
 	rnd := getRandomInt()
-	updatedData := json.RawMessage(`{"answer": "Updated Answer", "question": "Updated Question"}`)
 	orderIndex := int16(2)
 	reward := int16(20)
 	type_ := db.ExerciseTypeQuiz
@@ -152,7 +239,6 @@ func TestUpdateExercise(t *testing.T) {
 		OrderIndex: &orderIndex,
 		Reward:     &reward,
 		Type:       &type_,
-		Data:       &updatedData,
 	}
 
 	updatedExercise, err := testQueries.UpdateExercise(context.Background(), updateParams)
@@ -162,7 +248,6 @@ func TestUpdateExercise(t *testing.T) {
 	require.Equal(t, *updateParams.OrderIndex, updatedExercise.OrderIndex)
 	require.Equal(t, *updateParams.Reward, updatedExercise.Reward)
 	require.Equal(t, *updateParams.Type, updatedExercise.Type)
-	require.Equal(t, *updateParams.Data, updatedExercise.Data)
 
 	require.NotZero(t, updatedExercise.ModifiedAt)
 	require.Nil(t, updatedExercise.DeletedAt)
@@ -170,11 +255,18 @@ func TestUpdateExercise(t *testing.T) {
 	language := "en"
 	name := fmt.Sprintf("Updated Test Exercise %d", rnd)
 	description := fmt.Sprintf("Updated Test Description %d", rnd)
+	updatedQuizData := createTranslationQuizData([]map[string]interface{}{
+		{
+			"question": "Updated Question",
+			"answers":  []string{"Updated Answer 1", "Updated Answer 2"},
+		},
+	})
 	updateTranslationParams := db.UpdateExerciseTranslationParams{
 		Uuid:        exercise.Uuid,
 		Language:    language,
 		Name:        &name,
 		Description: &description,
+		QuizData:    updatedQuizData,
 	}
 	updateTranslation, err := testQueries.UpdateExerciseTranslation(context.Background(), updateTranslationParams)
 	require.NoError(t, err)
@@ -327,6 +419,8 @@ func TestCreateExerciseTranslationWithConflict(t *testing.T) {
 		Language:     "en",
 		Name:         "Test Exercise",
 		Description:  "Test Description",
+		CodeData:     nil,
+		QuizData:     nil,
 	})
 	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "uq_exercise_translations_exercise_language"))
 }

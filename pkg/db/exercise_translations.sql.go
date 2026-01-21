@@ -18,18 +18,22 @@ INSERT INTO "exercise_translations" (
   "exercise_uuid",
   "language",
   "name",
-  "description"
+  "description",
+  "code_data",
+  "quiz_data"
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5, $6
 )
-RETURNING uuid, exercise_uuid, language, name, description
+RETURNING uuid, exercise_uuid, language, name, description, code_data, quiz_data
 `
 
 type CreateExerciseTranslationParams struct {
-	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
-	Language     string    `json:"language"`
-	Name         string    `json:"name"`
-	Description  string    `json:"description"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Language     string           `json:"language"`
+	Name         string           `json:"name"`
+	Description  string           `json:"description"`
+	CodeData     *json.RawMessage `json:"code_data"`
+	QuizData     *json.RawMessage `json:"quiz_data"`
 }
 
 func (q *Queries) CreateExerciseTranslation(ctx context.Context, arg CreateExerciseTranslationParams) (ExerciseTranslation, error) {
@@ -38,6 +42,8 @@ func (q *Queries) CreateExerciseTranslation(ctx context.Context, arg CreateExerc
 		arg.Language,
 		arg.Name,
 		arg.Description,
+		arg.CodeData,
+		arg.QuizData,
 	)
 	var i ExerciseTranslation
 	err := row.Scan(
@@ -46,6 +52,8 @@ func (q *Queries) CreateExerciseTranslation(ctx context.Context, arg CreateExerc
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.CodeData,
+		&i.QuizData,
 	)
 	return i, err
 }
@@ -63,7 +71,7 @@ func (q *Queries) DeleteExerciseTranslation(ctx context.Context, argUuid uuid.UU
 }
 
 const getExerciseTranslation = `-- name: GetExerciseTranslation :one
-SELECT exercise_translations.uuid, exercise_uuid, language, name, description, exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, data FROM "exercise_translations"
+SELECT exercise_translations.uuid, exercise_uuid, language, name, description, exercise_translations.code_data, exercise_translations.quiz_data, exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, exercises.code_data, exercises.quiz_data FROM "exercise_translations"
 JOIN "exercises" ON "exercise_translations"."exercise_uuid" = "exercises"."uuid"
 WHERE "exercise_translations"."uuid" = $1
 AND "exercises"."deleted_at" IS NULL
@@ -71,20 +79,23 @@ LIMIT 1
 `
 
 type GetExerciseTranslationRow struct {
-	Uuid         uuid.UUID       `json:"uuid"`
-	ExerciseUuid uuid.UUID       `json:"exercise_uuid"`
-	Language     string          `json:"language"`
-	Name         string          `json:"name"`
-	Description  string          `json:"description"`
-	Uuid_2       uuid.UUID       `json:"uuid_2"`
-	CreatedAt    time.Time       `json:"created_at"`
-	ModifiedAt   time.Time       `json:"modified_at"`
-	DeletedAt    *time.Time      `json:"deleted_at"`
-	LessonUuid   uuid.UUID       `json:"lesson_uuid"`
-	OrderIndex   int16           `json:"order_index"`
-	Reward       int16           `json:"reward"`
-	Type         ExerciseType    `json:"type"`
-	Data         json.RawMessage `json:"data"`
+	Uuid         uuid.UUID        `json:"uuid"`
+	ExerciseUuid uuid.UUID        `json:"exercise_uuid"`
+	Language     string           `json:"language"`
+	Name         string           `json:"name"`
+	Description  string           `json:"description"`
+	CodeData     *json.RawMessage `json:"code_data"`
+	QuizData     *json.RawMessage `json:"quiz_data"`
+	Uuid_2       uuid.UUID        `json:"uuid_2"`
+	CreatedAt    time.Time        `json:"created_at"`
+	ModifiedAt   time.Time        `json:"modified_at"`
+	DeletedAt    *time.Time       `json:"deleted_at"`
+	LessonUuid   uuid.UUID        `json:"lesson_uuid"`
+	OrderIndex   int16            `json:"order_index"`
+	Reward       int16            `json:"reward"`
+	Type         ExerciseType     `json:"type"`
+	CodeData_2   *json.RawMessage `json:"code_data_2"`
+	QuizData_2   *json.RawMessage `json:"quiz_data_2"`
 }
 
 func (q *Queries) GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID) (GetExerciseTranslationRow, error) {
@@ -96,6 +107,8 @@ func (q *Queries) GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID)
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.CodeData,
+		&i.QuizData,
 		&i.Uuid_2,
 		&i.CreatedAt,
 		&i.ModifiedAt,
@@ -104,7 +117,8 @@ func (q *Queries) GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID)
 		&i.OrderIndex,
 		&i.Reward,
 		&i.Type,
-		&i.Data,
+		&i.CodeData_2,
+		&i.QuizData_2,
 	)
 	return i, err
 }
@@ -112,18 +126,22 @@ func (q *Queries) GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID)
 const updateExerciseTranslation = `-- name: UpdateExerciseTranslation :one
 UPDATE "exercise_translations"
 SET "name" = COALESCE($3, "name"),
-    "description" = COALESCE($4, "description")
+    "description" = COALESCE($4, "description"),
+    "code_data" = COALESCE($5, "exercise_translations"."code_data"),
+    "quiz_data" = COALESCE($6, "exercise_translations"."quiz_data")
 FROM "exercises"
 WHERE "exercise_translations"."exercise_uuid" = "exercises"."uuid" AND "exercise_translations"."language" = $2
 AND "exercises"."uuid" = $1
-RETURNING exercise_translations.uuid, exercise_translations.exercise_uuid, exercise_translations.language, exercise_translations.name, exercise_translations.description
+RETURNING exercise_translations.uuid, exercise_translations.exercise_uuid, exercise_translations.language, exercise_translations.name, exercise_translations.description, exercise_translations.code_data, exercise_translations.quiz_data
 `
 
 type UpdateExerciseTranslationParams struct {
-	Uuid        uuid.UUID `json:"uuid"`
-	Language    string    `json:"language"`
-	Name        *string   `json:"name"`
-	Description *string   `json:"description"`
+	Uuid        uuid.UUID        `json:"uuid"`
+	Language    string           `json:"language"`
+	Name        *string          `json:"name"`
+	Description *string          `json:"description"`
+	CodeData    *json.RawMessage `json:"code_data"`
+	QuizData    *json.RawMessage `json:"quiz_data"`
 }
 
 func (q *Queries) UpdateExerciseTranslation(ctx context.Context, arg UpdateExerciseTranslationParams) (ExerciseTranslation, error) {
@@ -132,6 +150,8 @@ func (q *Queries) UpdateExerciseTranslation(ctx context.Context, arg UpdateExerc
 		arg.Language,
 		arg.Name,
 		arg.Description,
+		arg.CodeData,
+		arg.QuizData,
 	)
 	var i ExerciseTranslation
 	err := row.Scan(
@@ -140,6 +160,8 @@ func (q *Queries) UpdateExerciseTranslation(ctx context.Context, arg UpdateExerc
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.CodeData,
+		&i.QuizData,
 	)
 	return i, err
 }

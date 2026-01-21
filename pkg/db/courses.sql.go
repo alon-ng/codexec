@@ -311,11 +311,14 @@ SELECT  courses.uuid                        AS "course_uuid",
         exercises.order_index               AS "exercise_order_index", 
         exercises.reward                    AS "exercise_reward", 
         exercises.type                      AS "exercise_type",
-        exercises.data                      AS "exercise_data",
+        exercises.code_data                 AS "exercise_code_data",
+        exercises.quiz_data                 AS "exercise_quiz_data",
         exercise_translations.uuid          AS "exercise_translation_uuid",
         exercise_translations.language      AS "exercise_translation_language",
         exercise_translations.name          AS "exercise_name", 
-        exercise_translations.description   AS "exercise_description"
+        exercise_translations.description   AS "exercise_description",
+        exercise_translations.code_data     AS "exercise_translation_code_data",
+        exercise_translations.quiz_data     AS "exercise_translation_quiz_data"
 FROM "courses"
 JOIN "course_translations"        ON "courses"."uuid" = "course_translations"."course_uuid" AND "course_translations"."language" = $2
 LEFT JOIN "lessons"               ON "courses"."uuid" = "lessons"."course_uuid"   AND "lessons"."deleted_at" IS NULL
@@ -365,11 +368,14 @@ type getCourseFullRow struct {
 	ExerciseOrderIndex          *int16           `json:"exercise_order_index"`
 	ExerciseReward              *int16           `json:"exercise_reward"`
 	ExerciseType                *ExerciseType    `json:"exercise_type"`
-	ExerciseData                *json.RawMessage `json:"exercise_data"`
+	ExerciseCodeData            *json.RawMessage `json:"exercise_code_data"`
+	ExerciseQuizData            *json.RawMessage `json:"exercise_quiz_data"`
 	ExerciseTranslationUuid     *uuid.UUID       `json:"exercise_translation_uuid"`
 	ExerciseTranslationLanguage *string          `json:"exercise_translation_language"`
 	ExerciseName                *string          `json:"exercise_name"`
 	ExerciseDescription         *string          `json:"exercise_description"`
+	ExerciseTranslationCodeData *json.RawMessage `json:"exercise_translation_code_data"`
+	ExerciseTranslationQuizData *json.RawMessage `json:"exercise_translation_quiz_data"`
 }
 
 func (q *Queries) getCourseFull(ctx context.Context, arg getCourseFullParams) ([]getCourseFullRow, error) {
@@ -415,11 +421,14 @@ func (q *Queries) getCourseFull(ctx context.Context, arg getCourseFullParams) ([
 			&i.ExerciseOrderIndex,
 			&i.ExerciseReward,
 			&i.ExerciseType,
-			&i.ExerciseData,
+			&i.ExerciseCodeData,
+			&i.ExerciseQuizData,
 			&i.ExerciseTranslationUuid,
 			&i.ExerciseTranslationLanguage,
 			&i.ExerciseName,
 			&i.ExerciseDescription,
+			&i.ExerciseTranslationCodeData,
+			&i.ExerciseTranslationQuizData,
 		); err != nil {
 			return nil, err
 		}

@@ -277,9 +277,6 @@ definitions:
     type: object
   exercises.CreateExerciseRequest:
     properties:
-      data:
-        additionalProperties: true
-        type: object
       description:
         example: Print Hello World
         type: string
@@ -302,7 +299,6 @@ definitions:
         - $ref: '#/definitions/db.ExerciseType'
         example: quiz
     required:
-    - data
     - description
     - language
     - lesson_uuid
@@ -311,8 +307,30 @@ definitions:
     - reward
     - type
     type: object
+  exercises.ExerciseCodeData:
+    properties:
+      directories:
+        items:
+          $ref: '#/definitions/fs.Directory'
+        type: array
+      files:
+        items:
+          $ref: '#/definitions/fs.File'
+        type: array
+      name:
+        type: string
+    required:
+    - directories
+    - files
+    - name
+    type: object
+  exercises.ExerciseQuizData:
+    additionalProperties: true
+    type: object
   exercises.ExerciseTranslation:
     properties:
+      code_data:
+        $ref: '#/definitions/exercises.ExerciseTranslationCodeData'
       description:
         example: Print Hello World
         type: string
@@ -324,6 +342,8 @@ definitions:
       name:
         example: Hello World
         type: string
+      quiz_data:
+        $ref: '#/definitions/exercises.ExerciseTranslationQuizData'
       uuid:
         type: string
     required:
@@ -333,12 +353,45 @@ definitions:
     - name
     - uuid
     type: object
+  exercises.ExerciseTranslationCodeData:
+    properties:
+      instructions:
+        example: <p>Hello! Start writing your exercise instructions here...</p>
+        type: string
+    required:
+    - instructions
+    type: object
+  exercises.ExerciseTranslationQuizData:
+    properties:
+      questions:
+        items:
+          properties:
+            answers:
+              example:
+              - '[Paris'
+              - ' London'
+              - ' Berlin'
+              - ' Madrid]'
+              items:
+                type: string
+              type: array
+            question:
+              example: What is the capital of France?
+              type: string
+          required:
+          - answers
+          - question
+          type: object
+        type: array
+    required:
+    - questions
+    type: object
   exercises.ExerciseWithTranslation:
     properties:
+      code_data:
+        $ref: '#/definitions/exercises.ExerciseCodeData'
       created_at:
         type: string
-      data:
-        type: object
       deleted_at:
         type: string
       lesson_uuid:
@@ -348,6 +401,8 @@ definitions:
       order_index:
         example: 1
         type: integer
+      quiz_data:
+        $ref: '#/definitions/exercises.ExerciseQuizData'
       reward:
         example: 10
         type: integer
@@ -361,7 +416,6 @@ definitions:
         type: string
     required:
     - created_at
-    - data
     - lesson_uuid
     - modified_at
     - order_index
@@ -379,9 +433,6 @@ definitions:
     type: object
   exercises.UpdateExerciseRequest:
     properties:
-      data:
-        additionalProperties: true
-        type: object
       description:
         example: Print Hello World
         type: string
@@ -409,6 +460,36 @@ definitions:
     required:
     - language
     - uuid
+    type: object
+  fs.Directory:
+    properties:
+      directories:
+        items:
+          $ref: '#/definitions/fs.Directory'
+        type: array
+      files:
+        items:
+          $ref: '#/definitions/fs.File'
+        type: array
+      name:
+        type: string
+    required:
+    - directories
+    - files
+    - name
+    type: object
+  fs.File:
+    properties:
+      content:
+        type: string
+      ext:
+        type: string
+      name:
+        type: string
+    required:
+    - content
+    - ext
+    - name
     type: object
   lessons.AddLessonTranslationRequest:
     properties:
@@ -579,6 +660,33 @@ definitions:
     - submission
     - type
     type: object
+  me.UserExercise:
+    properties:
+      attempts:
+        example: 0
+        type: integer
+      completed_at:
+        type: string
+      exercise_uuid:
+        type: string
+      last_accessed_at:
+        type: string
+      started_at:
+        type: string
+      submission:
+        type: object
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    required:
+    - attempts
+    - exercise_uuid
+    - started_at
+    - submission
+    - user_uuid
+    - uuid
+    type: object
   progress.UserCourseFull:
     properties:
       completed_at:
@@ -655,32 +763,6 @@ definitions:
     - total_exercises
     - translation
     - user_course_started_at
-    - uuid
-    type: object
-  progress.UserExercise:
-    properties:
-      attempts:
-        example: 0
-        type: integer
-      completed_at:
-        type: string
-      exercise_uuid:
-        type: string
-      last_accessed_at:
-        type: string
-      started_at:
-        type: string
-      submission:
-        type: object
-      user_uuid:
-        type: string
-      uuid:
-        type: string
-    required:
-    - attempts
-    - exercise_uuid
-    - started_at
-    - user_uuid
     - uuid
     type: object
   progress.UserExerciseStatus:
@@ -1880,7 +1962,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/progress.UserExercise'
+            $ref: '#/definitions/me.UserExercise'
         "400":
           description: Bad Request
           schema:

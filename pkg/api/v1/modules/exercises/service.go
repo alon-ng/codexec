@@ -22,7 +22,22 @@ func NewService(q *db.Queries, p *pgxpool.Pool) *Service {
 }
 
 // Conversion functions
-func toExercise(d db.Exercise) Exercise {
+func ToExercise(d db.Exercise) (Exercise, error) {
+	var codeData *ExerciseCodeData
+	var quizData *ExerciseQuizData
+	if d.CodeData != nil {
+		err := json.Unmarshal(*d.CodeData, &codeData)
+		if err != nil {
+			return Exercise{}, err
+		}
+	}
+	if d.QuizData != nil {
+		err := json.Unmarshal(*d.QuizData, &quizData)
+		if err != nil {
+			return Exercise{}, err
+		}
+	}
+
 	return Exercise{
 		Uuid:       d.Uuid,
 		CreatedAt:  d.CreatedAt,
@@ -32,33 +47,57 @@ func toExercise(d db.Exercise) Exercise {
 		OrderIndex: d.OrderIndex,
 		Reward:     d.Reward,
 		Type:       d.Type,
-		Data:       d.Data,
-	}
+		CodeData:   codeData,
+		QuizData:   quizData,
+	}, nil
 }
 
-func toExerciseTranslation(d db.ExerciseTranslation) ExerciseTranslation {
+func ToExerciseTranslation(d db.ExerciseTranslation) (ExerciseTranslation, error) {
+	var codeData *ExerciseTranslationCodeData
+	var quizData *ExerciseTranslationQuizData
+
+	if d.CodeData != nil {
+		err := json.Unmarshal(*d.CodeData, &codeData)
+		if err != nil {
+			return ExerciseTranslation{}, err
+		}
+	}
+	if d.QuizData != nil {
+		err := json.Unmarshal(*d.QuizData, &quizData)
+		if err != nil {
+			return ExerciseTranslation{}, err
+		}
+	}
+
 	return ExerciseTranslation{
 		Uuid:         d.Uuid,
 		ExerciseUuid: d.ExerciseUuid,
 		Language:     d.Language,
 		Name:         d.Name,
 		Description:  d.Description,
-	}
+		CodeData:     codeData,
+		QuizData:     quizData,
+	}, nil
 }
 
-func toExerciseWithTranslation(d db.ExerciseWithTranslation) ExerciseWithTranslation {
-	return ExerciseWithTranslation{
-		Exercise:    toExercise(d.Exercise),
-		Translation: toExerciseTranslation(d.Translation),
+func ToExerciseWithTranslation(d db.ExerciseWithTranslation) (ExerciseWithTranslation, error) {
+	exercise, err := ToExercise(d.Exercise)
+	if err != nil {
+		return ExerciseWithTranslation{}, err
 	}
+
+	translation, err := ToExerciseTranslation(d.Translation)
+	if err != nil {
+		return ExerciseWithTranslation{}, err
+	}
+
+	return ExerciseWithTranslation{
+		Exercise:    exercise,
+		Translation: translation,
+	}, nil
 }
 
 func (s *Service) Create(ctx context.Context, req CreateExerciseRequest) (ExerciseWithTranslation, *e.APIError) {
-	data, err := json.Marshal(req.Data)
-	if err != nil {
-		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseCreationFailed)
-	}
-
 	tx, err := s.p.Begin(ctx)
 	if err != nil {
 		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseCreationFailed)
@@ -72,7 +111,6 @@ func (s *Service) Create(ctx context.Context, req CreateExerciseRequest) (Exerci
 		OrderIndex: req.OrderIndex,
 		Reward:     req.Reward,
 		Type:       req.Type,
-		Data:       data,
 	})
 
 	if err != nil {
@@ -94,22 +132,18 @@ func (s *Service) Create(ctx context.Context, req CreateExerciseRequest) (Exerci
 		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseCreationFailed)
 	}
 
-	return toExerciseWithTranslation(db.ExerciseWithTranslation{
+	exerciseWithTranslation, err := ToExerciseWithTranslation(db.ExerciseWithTranslation{
 		Exercise:    exercise,
 		Translation: translation,
-	}), nil
+	})
+	if err != nil {
+		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseCreationFailed)
+	}
+
+	return exerciseWithTranslation, nil
 }
 
 func (s *Service) Update(ctx context.Context, req UpdateExerciseRequest) (ExerciseWithTranslation, *e.APIError) {
-	var data *json.RawMessage
-	if req.Data != nil {
-		d, err := json.Marshal(req.Data)
-		if err != nil {
-			return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseUpdateFailed)
-		}
-		data = (*json.RawMessage)(&d)
-	}
-
 	tx, err := s.p.Begin(ctx)
 	if err != nil {
 		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseUpdateFailed)
@@ -123,7 +157,6 @@ func (s *Service) Update(ctx context.Context, req UpdateExerciseRequest) (Exerci
 		OrderIndex: req.OrderIndex,
 		Reward:     req.Reward,
 		Type:       req.Type,
-		Data:       data,
 	})
 
 	if err != nil {
@@ -146,10 +179,15 @@ func (s *Service) Update(ctx context.Context, req UpdateExerciseRequest) (Exerci
 		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseUpdateFailed)
 	}
 
-	return toExerciseWithTranslation(db.ExerciseWithTranslation{
+	exerciseWithTranslation, err := ToExerciseWithTranslation(db.ExerciseWithTranslation{
 		Exercise:    exercise,
 		Translation: translation,
-	}), nil
+	})
+	if err != nil {
+		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseUpdateFailed)
+	}
+
+	return exerciseWithTranslation, nil
 }
 
 func (s *Service) Delete(ctx context.Context, id uuid.UUID) *e.APIError {
@@ -179,7 +217,11 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID, language string) (Exerc
 		}
 		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseGetFailed)
 	}
-	return toExerciseWithTranslation(exercise.ToExerciseWithTranslation()), nil
+	exerciseWithTranslation, err := ToExerciseWithTranslation(exercise.ToExerciseWithTranslation())
+	if err != nil {
+		return ExerciseWithTranslation{}, e.NewAPIError(err, ErrExerciseGetFailed)
+	}
+	return exerciseWithTranslation, nil
 }
 
 func (s *Service) List(ctx context.Context, req ListExercisesRequest) ([]ExerciseWithTranslation, *e.APIError) {
@@ -196,7 +238,11 @@ func (s *Service) List(ctx context.Context, req ListExercisesRequest) ([]Exercis
 
 	exercisesWithTranslation := make([]ExerciseWithTranslation, len(exercises))
 	for i, exercise := range exercises {
-		exercisesWithTranslation[i] = toExerciseWithTranslation(exercise.ToExerciseWithTranslation())
+		exerciseWithTranslation, err := ToExerciseWithTranslation(exercise.ToExerciseWithTranslation())
+		if err != nil {
+			return nil, e.NewAPIError(err, ErrExerciseListFailed)
+		}
+		exercisesWithTranslation[i] = exerciseWithTranslation
 	}
 
 	return exercisesWithTranslation, nil
@@ -214,5 +260,9 @@ func (s *Service) AddTranslation(ctx context.Context, req AddExerciseTranslation
 		return ExerciseTranslation{}, e.NewAPIError(err, ErrExerciseAddTranslationFailed)
 	}
 
-	return toExerciseTranslation(translation), nil
+	exerciseTranslation, err := ToExerciseTranslation(translation)
+	if err != nil {
+		return ExerciseTranslation{}, e.NewAPIError(err, ErrExerciseAddTranslationFailed)
+	}
+	return exerciseTranslation, nil
 }
