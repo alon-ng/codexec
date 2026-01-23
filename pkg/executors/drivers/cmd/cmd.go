@@ -8,8 +8,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os/exec"
-	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -117,8 +118,14 @@ func ExecuteNsjail(ctx context.Context, cmdPrefix string, cfgPath string) (model
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
-	err := cmd.Run()
+	start := time.Now()
+	var cpuTime time.Duration
+	var maxMemory int64
 	exitCode := 0
+
+	err := cmd.Run()
+	wallTime := time.Since(start)
+
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			exitCode = exitError.ExitCode()
@@ -127,62 +134,20 @@ func ExecuteNsjail(ctx context.Context, cmdPrefix string, cfgPath string) (model
 		}
 	}
 
-	stderrStr, maybeMetrics, err := seperateStderr(stderr.String())
-
-	if err != nil {
-		return models.ExecuteResponse{}, fmt.Errorf("failed to seperate stderr: %w", err)
-	}
-
-	if stderrStr != "" {
-		return models.ExecuteResponse{
-			Stdout:   stdout.String(),
-			Stderr:   stderrStr,
-			ExitCode: exitCode,
-		}, nil
-	}
-
-	time, cpu, memoryKb, err := parseMetrics(maybeMetrics)
-	if err != nil {
-		return models.ExecuteResponse{}, fmt.Errorf("failed to parse metrics: %w", err)
+	if cmd.ProcessState != nil {
+		cpuTime = cmd.ProcessState.UserTime() + cmd.ProcessState.SystemTime()
+		usage := cmd.ProcessState.SysUsage().(*syscall.Rusage)
+		maxMemory = usage.Maxrss / 1024
 	}
 
 	return models.ExecuteResponse{
 		Stdout:   stdout.String(),
-		Stderr:   stderrStr,
+		Stderr:   stderr.String(),
 		ExitCode: exitCode,
-		Time:     time,
-		CPU:      cpu,
-		Memory:   memoryKb,
+		Time:     wallTime.Seconds(),
+		CPU:      cpuTime.Seconds(),
+		Memory:   maxMemory,
 	}, nil
-}
-
-func parseMetrics(metricsLine string) (float64, float64, int64, error) {
-	metrics := strings.Split(metricsLine, ",")
-
-	if len(metrics) != 4 {
-		return 0, 0, 0, fmt.Errorf("failed to parse metrics, expected 4 values, got %d", len(metrics))
-	}
-
-	time, err := strconv.ParseFloat(metrics[0], 64)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to parse time: %w", err)
-	}
-	usrCpu, err := strconv.ParseFloat(metrics[1], 64)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to parse user cpu: %w", err)
-	}
-	sysCpu, err := strconv.ParseFloat(metrics[2], 64)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to parse system cpu: %w", err)
-	}
-	memoryKb, err := strconv.ParseInt(metrics[3], 10, 64)
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to parse memory: %w", err)
-	}
-
-	cpu := (usrCpu + sysCpu) * time
-
-	return time, cpu, memoryKb, nil
 }
 
 func WriteFile(ctx context.Context, cmdPrefix string, filePath string, content string) error {
@@ -192,19 +157,6 @@ func WriteFile(ctx context.Context, cmdPrefix string, filePath string, content s
 		return fmt.Errorf("failed to write file %s: %w", filePath, err)
 	}
 	return nil
-}
-
-func seperateStderr(stderr string) (string, string, error) {
-	lines := strings.Split(stderr, "\n")
-
-	if len(lines) < 2 {
-		return "", "", fmt.Errorf("failed to parse stderr, expected at least 2 lines, got %d", len(lines))
-	}
-
-	// Everything but the 2 last lines
-	errors := lines[:len(lines)-2]
-
-	return strings.Join(errors, "\n"), lines[len(lines)-2], nil
 }
 
 func executeCommand(ctx context.Context, cmdPrefix string, cmdArgs ...string) *exec.Cmd {

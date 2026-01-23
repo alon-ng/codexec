@@ -56,11 +56,8 @@ rlimit_nproc: 16
 time_limit: 1
 
 exec_bin {
-  path: "/usr/bin/time"
-  arg: "-f"
-  arg: "%e,%U,%S,%M"
-  arg: "/usr/bin/node"
-  arg: "/work/{{ENTRY_POINT}}"
+  path: "/usr/bin/node"
+  arg: 	"/work/{{ENTRY_POINT}}"
 }
 `
 )

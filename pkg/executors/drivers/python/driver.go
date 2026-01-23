@@ -55,10 +55,7 @@ rlimit_nproc: 16
 time_limit: 1
 
 exec_bin {
-  path: "/usr/bin/time"
-  arg: "-f"
-  arg: "%e,%U,%S,%M"
-  arg: "/usr/bin/python3"
+  path: "/usr/bin/python3"
   arg: "-I"
   arg: "/work/{{ENTRY_POINT}}"
 }
