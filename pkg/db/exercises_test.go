@@ -12,20 +12,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// createCodeData creates a Directory structure for code exercises
+// createCodeData creates an Entry structure for code exercises
 func createCodeData(fileName string, fileContent string) *json.RawMessage {
-	dir := fs.Directory{
-		Name:        "root",
-		Directories: []fs.Directory{},
-		Files: []fs.File{
+	entry := fs.Entry{
+		Name: "root",
+		Children: []fs.Entry{
 			{
 				Name:    fileName,
-				Ext:     getFileExtension(fileName),
 				Content: fileContent,
 			},
 		},
 	}
-	data, _ := json.Marshal(dir)
+	data, _ := json.Marshal(entry)
 	result := json.RawMessage(data)
 	return &result
 }

@@ -23,18 +23,18 @@ export interface ExerciseEditorProps {
 }
 
 function getCodeValue(submission: ExercisesExerciseCodeData | undefined): string {
-  if (!submission?.files?.[0]) {
+  if (!submission?.content) {
     return "";
   }
-  return submission.files[0].content;
+
+  return submission.content;
 }
 
 function getSubmissionFromCode(code: string, language: string): ExercisesExerciseCodeData {
   const ext = LANGUAGE_MAP[language] || "txt";
   return {
-    name: "root",
-    directories: [],
-    files: [{ name: "main", ext, content: code }],
+    name: `main.${ext}`,
+    content: code,
   };
 }
 
@@ -50,7 +50,7 @@ export default function ExerciseCode({
 
   const { submission, initialCode } = useMemo(() => {
     const userSubmission = userExercise.submission as unknown as ExercisesExerciseCodeData;
-    const hasUserSubmission = Boolean(userSubmission?.name);
+    const hasUserSubmission = Boolean(userSubmission?.name && userSubmission?.content);
 
     if (hasUserSubmission) {
       return {

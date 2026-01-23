@@ -137,3 +137,6 @@ export * from "./usersCreateUserRequest";
 export * from "./usersIDRequest";
 export * from "./usersUpdateUserRequest";
 export * from "./usersUser";
+export * from "./fsEntry";
+export * from "./meRunUserExerciseCodeSubmissionRequest";
+export * from "./progressUserExerciseSubmissionCode";

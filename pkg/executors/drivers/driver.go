@@ -13,7 +13,7 @@ import (
 )
 
 type Driver interface {
-	Execute(ctx context.Context, jobID uuid.UUID, src fs.Directory, entryPoint string) (models.ExecuteResponse, error)
+	Execute(ctx context.Context, jobID uuid.UUID, src fs.Entry, entryPoint string) (models.ExecuteResponse, error)
 	SetCmdPrefix(prefix string) error
 	CmdPrefix() string
 }

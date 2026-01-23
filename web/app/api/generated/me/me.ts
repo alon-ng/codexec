@@ -24,6 +24,7 @@ import type {
 import type {
   ErrorsErrorResponse,
   GetMeCoursesParams,
+  MeRunUserExerciseCodeSubmissionRequest,
   MeSaveUserExerciseSubmissionRequest,
   MeUserExercise,
   ProgressUserCourseFull,
@@ -749,6 +750,106 @@ export const usePutMeExercisesExerciseUuid = <
   TContext
 > => {
   const mutationOptions = getPutMeExercisesExerciseUuidMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * Run the user exercise code submission
+ * @summary Run the user exercise code submission
+ */
+export const postMeExercisesExerciseUuidRunCode = (
+  exerciseUuid: string,
+  meRunUserExerciseCodeSubmissionRequest: MeRunUserExerciseCodeSubmissionRequest,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<string>(
+    {
+      url: `/me/exercises/${exerciseUuid}/run/code`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: meRunUserExerciseCodeSubmissionRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostMeExercisesExerciseUuidRunCodeMutationOptions = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postMeExercisesExerciseUuidRunCode>>,
+    TError,
+    { exerciseUuid: string; data: MeRunUserExerciseCodeSubmissionRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postMeExercisesExerciseUuidRunCode>>,
+  TError,
+  { exerciseUuid: string; data: MeRunUserExerciseCodeSubmissionRequest },
+  TContext
+> => {
+  const mutationKey = ["postMeExercisesExerciseUuidRunCode"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postMeExercisesExerciseUuidRunCode>>,
+    { exerciseUuid: string; data: MeRunUserExerciseCodeSubmissionRequest }
+  > = (props) => {
+    const { exerciseUuid, data } = props ?? {};
+
+    return postMeExercisesExerciseUuidRunCode(
+      exerciseUuid,
+      data,
+      requestOptions,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostMeExercisesExerciseUuidRunCodeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postMeExercisesExerciseUuidRunCode>>
+>;
+export type PostMeExercisesExerciseUuidRunCodeMutationBody =
+  MeRunUserExerciseCodeSubmissionRequest;
+export type PostMeExercisesExerciseUuidRunCodeMutationError =
+  ErrorsErrorResponse;
+
+/**
+ * @summary Run the user exercise code submission
+ */
+export const usePostMeExercisesExerciseUuidRunCode = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postMeExercisesExerciseUuidRunCode>>,
+      TError,
+      { exerciseUuid: string; data: MeRunUserExerciseCodeSubmissionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postMeExercisesExerciseUuidRunCode>>,
+  TError,
+  { exerciseUuid: string; data: MeRunUserExerciseCodeSubmissionRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostMeExercisesExerciseUuidRunCodeMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

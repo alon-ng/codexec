@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string, jobID uuid.UUID, src fs.Directory, entryPoint string) (models.ExecuteResponse, error) {
+func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string, jobID uuid.UUID, src fs.Entry, entryPoint string) (models.ExecuteResponse, error) {
 	jobIDStr := jobID.String()
 	jobPath := fmt.Sprintf("/jobs/%s", jobIDStr)
 
@@ -67,29 +67,37 @@ func CreateJobDirectory(ctx context.Context, cmdPrefix string, basePath string) 
 	return nil
 }
 
-func WriteFiles(ctx context.Context, cmdPrefix string, basePath string, dir fs.Directory) error {
-	return WriteDirectory(ctx, cmdPrefix, basePath, dir)
+func WriteFiles(ctx context.Context, cmdPrefix string, basePath string, entry fs.Entry) error {
+	return WriteEntry(ctx, cmdPrefix, basePath, entry)
 }
 
-func WriteDirectory(ctx context.Context, cmdPrefix string, basePath string, dir fs.Directory) error {
-	// Write files in current directory
-	for _, file := range dir.Files {
-		filePath := fmt.Sprintf("%s/%s.%s", basePath, file.Name, file.Ext)
-		if err := WriteFile(ctx, cmdPrefix, filePath, file.Content); err != nil {
-			return err
+func WriteEntry(ctx context.Context, cmdPrefix string, basePath string, entry fs.Entry) error {
+	for _, child := range entry.Children {
+		childPath := fmt.Sprintf("%s/%s", basePath, child.Name)
+
+		if len(child.Children) > 0 {
+			cmd := executeCommand(ctx, cmdPrefix, "mkdir", "-p", childPath)
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("failed to create subdirectory %s: %w", childPath, err)
+			}
+			if err := WriteEntry(ctx, cmdPrefix, childPath, child); err != nil {
+				return err
+			}
+		} else if child.Content != "" {
+			if err := WriteFile(ctx, cmdPrefix, childPath, child.Content); err != nil {
+				return err
+			}
+		} else {
+			cmd := executeCommand(ctx, cmdPrefix, "mkdir", "-p", childPath)
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("failed to create empty directory %s: %w", childPath, err)
+			}
 		}
 	}
 
-	// Recursively write subdirectories
-	for _, subdir := range dir.Directories {
-		subdirPath := fmt.Sprintf("%s/%s", basePath, subdir.Name)
-		// Create subdirectory
-		cmd := executeCommand(ctx, cmdPrefix, "mkdir", "-p", subdirPath)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to create subdirectory %s: %w", subdirPath, err)
-		}
-		// Recursively write subdirectory contents
-		if err := WriteDirectory(ctx, cmdPrefix, subdirPath, subdir); err != nil {
+	if entry.Content != "" {
+		filePath := fmt.Sprintf("%s/%s", basePath, entry.Name)
+		if err := WriteFile(ctx, cmdPrefix, filePath, entry.Content); err != nil {
 			return err
 		}
 	}

@@ -123,8 +123,8 @@ type Client struct {
 }
 
 type SubmissionMessage struct {
-	ExerciseUuid uuid.UUID    `json:"exercise_uuid" validate:"required"`
-	Submission   fs.Directory `json:"submission" validate:"required"`
+	ExerciseUuid uuid.UUID `json:"exercise_uuid" validate:"required"`
+	Submission   fs.Entry  `json:"submission" validate:"required"`
 }
 
 // readPump pumps messages from the websocket connection to the hub.

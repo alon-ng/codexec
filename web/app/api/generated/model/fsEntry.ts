@@ -5,9 +5,8 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import type { FsEntry } from "./fsEntry";
 
-export interface ExercisesExerciseCodeData {
+export interface FsEntry {
   children?: FsEntry[];
   content?: string;
   name: string;

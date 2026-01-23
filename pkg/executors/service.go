@@ -13,10 +13,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type Checker struct {
+}
+
 type ExecutionRequest struct {
-	JobID      uuid.UUID    `json:"job_id"`
-	Source     fs.Directory `json:"src"`
-	EntryPoint string       `json:"entry_point"`
+	JobID      uuid.UUID `json:"job_id"`
+	Source     fs.Entry  `json:"src"`
+	EntryPoint string    `json:"entry_point"`
+	Checkers   []Checker `json:"checkers"`
 }
 
 type Service struct {

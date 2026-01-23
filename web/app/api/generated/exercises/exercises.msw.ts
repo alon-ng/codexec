@@ -24,29 +24,24 @@ export const getGetExercisesResponseMock =
     ).map(() => ({
       code_data: faker.helpers.arrayElement([
         {
-          directories: Array.from(
-            { length: faker.number.int({ min: 1, max: 10 }) },
-            (_, i) => i + 1,
-          ).map(() => ({
-            directories: [],
-            files: Array.from(
+          children: faker.helpers.arrayElement([
+            Array.from(
               { length: faker.number.int({ min: 1, max: 10 }) },
               (_, i) => i + 1,
             ).map(() => ({
-              content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-              ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
+              children: faker.helpers.arrayElement([[], undefined]),
+              content: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                undefined,
+              ]),
               name: faker.string.alpha({ length: { min: 10, max: 20 } }),
             })),
-            name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          })),
-          files: Array.from(
-            { length: faker.number.int({ min: 1, max: 10 }) },
-            (_, i) => i + 1,
-          ).map(() => ({
-            content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          })),
+            undefined,
+          ]),
+          content: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
           name: faker.string.alpha({ length: { min: 10, max: 20 } }),
         },
         undefined,
@@ -128,29 +123,24 @@ export const getPostExercisesCreateResponseMock = (
 ): ExercisesExerciseWithTranslation => ({
   code_data: faker.helpers.arrayElement([
     {
-      directories: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        directories: [],
-        files: Array.from(
+      children: faker.helpers.arrayElement([
+        Array.from(
           { length: faker.number.int({ min: 1, max: 10 }) },
           (_, i) => i + 1,
         ).map(() => ({
-          content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          children: faker.helpers.arrayElement([[], undefined]),
+          content: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
           name: faker.string.alpha({ length: { min: 10, max: 20 } }),
         })),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
-      files: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
+        undefined,
+      ]),
+      content: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
       name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
     undefined,
@@ -207,29 +197,24 @@ export const getPutExercisesUpdateResponseMock = (
 ): ExercisesExerciseWithTranslation => ({
   code_data: faker.helpers.arrayElement([
     {
-      directories: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        directories: [],
-        files: Array.from(
+      children: faker.helpers.arrayElement([
+        Array.from(
           { length: faker.number.int({ min: 1, max: 10 }) },
           (_, i) => i + 1,
         ).map(() => ({
-          content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          children: faker.helpers.arrayElement([[], undefined]),
+          content: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
           name: faker.string.alpha({ length: { min: 10, max: 20 } }),
         })),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
-      files: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
+        undefined,
+      ]),
+      content: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
       name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
     undefined,
@@ -280,29 +265,24 @@ export const getGetExercisesUuidResponseMock = (
 ): ExercisesExerciseWithTranslation => ({
   code_data: faker.helpers.arrayElement([
     {
-      directories: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        directories: [],
-        files: Array.from(
+      children: faker.helpers.arrayElement([
+        Array.from(
           { length: faker.number.int({ min: 1, max: 10 }) },
           (_, i) => i + 1,
         ).map(() => ({
-          content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          children: faker.helpers.arrayElement([[], undefined]),
+          content: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
           name: faker.string.alpha({ length: { min: 10, max: 20 } }),
         })),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
-      files: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        content: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        ext: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
+        undefined,
+      ]),
+      content: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
       name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
     undefined,

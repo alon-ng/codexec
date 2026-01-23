@@ -74,7 +74,7 @@ func New(cmdPrefix string, logger *logger.Logger) *Driver {
 	}
 }
 
-func (d *Driver) Execute(ctx context.Context, jobID uuid.UUID, src fs.Directory, entryPoint string) (models.ExecuteResponse, error) {
+func (d *Driver) Execute(ctx context.Context, jobID uuid.UUID, src fs.Entry, entryPoint string) (models.ExecuteResponse, error) {
 	return cmd.Execute(ctx, d.cmdPrefix, nsjailConfigTemplate, jobID, src, entryPoint)
 }
 

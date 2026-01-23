@@ -74,5 +74,5 @@ type SaveUserExerciseSubmissionRequest struct {
 	Submission json.RawMessage `json:"submission" binding:"required"`
 }
 
-type UserExerciseSubmissionCode fs.Directory
+type UserExerciseSubmissionCode fs.Entry
 type UserExerciseSubmissionQuiz json.RawMessage

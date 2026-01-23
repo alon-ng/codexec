@@ -11,18 +11,11 @@ import (
 )
 
 func createCodeData(fileName string, fileContent string) *json.RawMessage {
-	dir := fs.Directory{
-		Name:        "root",
-		Directories: []fs.Directory{},
-		Files: []fs.File{
-			{
-				Name:    fileName,
-				Ext:     "py",
-				Content: fileContent,
-			},
-		},
+	entry := fs.Entry{
+		Name:    fileName + ".py",
+		Content: fileContent,
 	}
-	data, _ := json.Marshal(dir)
+	data, _ := json.Marshal(entry)
 	result := json.RawMessage(data)
 	return &result
 }

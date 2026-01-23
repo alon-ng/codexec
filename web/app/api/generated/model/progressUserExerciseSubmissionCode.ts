@@ -7,7 +7,7 @@
  */
 import type { FsEntry } from "./fsEntry";
 
-export interface ExercisesExerciseCodeData {
+export interface ProgressUserExerciseSubmissionCode {
   children?: FsEntry[];
   content?: string;
   name: string;

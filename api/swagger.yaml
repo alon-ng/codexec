@@ -309,19 +309,15 @@ definitions:
     type: object
   exercises.ExerciseCodeData:
     properties:
-      directories:
+      children:
         items:
-          $ref: '#/definitions/fs.Directory'
+          $ref: '#/definitions/fs.Entry'
         type: array
-      files:
-        items:
-          $ref: '#/definitions/fs.File'
-        type: array
+      content:
+        type: string
       name:
         type: string
     required:
-    - directories
-    - files
     - name
     type: object
   exercises.ExerciseQuizData:
@@ -461,34 +457,17 @@ definitions:
     - language
     - uuid
     type: object
-  fs.Directory:
+  fs.Entry:
     properties:
-      directories:
+      children:
         items:
-          $ref: '#/definitions/fs.Directory'
+          $ref: '#/definitions/fs.Entry'
         type: array
-      files:
-        items:
-          $ref: '#/definitions/fs.File'
-        type: array
-      name:
-        type: string
-    required:
-    - directories
-    - files
-    - name
-    type: object
-  fs.File:
-    properties:
       content:
         type: string
-      ext:
-        type: string
       name:
         type: string
     required:
-    - content
-    - ext
     - name
     type: object
   lessons.AddLessonTranslationRequest:
@@ -648,6 +627,11 @@ definitions:
     - language
     - uuid
     type: object
+  me.RunUserExerciseCodeSubmissionRequest:
+    properties:
+      submission:
+        $ref: '#/definitions/progress.UserExerciseSubmissionCode'
+    type: object
   me.SaveUserExerciseSubmissionRequest:
     properties:
       submission:
@@ -780,6 +764,19 @@ definitions:
         type: string
     required:
     - exercise_uuid
+    type: object
+  progress.UserExerciseSubmissionCode:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/fs.Entry'
+        type: array
+      content:
+        type: string
+      name:
+        type: string
+    required:
+    - name
     type: object
   progress.UserLessonStatus:
     properties:
@@ -2018,6 +2015,47 @@ paths:
       security:
       - CookieAuth: []
       summary: Save the user exercise submission
+      tags:
+      - me
+  /me/exercises/{exercise_uuid}/run/code:
+    post:
+      consumes:
+      - application/json
+      description: Run the user exercise code submission
+      parameters:
+      - description: Exercise UUID
+        in: path
+        name: exercise_uuid
+        required: true
+        type: string
+      - description: Submission
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/me.RunUserExerciseCodeSubmissionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Run the user exercise code submission
       tags:
       - me
   /users:

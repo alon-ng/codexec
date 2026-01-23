@@ -43,7 +43,7 @@ type AddExerciseTranslationRequest struct {
 	Description  string    `json:"description" binding:"required" example:"Imprime Hola Mundo"`
 }
 
-type ExerciseCodeData = fs.Directory
+type ExerciseCodeData = fs.Entry
 type ExerciseQuizData = map[string]interface{}
 
 type ExerciseTranslationCodeData struct {

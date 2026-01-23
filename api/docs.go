@@ -1763,6 +1763,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/me/exercises/{exercise_uuid}/run/code": {
+            "post": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "description": "Run the user exercise code submission",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "me"
+                ],
+                "summary": "Run the user exercise code submission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exercise UUID",
+                        "name": "exercise_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Submission",
+                        "name": "submission",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/me.RunUserExerciseCodeSubmissionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -2532,22 +2596,17 @@ const docTemplate = `{
         "exercises.ExerciseCodeData": {
             "type": "object",
             "required": [
-                "directories",
-                "files",
                 "name"
             ],
             "properties": {
-                "directories": {
+                "children": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/fs.Directory"
+                        "$ref": "#/definitions/fs.Entry"
                     }
                 },
-                "files": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/fs.File"
-                    }
+                "content": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -2752,43 +2811,19 @@ const docTemplate = `{
                 }
             }
         },
-        "fs.Directory": {
+        "fs.Entry": {
             "type": "object",
             "required": [
-                "directories",
-                "files",
                 "name"
             ],
             "properties": {
-                "directories": {
+                "children": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/fs.Directory"
+                        "$ref": "#/definitions/fs.Entry"
                     }
                 },
-                "files": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/fs.File"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "fs.File": {
-            "type": "object",
-            "required": [
-                "content",
-                "ext",
-                "name"
-            ],
-            "properties": {
                 "content": {
-                    "type": "string"
-                },
-                "ext": {
                     "type": "string"
                 },
                 "name": {
@@ -3014,6 +3049,14 @@ const docTemplate = `{
                 }
             }
         },
+        "me.RunUserExerciseCodeSubmissionRequest": {
+            "type": "object",
+            "properties": {
+                "submission": {
+                    "$ref": "#/definitions/progress.UserExerciseSubmissionCode"
+                }
+            }
+        },
         "me.SaveUserExerciseSubmissionRequest": {
             "type": "object",
             "required": [
@@ -3202,6 +3245,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "started_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "progress.UserExerciseSubmissionCode": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fs.Entry"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
