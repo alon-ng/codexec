@@ -1,5 +1,5 @@
-import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useGetMeExercisesExerciseUuid } from "~/api/generated/me/me";
 import type { ExercisesExerciseWithTranslation } from "~/api/generated/model";
 import ExerciseCode from "./ExerciseCode";
@@ -9,16 +9,12 @@ export interface ExerciseContentProps {
   exercise?: ExercisesExerciseWithTranslation;
   exerciseUuid?: string;
   language: string;
-  onCodeChange?: (value: string | undefined) => void;
-  onSubmit?: () => void;
 }
 
 export default function ExerciseContent({
   exercise,
   exerciseUuid,
   language,
-  onCodeChange,
-  onSubmit,
 }: ExerciseContentProps) {
   const { t } = useTranslation();
 
@@ -64,13 +60,11 @@ export default function ExerciseContent({
           exercise={exercise}
           language={language}
           userExercise={userExerciseData}
-          onChange={onCodeChange}
         />
       ) : (
         <ExerciseQuiz
           exercise={exercise}
           language={language}
-          onChange={onCodeChange}
         />
       )}
     </div>

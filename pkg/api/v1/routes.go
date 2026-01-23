@@ -11,6 +11,7 @@ import (
 	"codim/pkg/api/v1/modules/lessons"
 	"codim/pkg/api/v1/modules/me"
 	"codim/pkg/api/v1/modules/users"
+	"codim/pkg/api/v1/websocket"
 	"codim/pkg/db"
 	"codim/pkg/utils/logger"
 
@@ -37,6 +38,7 @@ func NewRouter(
 	log *logger.Logger,
 	authProvider *authProvider.Provider,
 	redisClient *redis.Client,
+	wsHub *websocket.Hub,
 ) *gin.Engine {
 	// Disable Gin's default logger output
 	gin.DefaultWriter = log.Writer()
@@ -50,6 +52,10 @@ func NewRouter(
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	userCache := cache.NewUserCache(redisClient, q, log)
+
+	r.GET("/ws", func(c *gin.Context) {
+		websocket.ServeWs(wsHub, log, authProvider, userCache, q, c.Writer, c.Request)
+	})
 
 	v1 := r.Group("/api/v1")
 	{

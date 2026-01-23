@@ -68,3 +68,20 @@ func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exercis
 func (s *Service) SaveUserExerciseSubmission(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req SaveUserExerciseSubmissionRequest) *e.APIError {
 	return s.progressSvc.SaveUserExerciseSubmission(ctx, meUUID, exerciseUUID, req)
 }
+
+func (s *Service) RunUserExerciseCodeSubmission(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req RunUserExerciseCodeSubmissionRequest) *e.APIError {
+	exercise, err := s.q.GetExercise(ctx, db.GetExerciseParams{
+		Uuid:     exerciseUUID,
+		Language: "en",
+	})
+
+	if err != nil {
+		return e.NewAPIError(err, ErrGetExerciseFailed)
+	}
+
+	if exercise.Type != db.ExerciseTypeCode {
+		return e.NewAPIError(errors.New("exercise is not a code exercise"), ErrGetExerciseFailed)
+	}
+
+	return nil
+}

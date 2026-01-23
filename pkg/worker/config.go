@@ -5,12 +5,14 @@ import (
 	"fmt"
 
 	"github.com/caarlos0/env/v11"
+	v "github.com/go-playground/validator/v10"
 )
 
 type Config struct {
-	Driver      string `json:"driver" yaml:"driver"`
-	Queue       string `json:"queue" yaml:"queue"`
-	Concurrency int    `json:"concurrency" yaml:"concurrency" envDefault:"10"`
+	Driver       string `json:"driver" validate:"required"`
+	Queue        string `json:"queue" validate:"required"`
+	ResultsQueue string `json:"results_queue" validate:"required"`
+	Concurrency  int    `json:"concurrency"  envDefault:"10"`
 }
 
 // workersConfig is used to load the JSON string from environment
@@ -22,6 +24,7 @@ type workersConfig struct {
 // Workers are configured via the WORKERS environment variable as a JSON array.
 // Example: WORKERS='[{"driver":"node","queue":"codexec.node","concurrency":10},{"driver":"python","queue":"codexec.python","concurrency":10}]'
 func LoadConfig() ([]Config, error) {
+	validate := v.New()
 	var cfg workersConfig
 	if err := env.Parse(&cfg); err != nil {
 		return nil, fmt.Errorf("WORKERS environment variable is required: %w", err)
@@ -30,6 +33,12 @@ func LoadConfig() ([]Config, error) {
 	var workers []Config
 	if err := json.Unmarshal([]byte(cfg.WorkersJSON), &workers); err != nil {
 		return nil, fmt.Errorf("failed to parse WORKERS JSON: %w", err)
+	}
+
+	for _, worker := range workers {
+		if err := validate.Struct(worker); err != nil {
+			return nil, fmt.Errorf("invalid worker configuration: %w", err)
+		}
 	}
 
 	if len(workers) == 0 {

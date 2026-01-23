@@ -10,6 +10,8 @@
   },
   "common": {
     "run": "הרץ",
+    "console": "קונסול",
+    "errors": "שגיאות",
     "email": "דואר אלקטרוני",
     "password": "סיסמה",
     "firstName": "שם פרטי",
@@ -29,7 +31,9 @@
     "or": "או",
     "google": "גוגל",
     "buy": "קנה",
-    "readMore": "קרא עוד"
+    "readMore": "קרא עוד",
+    "noOutput": "אין פלט",
+    "noErrors": "אין שגיאות"
   },
   "auth": {
     "welcomeBack": "ברוכים הבאים",

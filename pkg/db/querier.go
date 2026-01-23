@@ -39,6 +39,7 @@ type Querier interface {
 	GetCourse(ctx context.Context, arg GetCourseParams) (GetCourseRow, error)
 	GetCourseTranslation(ctx context.Context, argUuid uuid.UUID) (GetCourseTranslationRow, error)
 	GetExercise(ctx context.Context, arg GetExerciseParams) (GetExerciseRow, error)
+	GetExerciseSubjectAndType(ctx context.Context, argUuid uuid.UUID) (GetExerciseSubjectAndTypeRow, error)
 	GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID) (GetExerciseTranslationRow, error)
 	GetLesson(ctx context.Context, arg GetLessonParams) (GetLessonRow, error)
 	GetLessonTranslation(ctx context.Context, argUuid uuid.UUID) (GetLessonTranslationRow, error)

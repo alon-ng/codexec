@@ -11,9 +11,11 @@ import (
 type Worker struct {
 	concurrency     int
 	queue           string
+	resultsQueue    string
 	ctx             context.Context
 	cancel          context.CancelFunc
 	rmqClient       *rabbitmq.Client
+	resProducer     *rabbitmq.Producer
 	executorService *executors.Service
 	logger          *logger.Logger
 }
@@ -24,10 +26,13 @@ func New(
 	logger *logger.Logger,
 	cfg Config,
 ) *Worker {
+	resProducer := rmqClient.NewProducer()
 	return &Worker{
 		concurrency:     cfg.Concurrency,
 		queue:           cfg.Queue,
+		resultsQueue:    cfg.ResultsQueue,
 		rmqClient:       rmqClient,
+		resProducer:     resProducer,
 		executorService: executorService,
 		logger:          logger,
 	}
@@ -60,7 +65,14 @@ func (w *Worker) messageHandler(ctx context.Context, body []byte) error {
 		return err
 	}
 
-	_, err = w.executorService.Execute(ctx, executionRequest)
+	r, err := w.executorService.Execute(ctx, executionRequest)
+	if err != nil {
+		return err
+	}
+
+	r.JobID = executionRequest.JobID
+
+	err = w.resProducer.PublishObject(ctx, w.resultsQueue, "", r)
 	if err != nil {
 		return err
 	}

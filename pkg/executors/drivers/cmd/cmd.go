@@ -5,6 +5,7 @@ import (
 	"codim/pkg/executors/drivers/models"
 	"codim/pkg/fs"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -17,6 +18,10 @@ func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string,
 	jobIDStr := jobID.String()
 	jobPath := fmt.Sprintf("/jobs/%s", jobIDStr)
 
+	// Build nsjail config with replaced placeholders
+	config := strings.ReplaceAll(nsjailConfigTemplate, "{{JOB_ID}}", jobIDStr)
+	config = strings.ReplaceAll(config, "{{ENTRY_POINT}}", entryPoint)
+
 	// Create job directory in container
 	if err := CreateJobDirectory(ctx, cmdPrefix, jobPath); err != nil {
 		return models.ExecuteResponse{}, fmt.Errorf("failed to create job directory: %w", err)
@@ -24,17 +29,21 @@ func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string,
 
 	defer DeleteJobDirectory(ctx, cmdPrefix, jobPath)
 
+	// Create config file in container
+	cfgPath := fmt.Sprintf("/tmp/config-%s.cfg", jobIDStr)
+	if err := CreateConfigFile(ctx, cmdPrefix, cfgPath, config); err != nil {
+		return models.ExecuteResponse{}, fmt.Errorf("failed to create config file: %w", err)
+	}
+
+	defer DeleteConfigFile(ctx, cmdPrefix, cfgPath)
+
 	// Write files to container
 	if err := WriteFiles(ctx, cmdPrefix, jobPath, src); err != nil {
 		return models.ExecuteResponse{}, fmt.Errorf("failed to write files: %w", err)
 	}
 
-	// Build nsjail config with replaced placeholders
-	config := strings.ReplaceAll(nsjailConfigTemplate, "{{JOB_ID}}", jobIDStr)
-	config = strings.ReplaceAll(config, "{{ENTRY_POINT}}", entryPoint)
-
 	// Execute nsjail
-	r, err := ExecuteNsjail(ctx, cmdPrefix, config)
+	r, err := ExecuteNsjail(ctx, cmdPrefix, cfgPath)
 
 	return r, err
 }
@@ -64,11 +73,9 @@ func WriteFiles(ctx context.Context, cmdPrefix string, basePath string, dir fs.D
 func WriteDirectory(ctx context.Context, cmdPrefix string, basePath string, dir fs.Directory) error {
 	// Write files in current directory
 	for _, file := range dir.Files {
-		filePath := fmt.Sprintf("%s/%s%s", basePath, file.Name, file.Ext)
-		cmd := executeCommand(ctx, cmdPrefix, "sh", "-c", fmt.Sprintf("cat > %s", filePath))
-		cmd.Stdin = strings.NewReader(file.Content)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to write file %s: %w", filePath, err)
+		filePath := fmt.Sprintf("%s/%s.%s", basePath, file.Name, file.Ext)
+		if err := WriteFile(ctx, cmdPrefix, filePath, file.Content); err != nil {
+			return err
 		}
 	}
 
@@ -89,11 +96,22 @@ func WriteDirectory(ctx context.Context, cmdPrefix string, basePath string, dir 
 	return nil
 }
 
-func ExecuteNsjail(ctx context.Context, cmdPrefix string, config string) (models.ExecuteResponse, error) {
+func DeleteConfigFile(ctx context.Context, cmdPrefix string, cfgPath string) error {
+	cmd := executeCommand(ctx, cmdPrefix, "rm", "-f", cfgPath)
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to delete config file %s: %w", cfgPath, err)
+	}
+	return nil
+}
+
+func CreateConfigFile(ctx context.Context, cmdPrefix string, cfgPath string, config string) error {
+	return WriteFile(ctx, cmdPrefix, cfgPath, config)
+}
+
+func ExecuteNsjail(ctx context.Context, cmdPrefix string, cfgPath string) (models.ExecuteResponse, error) {
 	// Execute nsjail with config piped to stdin
 	// Use -Q flag to suppress nsjail's verbose logging (only show errors)
-	cmd := executeCommand(ctx, cmdPrefix, "nsjail", "-Q", "--config", "/dev/stdin")
-	cmd.Stdin = strings.NewReader(config)
+	cmd := executeCommand(ctx, cmdPrefix, "nsjail", "-Q", "--config", cfgPath)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -113,6 +131,14 @@ func ExecuteNsjail(ctx context.Context, cmdPrefix string, config string) (models
 
 	if err != nil {
 		return models.ExecuteResponse{}, fmt.Errorf("failed to seperate stderr: %w", err)
+	}
+
+	if stderrStr != "" {
+		return models.ExecuteResponse{
+			Stdout:   stdout.String(),
+			Stderr:   stderrStr,
+			ExitCode: exitCode,
+		}, nil
 	}
 
 	time, cpu, memoryKb, err := parseMetrics(maybeMetrics)
@@ -154,9 +180,18 @@ func parseMetrics(metricsLine string) (float64, float64, int64, error) {
 		return 0, 0, 0, fmt.Errorf("failed to parse memory: %w", err)
 	}
 
-	cpu := (usrCpu + sysCpu) / time
+	cpu := (usrCpu + sysCpu) * time
 
 	return time, cpu, memoryKb, nil
+}
+
+func WriteFile(ctx context.Context, cmdPrefix string, filePath string, content string) error {
+	base64Content := base64.StdEncoding.EncodeToString([]byte(content))
+	cmd := executeCommand(ctx, cmdPrefix, "sh", "-c", fmt.Sprintf("echo '%s' | base64 -d > %s", base64Content, filePath))
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to write file %s: %w", filePath, err)
+	}
+	return nil
 }
 
 func seperateStderr(stderr string) (string, string, error) {

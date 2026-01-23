@@ -61,4 +61,4 @@ RUN mkdir -p /opt/nsjail/rootfs/usr/bin \
 
 WORKDIR /
 
-CMD ["/app/codexec"]
+# CMD ["/app/codexec"]

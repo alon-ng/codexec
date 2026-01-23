@@ -1,15 +1,15 @@
 import { useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-import { useGetMeCoursesCourseUuid } from "~/api/generated/me/me";
 import { useGetCoursesUuid } from "~/api/generated/courses/courses";
+import { useGetMeCoursesCourseUuid } from "~/api/generated/me/me";
 import type { MeUserExerciseStatus } from "~/api/generated/model";
 import PageHeader, { type BreadcrumbProps } from "~/components/PageHeader";
-import LessonSidebar from "~/components/classroom/LessonSidebar";
-import ExerciseContent from "~/components/classroom/ExerciseContent";
-import ClassroomLoading from "~/components/classroom/ClassroomLoading";
 import ClassroomError from "~/components/classroom/ClassroomError";
+import ClassroomLoading from "~/components/classroom/ClassroomLoading";
+import ExerciseContent from "~/components/classroom/ExerciseContent";
+import LessonSidebar from "~/components/classroom/LessonSidebar";
 
 export default function Classroom() {
     const { t, i18n } = useTranslation();
@@ -143,18 +143,6 @@ export default function Classroom() {
         }
     };
 
-    // Handle exercise submit
-    const handleExerciseSubmit = () => {
-        // TODO: Implement submit logic
-        toast.info(t("common.comingSoon") || "Coming soon!");
-    };
-
-    // Handle code change
-    const handleCodeChange = (value: string | undefined) => {
-        // TODO: Implement code change logic (e.g., save to local storage or state)
-        console.log("Code changed:", value);
-    };
-
     if (isLoadingUserCourse || isLoadingCourse) {
         return <ClassroomLoading />;
     }
@@ -163,7 +151,6 @@ export default function Classroom() {
         return <ClassroomError />;
     }
 
-    // TypeScript narrowing - we know these are defined after the check above
     const safeUserCourseData: typeof userCourseData = userCourseData;
     const safeCourseData: typeof courseData = courseData;
 
@@ -198,8 +185,6 @@ export default function Classroom() {
                         exercise={selectedExerciseData}
                         exerciseUuid={exerciseUuid}
                         language={courseData.subject}
-                        onCodeChange={handleCodeChange}
-                        onSubmit={handleExerciseSubmit}
                     />
                 </main>
             </div>

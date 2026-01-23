@@ -10,6 +10,8 @@
     },
     "common": {
         "run": "Run",
+        "console": "Console",
+        "errors": "Errors",
         "email": "Email",
         "password": "Password",
         "firstName": "First Name",
@@ -29,7 +31,9 @@
         "or": "Or",
         "buy": "Buy",
         "google": "Google",
-        "readMore": "Read More"
+        "readMore": "Read More",
+        "noOutput": "No output",
+        "noErrors": "No errors"
     },
     "auth": {
         "welcomeBack": "Welcome back",

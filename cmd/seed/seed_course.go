@@ -17,7 +17,7 @@ func createCodeData(fileName string, fileContent string) *json.RawMessage {
 		Files: []fs.File{
 			{
 				Name:    fileName,
-				Ext:     getFileExtension(fileName),
+				Ext:     "py",
 				Content: fileContent,
 			},
 		},
@@ -48,16 +48,6 @@ func createTranslationQuizData(questions []map[string]interface{}) *json.RawMess
 	result, _ := json.Marshal(data)
 	raw := json.RawMessage(result)
 	return &raw
-}
-
-func getFileExtension(fileName string) string {
-	if len(fileName) > 3 && fileName[len(fileName)-3:] == ".js" {
-		return "js"
-	}
-	if len(fileName) > 3 && fileName[len(fileName)-3:] == ".py" {
-		return "py"
-	}
-	return ""
 }
 
 type Translation struct {
@@ -373,7 +363,7 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 				if code, ok := eSeed.Data["code"].(string); ok {
 					codeContent = code
 				}
-				codeData = createCodeData("main.py", codeContent)
+				codeData = createCodeData("main", codeContent)
 				quizData = nil
 			} else {
 				codeData = nil

@@ -27,7 +27,9 @@ import (
 	"codim/cmd/api/config"
 	"codim/pkg/api/auth"
 	"codim/pkg/api/v1"
+	"codim/pkg/api/v1/websocket"
 	"codim/pkg/db"
+	"codim/pkg/rabbitmq"
 	"codim/pkg/utils/logger"
 	"context"
 	"fmt"
@@ -54,6 +56,17 @@ func main() {
 	redisClient := initializeRedis(cfg, log)
 	defer redisClient.Close()
 
+	rmqClient := initializeRabbitMQ(cfg, log)
+	defer rmqClient.Close()
+
+	wsHub := websocket.NewHub(rmqClient, log)
+	go wsHub.Run()
+	go func() {
+		if err := wsHub.ListenToRabbitMQ(context.Background(), "codexec.results"); err != nil {
+			log.Errorf("Failed to listen to RabbitMQ: %v", err)
+		}
+	}()
+
 	authProvider := auth.NewProvider(
 		cfg.API.PasswordSalt,
 		[]byte(cfg.API.JwtSecret),
@@ -61,7 +74,7 @@ func main() {
 		cfg.API.JwtRenewalThreshold,
 	)
 
-	router := api.NewRouter(queries, pool, log, authProvider, redisClient)
+	router := api.NewRouter(queries, pool, log, authProvider, redisClient, wsHub)
 
 	addr := fmt.Sprintf(":%d", cfg.API.Port)
 	log.Infof("Starting server on %s", addr)
@@ -116,4 +129,13 @@ func initializeRedis(cfg config.Config, log *logger.Logger) *redis.Client {
 	log.Info("Redis initialized successfully")
 
 	return redisClient
+}
+
+func initializeRabbitMQ(cfg config.Config, log *logger.Logger) *rabbitmq.Client {
+	rmqClient, err := rabbitmq.NewClient(cfg.RabbitMQ, log)
+	if err != nil {
+		log.Fatalf("Failed to initialize RabbitMQ: %v", err)
+	}
+
+	return rmqClient
 }

@@ -141,6 +141,26 @@ func (q *Queries) GetExercise(ctx context.Context, arg GetExerciseParams) (GetEx
 	return i, err
 }
 
+const getExerciseSubjectAndType = `-- name: GetExerciseSubjectAndType :one
+SELECT "courses"."subject", "exercises"."type" FROM "courses"
+JOIN "lessons" ON "courses"."uuid" = "lessons"."course_uuid"
+JOIN "exercises" ON "lessons"."uuid" = "exercises"."lesson_uuid"
+WHERE "exercises"."uuid" = $1
+LIMIT 1
+`
+
+type GetExerciseSubjectAndTypeRow struct {
+	Subject string       `json:"subject"`
+	Type    ExerciseType `json:"type"`
+}
+
+func (q *Queries) GetExerciseSubjectAndType(ctx context.Context, argUuid uuid.UUID) (GetExerciseSubjectAndTypeRow, error) {
+	row := q.db.QueryRow(ctx, getExerciseSubjectAndType, argUuid)
+	var i GetExerciseSubjectAndTypeRow
+	err := row.Scan(&i.Subject, &i.Type)
+	return i, err
+}
+
 const hardDeleteExercise = `-- name: HardDeleteExercise :exec
 DELETE FROM "exercises"
 WHERE "uuid" = $1

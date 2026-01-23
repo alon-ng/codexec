@@ -1,12 +1,12 @@
+import { motion } from "motion/react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
+import { toast } from "sonner";
+import { usePostAuthSignup } from "~/api/generated/auth/auth";
 import { Button } from "~/components/base/Button";
 import { Input } from "~/components/base/Input";
-import { usePostAuthSignup } from "~/api/generated/auth/auth";
-import { toast } from "sonner";
 import { blurInVariants } from "~/utils/animations";
-import { motion } from "motion/react";
-import { Link } from "react-router";
-import { useTranslation } from "react-i18next";
 
 interface SignupFormProps {
     onSuccess?: () => void;
@@ -26,7 +26,6 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 onSuccess?.();
             },
             onError: (error) => {
-                console.log("this is the error", error);
                 toast.error(error.error || t("auth.signupError"), {
                     className: "error-toast",
                 });

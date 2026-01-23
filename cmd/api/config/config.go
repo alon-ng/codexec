@@ -3,6 +3,7 @@ package config
 import (
 	"codim/pkg/api/v1"
 	"codim/pkg/db"
+	"codim/pkg/rabbitmq"
 	"codim/pkg/redis"
 	"codim/pkg/utils/logger"
 	"sync"
@@ -18,9 +19,10 @@ var (
 
 type Config struct {
 	Logger logger.Config
-	API    api.Config
-	DB     db.Config
-	Redis  redis.Config
+	API      api.Config
+	DB       db.Config
+	Redis    redis.Config
+	RabbitMQ rabbitmq.Config
 }
 
 func Load() (Config, error) {
@@ -52,6 +54,13 @@ func Load() (Config, error) {
 			return
 		}
 		config.Redis = redisCfg
+
+		rmqCfg, err := rabbitmq.LoadConfig()
+		if err != nil {
+			loadErr = err
+			return
+		}
+		config.RabbitMQ = rmqCfg
 
 		// Parse the remaining fields using caarlos0/env
 		if err := env.Parse(&config); err != nil {
