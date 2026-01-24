@@ -4,7 +4,8 @@ import (
 	"codim/pkg/api/auth"
 	"codim/pkg/api/v1/cache"
 	"codim/pkg/db"
-	"codim/pkg/executors"
+	"codim/pkg/executors/checkers"
+	"codim/pkg/executors/drivers/models"
 	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
@@ -165,27 +166,44 @@ func (c *Client) readPump() {
 		// Create execution request
 		jobID := uuid.New()
 
-		row, err := c.q.GetExerciseSubjectAndType(context.Background(), submission.ExerciseUuid)
+		row, err := c.q.GetExerciseForSubmission(context.Background(), submission.ExerciseUuid)
 		if err != nil {
 			c.logger.Errorf("error getting exercise subject and type: %v", err)
 			continue
 		}
 
 		if row.Type == db.ExerciseTypeCode {
-			runCodeSubmission(c, jobID, submission, row.Subject)
+			runCodeSubmission(c, jobID, submission, row)
 		}
 	}
 }
 
-func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage, subject string) {
+func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage, exercise db.GetExerciseForSubmissionRow) {
 	// Map language to queue/driver
 	// For now we assume queue names based on language
-	queueName := "codexec." + subject
+	queueName := "codexec." + exercise.Subject
 
-	req := executors.ExecutionRequest{
-		JobID:      jobID,
-		Source:     submission.Submission,
-		EntryPoint: "main." + getExtension(subject),
+	var codeChecker *checkers.CodeChecker
+	var ioChecker *checkers.IOChecker
+	if exercise.CodeChecker != nil {
+		if err := json.Unmarshal(*exercise.CodeChecker, &codeChecker); err != nil {
+			c.logger.Errorf("error unmarshalling code checker: %v", err)
+			return
+		}
+	}
+	if exercise.IoChecker != nil {
+		if err := json.Unmarshal(*exercise.IoChecker, &ioChecker); err != nil {
+			c.logger.Errorf("error unmarshalling io checker: %v", err)
+			return
+		}
+	}
+
+	req := models.ExecutionRequest{
+		JobID:       jobID,
+		Source:      submission.Submission,
+		EntryPoint:  "main." + getExtension(exercise.Subject),
+		CodeChecker: codeChecker,
+		IOChecker:   ioChecker,
 	}
 
 	c.hub.registerJob <- &JobClient{

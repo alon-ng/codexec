@@ -87,11 +87,13 @@ CREATE TABLE IF NOT EXISTS "exercises" (
     "modified_at"   TIMESTAMP       NOT NULL    DEFAULT NOW(),
     "deleted_at"    TIMESTAMP       NULL,
     "lesson_uuid"   UUID            NOT NULL,
-    "order_index"	SMALLINT		NOT NULL,
+    "order_index"   SMALLINT		NOT NULL,
     "reward"	    SMALLINT		NOT NULL,
     "type"          exercise_type   NOT NULL,
     "code_data"     JSONB           NULL,
     "quiz_data"     JSONB           NULL,
+    "io_checker"    JSONB           NULL,
+    "code_checker"  JSONB           NULL,
     CONSTRAINT fk_exercises_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE
 );
 

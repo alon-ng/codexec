@@ -4,16 +4,13 @@ import (
 	"codim/pkg/executors/drivers/models"
 	"codim/pkg/executors/drivers/node"
 	"codim/pkg/executors/drivers/python"
-	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type Driver interface {
-	Execute(ctx context.Context, jobID uuid.UUID, src fs.Entry, entryPoint string) (models.ExecuteResponse, error)
+	Execute(ctx context.Context, executionRequest models.ExecutionRequest) (models.ExecuteResponse, error)
 	SetCmdPrefix(prefix string) error
 	CmdPrefix() string
 }

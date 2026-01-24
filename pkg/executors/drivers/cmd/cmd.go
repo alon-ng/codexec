@@ -11,17 +11,20 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"github.com/google/uuid"
 )
 
-func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string, jobID uuid.UUID, src fs.Entry, entryPoint string) (models.ExecuteResponse, error) {
-	jobIDStr := jobID.String()
+func Execute(
+	ctx context.Context,
+	cmdPrefix string,
+	nsjailConfigTemplate string,
+	testUtilsFile string,
+	executionRequest models.ExecutionRequest,
+) (models.ExecuteResponse, error) {
+	jobIDStr := executionRequest.JobID.String()
 	jobPath := fmt.Sprintf("/jobs/%s", jobIDStr)
 
 	// Build nsjail config with replaced placeholders
-	config := strings.ReplaceAll(nsjailConfigTemplate, "{{JOB_ID}}", jobIDStr)
-	config = strings.ReplaceAll(config, "{{ENTRY_POINT}}", entryPoint)
+	config := prepareNsjailConfig(nsjailConfigTemplate, jobIDStr, jobIDStr, executionRequest.EntryPoint)
 
 	// Create job directory in container
 	if err := CreateJobDirectory(ctx, cmdPrefix, jobPath); err != nil {
@@ -36,15 +39,29 @@ func Execute(ctx context.Context, cmdPrefix string, nsjailConfigTemplate string,
 		return models.ExecuteResponse{}, fmt.Errorf("failed to create config file: %w", err)
 	}
 
-	defer DeleteConfigFile(ctx, cmdPrefix, cfgPath)
+	defer DeleteFile(ctx, cmdPrefix, cfgPath)
 
 	// Write files to container
-	if err := WriteFiles(ctx, cmdPrefix, jobPath, src); err != nil {
+	if err := WriteFiles(ctx, cmdPrefix, jobPath, executionRequest.Source); err != nil {
 		return models.ExecuteResponse{}, fmt.Errorf("failed to write files: %w", err)
 	}
 
 	// Execute nsjail
 	r, err := ExecuteNsjail(ctx, cmdPrefix, cfgPath)
+
+	if err != nil {
+		return models.ExecuteResponse{}, err
+	}
+
+	runCheckers(
+		ctx,
+		executionRequest,
+		&r,
+		cmdPrefix,
+		nsjailConfigTemplate,
+		jobPath,
+		testUtilsFile,
+	)
 
 	return r, err
 }
@@ -105,10 +122,10 @@ func WriteEntry(ctx context.Context, cmdPrefix string, basePath string, entry fs
 	return nil
 }
 
-func DeleteConfigFile(ctx context.Context, cmdPrefix string, cfgPath string) error {
-	cmd := executeCommand(ctx, cmdPrefix, "rm", "-f", cfgPath)
+func DeleteFile(ctx context.Context, cmdPrefix string, filePath string) error {
+	cmd := executeCommand(ctx, cmdPrefix, "rm", "-f", filePath)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to delete config file %s: %w", cfgPath, err)
+		return fmt.Errorf("failed to delete config file %s: %w", filePath, err)
 	}
 	return nil
 }
@@ -149,8 +166,8 @@ func ExecuteNsjail(ctx context.Context, cmdPrefix string, cfgPath string) (model
 	}
 
 	return models.ExecuteResponse{
-		Stdout:   stdout.String(),
-		Stderr:   stderr.String(),
+		Stdout:   strings.TrimSpace(stdout.String()),
+		Stderr:   strings.TrimSpace(stderr.String()),
 		ExitCode: exitCode,
 		Time:     wallTime.Seconds(),
 		CPU:      cpuTime.Seconds(),
@@ -186,4 +203,62 @@ func executeCommand(ctx context.Context, cmdPrefix string, cmdArgs ...string) *e
 func deconstructCmdPrefix(cmdPrefix string) (string, []string) {
 	parts := strings.Split(cmdPrefix, " ")
 	return parts[0], parts[1:]
+}
+
+func runCheckers(
+	ctx context.Context,
+	request models.ExecutionRequest,
+	response *models.ExecuteResponse,
+	cmdPrefix string,
+	nsjailConfigTemplate string,
+	jobPath string,
+	testUtilsFile string,
+) error {
+	if request.IOChecker != nil {
+		r := request.IOChecker.Check(ctx, response.Stdout)
+		response.CheckerResults = append(response.CheckerResults, r)
+	}
+
+	if request.CodeChecker != nil {
+		testFilePath := fmt.Sprintf("%s/%s", jobPath, request.CodeChecker.FileName)
+		err := WriteFile(ctx, cmdPrefix, testFilePath, request.CodeChecker.Code)
+		if err != nil {
+			return err
+		}
+
+		testUtilsFilePath := fmt.Sprintf("%s/%s", jobPath, "test_utils.py")
+		err = WriteFile(ctx, cmdPrefix, testUtilsFilePath, testUtilsFile)
+		if err != nil {
+			return err
+		}
+
+		testJobId := fmt.Sprintf("%s-tests", request.JobID.String())
+		cfgPath := fmt.Sprintf("/tmp/config-%s.cfg", testJobId)
+		config := prepareNsjailConfig(nsjailConfigTemplate, testJobId, request.JobID.String(), request.CodeChecker.FileName)
+
+		err = CreateConfigFile(ctx, cmdPrefix, cfgPath, config)
+		if err != nil {
+			return err
+		}
+
+		defer DeleteFile(ctx, cmdPrefix, cfgPath)
+
+		r, err := ExecuteNsjail(ctx, cmdPrefix, cfgPath)
+		if err != nil {
+			return err
+		}
+
+		rs := request.CodeChecker.Check(ctx, r.Stdout)
+
+		response.CheckerResults = append(response.CheckerResults, rs...)
+	}
+
+	return nil
+}
+
+func prepareNsjailConfig(config string, jobId string, jobFolder string, entryPoint string) string {
+	config = strings.ReplaceAll(config, "{{JOB_ID}}", jobId)
+	config = strings.ReplaceAll(config, "{{JOB_ID_FOLDER}}", jobFolder)
+	config = strings.ReplaceAll(config, "{{ENTRY_POINT}}", entryPoint)
+	return config
 }

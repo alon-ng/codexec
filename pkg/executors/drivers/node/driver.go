@@ -3,11 +3,8 @@ package node
 import (
 	"codim/pkg/executors/drivers/cmd"
 	"codim/pkg/executors/drivers/models"
-	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -35,7 +32,7 @@ mount {
   rw: false
 }
 
-mount { src: "/jobs/{{JOB_ID}}" dst: "/work" is_bind: true rw: true }
+mount { src: "/jobs/{{JOB_ID_FOLDER}}" dst: "/work" is_bind: true rw: true }
 
 mount { src: "/usr/bin/node" 		dst: "/usr/bin/node" 		is_bind: true rw: false }
 mount { src: "/usr/bin/time" 		dst: "/usr/bin/time" 		is_bind: true rw: false }
@@ -60,6 +57,7 @@ exec_bin {
   arg: 	"/work/{{ENTRY_POINT}}"
 }
 `
+	testUtilsFile = ``
 )
 
 type Driver struct {
@@ -74,8 +72,14 @@ func New(cmdPrefix string, logger *logger.Logger) *Driver {
 	}
 }
 
-func (d *Driver) Execute(ctx context.Context, jobID uuid.UUID, src fs.Entry, entryPoint string) (models.ExecuteResponse, error) {
-	return cmd.Execute(ctx, d.cmdPrefix, nsjailConfigTemplate, jobID, src, entryPoint)
+func (d *Driver) Execute(ctx context.Context, executionRequest models.ExecutionRequest) (models.ExecuteResponse, error) {
+	return cmd.Execute(
+		ctx,
+		d.cmdPrefix,
+		nsjailConfigTemplate,
+		testUtilsFile,
+		executionRequest,
+	)
 }
 
 func (d *Driver) SetCmdPrefix(prefix string) error {

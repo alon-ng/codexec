@@ -2,6 +2,7 @@ package main
 
 import (
 	"codim/pkg/db"
+	"codim/pkg/executors/checkers"
 	"codim/pkg/fs"
 	"context"
 	"encoding/json"
@@ -56,6 +57,8 @@ type ExerciseSeed struct {
 	Reward       int16
 	Data         map[string]interface{}
 	Translations map[string]Translation
+	CodeChecker  *checkers.CodeChecker
+	IoChecker    *checkers.IOChecker
 }
 
 type LessonSeed struct {
@@ -122,6 +125,10 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 								CodeData:    createRawMessage([]byte(`{"instructions": "<div>הדפס <code>Hello World</code> לקונסול.</div>"}`)),
 							},
 						},
+						IoChecker: &checkers.IOChecker{
+							Input:          "",
+							ExpectedOutput: "Hello World",
+						},
 					},
 					{
 						Type:   db.ExerciseTypeQuiz,
@@ -148,6 +155,10 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 						Translations: map[string]Translation{
 							"en": {Name: "Integer Variable", Description: "Store a number."},
 							"he": {Name: "משתנה שלם", Description: "שמור מספר."},
+						},
+						CodeChecker: &checkers.CodeChecker{
+							Code:     "from test_utils import TestUtils\ntry:\n    from main import x\n    TestUtils.success(\"Found variable: x\")\n\n    if x != 5:\n        TestUtils.failure(\"Variable x is not 5\")\n    else:\n        TestUtils.success(\"Variable x is set to 5\")\nexcept ImportError:\n    TestUtils.failure(\"Missing variable: x\")",
+							FileName: "tests.py",
 						},
 					},
 					{
@@ -363,14 +374,25 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 				quizData = createQuizData()
 			}
 
-			e, err := queries.CreateExercise(ctx, db.CreateExerciseParams{
+			params := db.CreateExerciseParams{
 				LessonUuid: l.Uuid,
 				OrderIndex: int16(j + 1),
 				Reward:     eSeed.Reward,
 				Type:       eSeed.Type,
 				CodeData:   codeData,
 				QuizData:   quizData,
-			})
+			}
+
+			if eSeed.CodeChecker != nil {
+				codeCheckerData, _ := json.Marshal(eSeed.CodeChecker)
+				params.CodeChecker = createRawMessage(codeCheckerData)
+			}
+			if eSeed.IoChecker != nil {
+				ioCheckerData, _ := json.Marshal(eSeed.IoChecker)
+				params.IoChecker = createRawMessage(ioCheckerData)
+			}
+
+			e, err := queries.CreateExercise(ctx, params)
 			if err != nil {
 				log.Fatalf("Failed to create exercise: %v", err)
 			}
