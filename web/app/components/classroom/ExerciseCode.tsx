@@ -100,12 +100,12 @@ export default function ExerciseCode({
   })
 
   // Helper function to save the code
-  const saveCode = (currentCode: string, currentSubmission: ExercisesExerciseCodeData, currentLanguage: string, currentExerciseUuid: string) => {
+  const saveCode = (currentCode: string, currentExerciseUuid: string) => {
     if (currentCode.trim() === "") {
       return;
     }
 
-    const s = getSubmissionFromCode(codeValue, language);
+    const s = getSubmissionFromCode(currentCode, language);
 
     saveMutation.mutate({
       exerciseUuid: currentExerciseUuid,
@@ -124,7 +124,7 @@ export default function ExerciseCode({
     const interval = setInterval(() => {
       const currentCode = codeValueRef.current;
       if (currentCode !== previousCodeRef.current) {
-        saveCode(currentCode, submission, language, exercise.uuid);
+        saveCode(currentCode, exercise.uuid);
       }
     }, 5000); // Check every 5 seconds
 
@@ -133,7 +133,7 @@ export default function ExerciseCode({
       // Before unmount, check if there are unsaved changes and save them
       const currentCode = codeValueRef.current;
       if (currentCode !== previousCodeRef.current) {
-        saveCode(currentCode, submission, language, exercise.uuid);
+        saveCode(currentCode, exercise.uuid);
       }
     };
   }, [exercise.uuid]);
