@@ -53,10 +53,6 @@ func NewRouter(
 
 	userCache := cache.NewUserCache(redisClient, q, log)
 
-	r.GET("/ws", func(c *gin.Context) {
-		websocket.ServeWs(wsHub, log, authProvider, userCache, q, c.Writer, c.Request)
-	})
-
 	v1 := r.Group("/api/v1")
 	{
 		auth.RegisterRoutes(v1, q, p, log, authProvider)
@@ -65,6 +61,7 @@ func NewRouter(
 		protected := v1.Group("/")
 		protected.Use(middleware.AuthMiddleware(authProvider, userCache, log))
 		{
+			protected.GET("/ws", wsHub.ServeWs)
 			me.RegisterRoutes(protected, q, p, log)
 			admin := protected.Group("/")
 			admin.Use(middleware.AdminMiddleware(log))

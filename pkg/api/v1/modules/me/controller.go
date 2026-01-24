@@ -157,35 +157,3 @@ func (c *Controller) SaveUserExerciseSubmission(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
-
-// RunUserExerciseCodeSubmission godoc
-// @Summary      Run the user exercise code submission
-// @Description  Run the user exercise code submission
-// @Tags         me
-// @Accept       json
-// @Produce      json
-// @Security     CookieAuth
-// @Param        exercise_uuid path string true "Exercise UUID"
-// @Param        submission body RunUserExerciseCodeSubmissionRequest true "Submission"
-// @Success      200     {string}  string  "OK"
-// @Failure      400     {object}  errors.ErrorResponse
-// @Failure      401     {object}  errors.ErrorResponse
-// @Failure      500     {object}  errors.ErrorResponse
-// @Router       /me/exercises/{exercise_uuid}/run/code [post]
-func (c *Controller) RunUserExerciseCodeSubmission(ctx *gin.Context) {
-	meUUID := uuid.MustParse(ctx.GetString("user_uuid"))
-	exerciseUUID := uuid.MustParse(ctx.Param("exercise_uuid"))
-	var req RunUserExerciseCodeSubmissionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
-		return
-	}
-
-	err := c.svc.RunUserExerciseCodeSubmission(ctx.Request.Context(), meUUID, exerciseUUID, req)
-	if err != nil {
-		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
-		return
-	}
-
-	ctx.Status(http.StatusOK)
-}

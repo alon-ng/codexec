@@ -1,8 +1,6 @@
 package websocket
 
 import (
-	"codim/pkg/api/auth"
-	"codim/pkg/api/v1/cache"
 	"codim/pkg/db"
 	"codim/pkg/executors/checkers"
 	"codim/pkg/executors/drivers/models"
@@ -10,7 +8,7 @@ import (
 	"codim/pkg/utils/logger"
 	"context"
 	"encoding/json"
-	"net/http"
+	"fmt"
 	"time"
 
 	v "github.com/go-playground/validator/v10"
@@ -19,16 +17,9 @@ import (
 )
 
 const (
-	// Time allowed to write a message to the peer.
-	writeWait = 10 * time.Second
-
-	// Time allowed to read the next pong message from the peer.
-	pongWait = 60 * time.Second
-
-	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
-
-	// Maximum message size allowed from peer.
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
 	maxMessageSize = 512
 )
 
@@ -37,83 +28,6 @@ var (
 	space   = []byte{' '}
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-// ServeWs handles websocket requests from the peer.
-func ServeWs(hub *Hub, logger *logger.Logger, authProvider *auth.Provider, userCache *cache.UserCache, q *db.Queries, w http.ResponseWriter, r *http.Request) {
-	// Check authentication cookie before upgrading
-	cookie, err := r.Cookie(auth.AuthCookieName)
-	if err != nil || cookie == nil || cookie.Value == "" {
-		logger.Warn("WebSocket connection rejected: no auth cookie")
-		http.Error(w, "Authentication required", http.StatusUnauthorized)
-		return
-	}
-
-	// Verify token
-	userUUID, renewalRequired, err := authProvider.VerifyToken(cookie.Value)
-	if err != nil {
-		logger.Warnf("WebSocket connection rejected: invalid token: %v", err)
-		http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
-		return
-	}
-
-	// Get user from cache (verify user exists)
-	_, err = userCache.GetUser(r.Context(), userUUID)
-	if err != nil {
-		logger.Errorf("WebSocket connection rejected: failed to get user: %v", err)
-		http.Error(w, "Failed to get user", http.StatusInternalServerError)
-		return
-	}
-
-	// Renew token if needed
-	if renewalRequired {
-		newToken, err := authProvider.GenerateToken(userUUID)
-		if err != nil {
-			logger.Errorf("Failed to generate new token for WebSocket: %v", err)
-			// Continue anyway, token is still valid
-		} else {
-			// Set new token cookie
-			http.SetCookie(w, &http.Cookie{
-				Name:     auth.AuthCookieName,
-				Value:    newToken,
-				Path:     "/",
-				HttpOnly: true,
-				SameSite: http.SameSiteLaxMode,
-			})
-		}
-	}
-
-	// Enable CORS for WebSocket (consider restricting this in production)
-	upgrader.CheckOrigin = func(r *http.Request) bool {
-		return true
-	}
-
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		logger.Errorf("error upgrading websocket: %v", err)
-		return
-	}
-
-	client := &Client{
-		hub:    hub,
-		conn:   conn,
-		send:   make(chan []byte, 256),
-		logger: logger,
-		userID: userUUID,
-		q:      q,
-	}
-	client.hub.register <- client
-
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	go client.writePump()
-	go client.readPump()
-}
-
-// Client is a middleman between the websocket connection and the hub.
 type Client struct {
 	hub    *Hub
 	conn   *websocket.Conn
@@ -145,7 +59,7 @@ func (c *Client) readPump() {
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure, websocket.CloseNoStatusReceived) {
 				c.logger.Errorf("error: %v", err)
 			}
 			break
@@ -163,9 +77,7 @@ func (c *Client) readPump() {
 			continue
 		}
 
-		// Create execution request
 		jobID := uuid.New()
-
 		row, err := c.q.GetExerciseForSubmission(context.Background(), submission.ExerciseUuid)
 		if err != nil {
 			c.logger.Errorf("error getting exercise subject and type: %v", err)
@@ -179,8 +91,6 @@ func (c *Client) readPump() {
 }
 
 func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage, exercise db.GetExerciseForSubmissionRow) {
-	// Map language to queue/driver
-	// For now we assume queue names based on language
 	queueName := "codexec." + exercise.Subject
 
 	var codeChecker *checkers.CodeChecker
@@ -211,8 +121,6 @@ func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage,
 		Client: c,
 	}
 
-	// Publish to default exchange (empty string) with queue name as routing key
-	// This routes directly to the queue without needing to declare an exchange
 	err := c.hub.producer.PublishObject(context.Background(), "", queueName, req)
 	if err != nil {
 		c.logger.Errorf("error publishing to rabbitmq: %v", err)
@@ -244,34 +152,46 @@ func (c *Client) writePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
-
-			if err := w.Close(); err != nil {
+			if err := c.writeMessage(message); err != nil {
 				return
 			}
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := c.ping(); err != nil {
 				return
 			}
 		}
 	}
+}
+
+func (c *Client) ping() error {
+	c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+	return c.conn.WriteMessage(websocket.PingMessage, nil)
+}
+
+func (c *Client) writeMessage(message []byte) error {
+	c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+
+	w, err := c.conn.NextWriter(websocket.TextMessage)
+	if err != nil {
+		return fmt.Errorf("error getting next writer: %v", err)
+	}
+	w.Write(message)
+
+	// Add queued chat messages to the current websocket message.
+	n := len(c.send)
+	for i := 0; i < n; i++ {
+		w.Write(newline)
+		w.Write(<-c.send)
+	}
+
+	if err := w.Close(); err != nil {
+		return fmt.Errorf("error closing writer: %v", err)
+	}
+
+	return nil
 }

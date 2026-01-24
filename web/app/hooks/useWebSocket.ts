@@ -9,54 +9,67 @@ export const useWebSocket = () => {
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    // Determine WS protocol based on current protocol
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // Use window.location.host to connect to the same host/port (proxied by Vite or Nginx)
-    // Assuming /ws is proxied to backend /ws or /api/v1/ws.
-    // The backend route is /ws but attached to gin router which usually has prefix /api/v1?
-    // In `pkg/api/v1/routes.go`: `v1 := r.Group("/api/v1")`, but `/ws` was registered on `r` directly?
-    // Let's check `routes.go` update.
-    // `r.GET("/ws", ...)` was added on `r`. So it is at root `/ws`.
-    // Wait, in `main.go`, `router := api.NewRouter(...)` returns `*gin.Engine`.
-    // So `/ws` is at root.
-    // However, if we run locally, frontend is 5173, backend is 8080.
-    // Vite proxy usually proxies /api. Does it proxy /ws?
+    let timeoutId: NodeJS.Timeout;
+    let socket: WebSocket | null = null;
+    let attempts = 0;
+    let isMounted = true;
 
-    // Let's assume we connect to `/ws`.
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    const connect = () => {
+      if (!isMounted) return;
 
-    // In development with Vite, we might need to point to backend port if proxy isn't set up for /ws.
-    // But typically we configure proxy for /ws too.
+      // Determine WS protocol based on current protocol
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/api/v1/ws`;
 
-    const socket = new WebSocket(wsUrl);
-    socketRef.current = socket;
+      socket = new WebSocket(wsUrl);
+      socketRef.current = socket;
 
-    socket.onopen = () => {
-      setIsConnected(true);
-    };
+      socket.onopen = () => {
+        if (!isMounted) return;
+        setIsConnected(true);
+        attempts = 0;
+      };
 
-    socket.onmessage = (event) => {
-      try {
-        const response = JSON.parse(event.data);
-        // Check if it looks like ExecuteResponse
-        if (response.job_id) {
-          setLastResult(response);
+      socket.onmessage = (event) => {
+        if (!isMounted) return;
+        try {
+          const response = JSON.parse(event.data);
+          // Check if it looks like ExecuteResponse
+          if (response.job_id) {
+            setLastResult(response);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
         }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
+      };
+
+      socket.onclose = () => {
+        if (!isMounted) return;
+        setIsConnected(false);
+
+        // Calculate backoff delay with a cap (e.g., max 30 seconds)
+        const delay = Math.min(1000 * Math.pow(2, attempts), 30000);
+        attempts++;
+
+        console.log(`WebSocket disconnected. Retrying in ${delay}ms...`);
+        timeoutId = setTimeout(connect, delay);
+      };
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
     };
 
-    socket.onclose = () => {
-      setIsConnected(false);
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    connect();
 
     return () => {
-      socket.close();
+      isMounted = false;
+      clearTimeout(timeoutId);
+      if (socket) {
+        socket.onclose = null;
+        socket.onerror = null;
+        socket.close();
+      }
     };
   }, []);
 

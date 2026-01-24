@@ -59,7 +59,7 @@ func main() {
 	rmqClient := initializeRabbitMQ(cfg, log)
 	defer rmqClient.Close()
 
-	wsHub := websocket.NewHub(rmqClient, log)
+	wsHub := websocket.NewHub(rmqClient, log, queries)
 	go wsHub.Run()
 	go func() {
 		if err := wsHub.ListenToRabbitMQ(context.Background(), "codexec.results"); err != nil {
