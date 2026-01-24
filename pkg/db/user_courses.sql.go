@@ -214,19 +214,21 @@ LEFT JOIN user_exercise_counts    ON "courses"."uuid" = user_exercise_counts.cou
 LEFT JOIN next_lessons            ON "courses"."uuid" = next_lessons.course_uuid
 LEFT JOIN next_exercises          ON "courses"."uuid" = next_exercises.course_uuid
 WHERE "user_courses"."user_uuid" = $1
-AND   ($5::text IS NULL OR "courses"."subject" = $5)
-AND   ($6::boolean IS NULL OR "courses"."is_active" = $6)
+AND   ($5::uuid IS NULL OR "courses"."uuid" = $5)
+AND   ($6::text IS NULL OR "courses"."subject" = $6)
+AND   ($7::boolean IS NULL OR "courses"."is_active" = $7)
 ORDER BY "user_courses"."last_accessed_at" DESC
 LIMIT $3 OFFSET $4
 `
 
 type ListUserCoursesWithProgressParams struct {
-	UserUuid uuid.UUID `json:"user_uuid"`
-	Language string    `json:"language"`
-	Limit    int32     `json:"limit"`
-	Offset   int32     `json:"offset"`
-	Subject  *string   `json:"subject"`
-	IsActive *bool     `json:"is_active"`
+	UserUuid   uuid.UUID  `json:"user_uuid"`
+	Language   string     `json:"language"`
+	Limit      int32      `json:"limit"`
+	Offset     int32      `json:"offset"`
+	CourseUuid *uuid.UUID `json:"course_uuid"`
+	Subject    *string    `json:"subject"`
+	IsActive   *bool      `json:"is_active"`
 }
 
 type ListUserCoursesWithProgressRow struct {
@@ -261,6 +263,7 @@ func (q *Queries) ListUserCoursesWithProgress(ctx context.Context, arg ListUserC
 		arg.Language,
 		arg.Limit,
 		arg.Offset,
+		arg.CourseUuid,
 		arg.Subject,
 		arg.IsActive,
 	)
@@ -304,6 +307,62 @@ func (q *Queries) ListUserCoursesWithProgress(ctx context.Context, arg ListUserC
 		return nil, err
 	}
 	return items, nil
+}
+
+const syncProgressAfterExercise = `-- name: SyncProgressAfterExercise :exec
+WITH target AS (
+    SELECT e.lesson_uuid, l.course_uuid
+    FROM exercises e
+    JOIN lessons l ON e.lesson_uuid = l.uuid
+    WHERE e.uuid = $2
+),
+lesson_progress AS (
+    SELECT 
+        t.lesson_uuid,
+        BOOL_AND(ue.completed_at IS NOT NULL) as is_completed
+    FROM target t
+    JOIN exercises e ON t.lesson_uuid = e.lesson_uuid
+    LEFT JOIN user_exercises ue ON e.uuid = ue.exercise_uuid AND ue.user_uuid = $1
+    WHERE e.deleted_at IS NULL
+    GROUP BY t.lesson_uuid
+),
+course_progress AS (
+    SELECT 
+        t.course_uuid,
+        BOOL_AND(ue.completed_at IS NOT NULL) as is_completed
+    FROM target t
+    JOIN lessons l ON t.course_uuid = l.course_uuid
+    JOIN exercises e ON l.uuid = e.lesson_uuid
+    LEFT JOIN user_exercises ue ON e.uuid = ue.exercise_uuid AND ue.user_uuid = $1
+    WHERE l.deleted_at IS NULL AND e.deleted_at IS NULL
+    GROUP BY t.course_uuid
+),
+update_lesson AS (
+    UPDATE user_lessons
+    SET completed_at = NOW()
+    FROM lesson_progress
+    WHERE user_lessons.lesson_uuid = lesson_progress.lesson_uuid
+      AND user_lessons.user_uuid = $1
+      AND lesson_progress.is_completed
+      AND user_lessons.completed_at IS NULL
+)
+UPDATE user_courses
+SET completed_at = NOW()
+FROM course_progress
+WHERE user_courses.course_uuid = course_progress.course_uuid
+  AND user_courses.user_uuid = $1
+  AND course_progress.is_completed
+  AND user_courses.completed_at IS NULL
+`
+
+type SyncProgressAfterExerciseParams struct {
+	UserUuid     uuid.UUID `json:"user_uuid"`
+	ExerciseUuid uuid.UUID `json:"exercise_uuid"`
+}
+
+func (q *Queries) SyncProgressAfterExercise(ctx context.Context, arg SyncProgressAfterExerciseParams) error {
+	_, err := q.db.Exec(ctx, syncProgressAfterExercise, arg.UserUuid, arg.ExerciseUuid)
+	return err
 }
 
 const updateUserCourse = `-- name: UpdateUserCourse :one

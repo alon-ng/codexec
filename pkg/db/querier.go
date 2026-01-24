@@ -40,6 +40,7 @@ type Querier interface {
 	GetCourseTranslation(ctx context.Context, argUuid uuid.UUID) (GetCourseTranslationRow, error)
 	GetExercise(ctx context.Context, arg GetExerciseParams) (GetExerciseRow, error)
 	GetExerciseForSubmission(ctx context.Context, argUuid uuid.UUID) (GetExerciseForSubmissionRow, error)
+	GetExerciseLessonCourse(ctx context.Context, argUuid uuid.UUID) (GetExerciseLessonCourseRow, error)
 	GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID) (GetExerciseTranslationRow, error)
 	GetLesson(ctx context.Context, arg GetLessonParams) (GetLessonRow, error)
 	GetLessonTranslation(ctx context.Context, argUuid uuid.UUID) (GetLessonTranslationRow, error)
@@ -59,6 +60,7 @@ type Querier interface {
 	ListUserCoursesWithProgress(ctx context.Context, arg ListUserCoursesWithProgressParams) ([]ListUserCoursesWithProgressRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	ResetUserExercise(ctx context.Context, arg ResetUserExerciseParams) (UserExercise, error)
+	SyncProgressAfterExercise(ctx context.Context, arg SyncProgressAfterExerciseParams) error
 	UndeleteCourse(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteExercise(ctx context.Context, argUuid uuid.UUID) error
 	UndeleteLesson(ctx context.Context, argUuid uuid.UUID) error

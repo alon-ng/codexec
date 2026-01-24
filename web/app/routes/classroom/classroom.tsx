@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useGetCoursesUuid } from "~/api/generated/courses/courses";
 import { useGetMeCoursesCourseUuid } from "~/api/generated/me/me";
 import type { MeUserExerciseStatus } from "~/api/generated/model";
+import successSound from "~/assets/success.mp3";
 import PageHeader, { type BreadcrumbProps } from "~/components/PageHeader";
 import ClassroomError from "~/components/classroom/ClassroomError";
 import ClassroomLoading from "~/components/classroom/ClassroomLoading";
@@ -25,6 +26,7 @@ export default function Classroom() {
         data: userCourseData,
         isLoading: isLoadingUserCourse,
         error: userCourseError,
+        refetch: refetchUserCourse,
     } = useGetMeCoursesCourseUuid(courseUuid!, {
         query: {
             enabled: !!courseUuid,
@@ -42,12 +44,6 @@ export default function Classroom() {
             enabled: !!courseUuid,
         },
     });
-
-    // Look up selected lesson from courseData
-    const selectedLessonData = useMemo(() => {
-        if (!courseData || !lessonUuid) return undefined;
-        return courseData.lessons?.find((lesson) => lesson.uuid === lessonUuid);
-    }, [courseData, lessonUuid]);
 
     // Look up selected exercise from courseData
     const selectedExerciseData = useMemo(() => {
@@ -163,6 +159,19 @@ export default function Classroom() {
         },
     ];
 
+    const onExerciseComplete = (exerciseUuid: string, nextLessonUuid?: string, nextExerciseUuid?: string) => {
+        if (nextLessonUuid && nextExerciseUuid) {
+            navigate(`/classroom/${courseUuid}/${nextLessonUuid}/${nextExerciseUuid}`);
+        } else if (nextLessonUuid) {
+            navigate(`/classroom/${courseUuid}/${nextLessonUuid}`);
+        }
+
+        const audio = new Audio(successSound);
+        audio.play();
+
+        refetchUserCourse();
+    };
+
     return (
         <div className="flex flex-col h-full gap-4">
             <PageHeader
@@ -185,6 +194,7 @@ export default function Classroom() {
                         exercise={selectedExerciseData}
                         exerciseUuid={exerciseUuid}
                         language={courseData.subject}
+                        onExerciseComplete={onExerciseComplete}
                     />
                 </main>
             </div>

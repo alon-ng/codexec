@@ -180,7 +180,53 @@ LEFT JOIN user_exercise_counts    ON "courses"."uuid" = user_exercise_counts.cou
 LEFT JOIN next_lessons            ON "courses"."uuid" = next_lessons.course_uuid
 LEFT JOIN next_exercises          ON "courses"."uuid" = next_exercises.course_uuid
 WHERE "user_courses"."user_uuid" = $1
+AND   (sqlc.narg('course_uuid')::uuid IS NULL OR "courses"."uuid" = sqlc.narg('course_uuid'))
 AND   (sqlc.narg('subject')::text IS NULL OR "courses"."subject" = sqlc.narg('subject'))
 AND   (sqlc.narg('is_active')::boolean IS NULL OR "courses"."is_active" = sqlc.narg('is_active'))
 ORDER BY "user_courses"."last_accessed_at" DESC
 LIMIT $3 OFFSET $4;
+
+-- name: SyncProgressAfterExercise :exec
+WITH target AS (
+    SELECT e.lesson_uuid, l.course_uuid
+    FROM exercises e
+    JOIN lessons l ON e.lesson_uuid = l.uuid
+    WHERE e.uuid = sqlc.arg(exercise_uuid)
+),
+lesson_progress AS (
+    SELECT 
+        t.lesson_uuid,
+        BOOL_AND(ue.completed_at IS NOT NULL) as is_completed
+    FROM target t
+    JOIN exercises e ON t.lesson_uuid = e.lesson_uuid
+    LEFT JOIN user_exercises ue ON e.uuid = ue.exercise_uuid AND ue.user_uuid = sqlc.arg(user_uuid)
+    WHERE e.deleted_at IS NULL
+    GROUP BY t.lesson_uuid
+),
+course_progress AS (
+    SELECT 
+        t.course_uuid,
+        BOOL_AND(ue.completed_at IS NOT NULL) as is_completed
+    FROM target t
+    JOIN lessons l ON t.course_uuid = l.course_uuid
+    JOIN exercises e ON l.uuid = e.lesson_uuid
+    LEFT JOIN user_exercises ue ON e.uuid = ue.exercise_uuid AND ue.user_uuid = sqlc.arg(user_uuid)
+    WHERE l.deleted_at IS NULL AND e.deleted_at IS NULL
+    GROUP BY t.course_uuid
+),
+update_lesson AS (
+    UPDATE user_lessons
+    SET completed_at = NOW()
+    FROM lesson_progress
+    WHERE user_lessons.lesson_uuid = lesson_progress.lesson_uuid
+      AND user_lessons.user_uuid = sqlc.arg(user_uuid)
+      AND lesson_progress.is_completed
+      AND user_lessons.completed_at IS NULL
+)
+UPDATE user_courses
+SET completed_at = NOW()
+FROM course_progress
+WHERE user_courses.course_uuid = course_progress.course_uuid
+  AND user_courses.user_uuid = sqlc.arg(user_uuid)
+  AND course_progress.is_completed
+  AND user_courses.completed_at IS NULL;

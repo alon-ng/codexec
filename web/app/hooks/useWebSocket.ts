@@ -3,7 +3,7 @@ import type { ExercisesExerciseCodeData } from '~/api/generated/model';
 import type { ExecuteResponse } from '~/api/types';
 
 
-export const useWebSocket = () => {
+export const useWebSocket = (onSubmissionResponse?: (result: ExecuteResponse) => void) => {
   const [lastResult, setLastResult] = useState<ExecuteResponse | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
@@ -37,6 +37,7 @@ export const useWebSocket = () => {
           // Check if it looks like ExecuteResponse
           if (response.job_id) {
             setLastResult(response);
+            onSubmissionResponse?.(response);
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);

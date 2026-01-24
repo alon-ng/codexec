@@ -180,6 +180,57 @@ func (q *Queries) GetExerciseForSubmission(ctx context.Context, argUuid uuid.UUI
 	return i, err
 }
 
+const getExerciseLessonCourse = `-- name: GetExerciseLessonCourse :one
+SELECT courses.uuid, courses.created_at, courses.modified_at, courses.deleted_at, courses.subject, courses.price, courses.discount, courses.is_active, courses.difficulty, lessons.uuid, lessons.created_at, lessons.modified_at, lessons.deleted_at, lessons.course_uuid, lessons.order_index, lessons.is_public FROM "courses"
+JOIN "lessons" ON "courses"."uuid" = "lessons"."course_uuid"
+JOIN "exercises" ON "lessons"."uuid" = "exercises"."lesson_uuid"
+WHERE "exercises"."uuid" = $1
+LIMIT 1
+`
+
+type GetExerciseLessonCourseRow struct {
+	Uuid         uuid.UUID  `json:"uuid"`
+	CreatedAt    time.Time  `json:"created_at"`
+	ModifiedAt   time.Time  `json:"modified_at"`
+	DeletedAt    *time.Time `json:"deleted_at"`
+	Subject      string     `json:"subject"`
+	Price        int16      `json:"price"`
+	Discount     int16      `json:"discount"`
+	IsActive     bool       `json:"is_active"`
+	Difficulty   int16      `json:"difficulty"`
+	Uuid_2       uuid.UUID  `json:"uuid_2"`
+	CreatedAt_2  time.Time  `json:"created_at_2"`
+	ModifiedAt_2 time.Time  `json:"modified_at_2"`
+	DeletedAt_2  *time.Time `json:"deleted_at_2"`
+	CourseUuid   uuid.UUID  `json:"course_uuid"`
+	OrderIndex   int16      `json:"order_index"`
+	IsPublic     bool       `json:"is_public"`
+}
+
+func (q *Queries) GetExerciseLessonCourse(ctx context.Context, argUuid uuid.UUID) (GetExerciseLessonCourseRow, error) {
+	row := q.db.QueryRow(ctx, getExerciseLessonCourse, argUuid)
+	var i GetExerciseLessonCourseRow
+	err := row.Scan(
+		&i.Uuid,
+		&i.CreatedAt,
+		&i.ModifiedAt,
+		&i.DeletedAt,
+		&i.Subject,
+		&i.Price,
+		&i.Discount,
+		&i.IsActive,
+		&i.Difficulty,
+		&i.Uuid_2,
+		&i.CreatedAt_2,
+		&i.ModifiedAt_2,
+		&i.DeletedAt_2,
+		&i.CourseUuid,
+		&i.OrderIndex,
+		&i.IsPublic,
+	)
+	return i, err
+}
+
 const hardDeleteExercise = `-- name: HardDeleteExercise :exec
 DELETE FROM "exercises"
 WHERE "uuid" = $1

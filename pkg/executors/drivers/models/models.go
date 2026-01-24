@@ -7,6 +7,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type ExecutionRequest struct {
+	JobID       uuid.UUID             `json:"job_id"`
+	Source      fs.Entry              `json:"src"`
+	EntryPoint  string                `json:"entry_point"`
+	IOChecker   *checkers.IOChecker   `json:"io_data_checker,omitempty"`
+	CodeChecker *checkers.CodeChecker `json:"code_checker,omitempty"`
+}
+
 type ExecuteResponse struct {
 	JobID          uuid.UUID                `json:"job_id"`
 	Stdout         string                   `json:"stdout"`
@@ -18,10 +26,16 @@ type ExecuteResponse struct {
 	CheckerResults []checkers.CheckerResult `json:"checker_results"`
 }
 
-type ExecutionRequest struct {
-	JobID       uuid.UUID             `json:"job_id"`
-	Source      fs.Entry              `json:"src"`
-	EntryPoint  string                `json:"entry_point"`
-	IOChecker   *checkers.IOChecker   `json:"io_data_checker,omitempty"`
-	CodeChecker *checkers.CodeChecker `json:"code_checker,omitempty"`
+func (e *ExecuteResponse) Passed() bool {
+	if e.ExitCode != 0 {
+		return false
+	}
+
+	for _, checkerResult := range e.CheckerResults {
+		if !checkerResult.Success {
+			return false
+		}
+	}
+
+	return true
 }

@@ -65,3 +65,10 @@ JOIN "exercises" ON "lessons"."uuid" = "exercises"."lesson_uuid"
 WHERE "exercises"."uuid" = $1
 LIMIT 1;
 
+-- name: GetExerciseLessonCourse :one
+SELECT "courses".*, "lessons".* FROM "courses"
+JOIN "lessons" ON "courses"."uuid" = "lessons"."course_uuid"
+JOIN "exercises" ON "lessons"."uuid" = "exercises"."lesson_uuid"
+WHERE "exercises"."uuid" = $1
+LIMIT 1;
+

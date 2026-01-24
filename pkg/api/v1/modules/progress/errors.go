@@ -8,4 +8,6 @@ var (
 	ErrGetUserExerciseFailed             = "Failed to get user exercise"
 	ErrSaveUserExerciseSubmissionFailed  = "Failed to save user exercise submission"
 	ErrValidateSubmissionFailed          = "Failed to validate submission"
+	ErrCompleteUserExerciseFailed        = "Failed to complete user exercise"
+	ErrGetExerciseLessonCourseFailed     = "Failed to get exercise lesson course"
 )

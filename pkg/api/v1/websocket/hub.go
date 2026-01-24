@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"codim/pkg/api/v1/errors"
+	"codim/pkg/api/v1/modules/progress"
 	"codim/pkg/db"
 	"codim/pkg/executors/drivers/models"
 	"codim/pkg/rabbitmq"
@@ -15,16 +16,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type JobClient struct {
-	JobID  string
-	Client *Client
+	JobID        uuid.UUID
+	ExerciseUuid uuid.UUID
+	Client       *Client
 }
 
 type Hub struct {
 	clients     map[*Client]bool
-	jobClients  map[string]*Client
+	jobClients  map[uuid.UUID]*JobClient
 	jobMutex    sync.Mutex
 	register    chan *Client
 	unregister  chan *Client
@@ -35,22 +38,25 @@ type Hub struct {
 	logger      *logger.Logger
 	q           *db.Queries
 	upgrader    websocket.Upgrader
+	progressSvc *progress.Service
 }
 
-func NewHub(rmqClient *rabbitmq.Client, logger *logger.Logger, q *db.Queries) *Hub {
+func NewHub(rmqClient *rabbitmq.Client, logger *logger.Logger, q *db.Queries, p *pgxpool.Pool) *Hub {
 	producer := rmqClient.NewProducer()
 	consumer := rmqClient.NewConsumer()
+	progressSvc := progress.NewService(q, p)
 	return &Hub{
 		register:    make(chan *Client),
 		unregister:  make(chan *Client),
 		clients:     make(map[*Client]bool),
-		jobClients:  make(map[string]*Client),
+		jobClients:  make(map[uuid.UUID]*JobClient),
 		registerJob: make(chan *JobClient),
 		rmqClient:   rmqClient,
 		producer:    producer,
 		consumer:    consumer,
 		logger:      logger,
 		q:           q,
+		progressSvc: progressSvc,
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
@@ -69,7 +75,7 @@ func (h *Hub) Run() {
 		case client := <-h.unregister:
 			h.unregisterClient(client)
 		case jobClient := <-h.registerJob:
-			h.registerJobClient(jobClient.JobID, jobClient.Client)
+			h.registerJobClient(jobClient)
 		}
 	}
 }
@@ -85,13 +91,13 @@ func (h *Hub) unregisterClient(client *Client) {
 	}
 }
 
-func (h *Hub) registerJobClient(jobID string, client *Client) {
+func (h *Hub) registerJobClient(jobClient *JobClient) {
 	h.jobMutex.Lock()
-	h.jobClients[jobID] = client
+	h.jobClients[jobClient.JobID] = jobClient
 	h.jobMutex.Unlock()
 }
 
-func (h *Hub) unregisterJobClient(jobID string) {
+func (h *Hub) unregisterJobClient(jobID uuid.UUID) {
 	h.jobMutex.Lock()
 	delete(h.jobClients, jobID)
 	h.jobMutex.Unlock()
@@ -149,18 +155,37 @@ func (h *Hub) messageHandler(ctx context.Context, body []byte) error {
 		return err
 	}
 
-	jobID := res.JobID.String()
-
 	h.jobMutex.Lock()
-	client, ok := h.jobClients[jobID]
+	jobClient, ok := h.jobClients[res.JobID]
 	if ok {
-		delete(h.jobClients, jobID)
+		delete(h.jobClients, res.JobID)
 	}
 	h.jobMutex.Unlock()
 
+	response := progress.UserExerciseSubmissionResponse{
+		ExecuteResponse: res,
+		Passed:          res.Passed(),
+	}
+	if response.Passed {
+		nextLessonUuid, nextExerciseUuid, err := h.progressSvc.CompleteUserExercise(ctx, jobClient.Client.userID, jobClient.ExerciseUuid)
+		if err != nil {
+			errors.HandleError(nil, h.logger, err, http.StatusInternalServerError)
+			return err.OriginalError
+		}
+
+		response.NextLessonUuid = nextLessonUuid
+		response.NextExerciseUuid = nextExerciseUuid
+	}
+
+	responseBytes, err := json.Marshal(response)
+	if err != nil {
+		errors.HandleError(nil, h.logger, errors.NewAPIError(err, "Internal server error"), http.StatusInternalServerError)
+		return err
+	}
+
 	if ok {
 		select {
-		case client.send <- body:
+		case jobClient.Client.send <- responseBytes:
 		default:
 			// Client buffer full or closed
 		}

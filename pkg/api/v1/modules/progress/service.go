@@ -34,6 +34,60 @@ func (s *Service) InitUserCourse(ctx context.Context, userUuid uuid.UUID, course
 	return nil
 }
 
+func (s *Service) CompleteUserExercise(ctx context.Context, userUuid uuid.UUID, exerciseUuid uuid.UUID) (*uuid.UUID, *uuid.UUID, *e.APIError) {
+	tx, err := s.p.Begin(ctx)
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
+	}
+
+	qtx := s.q.WithTx(tx)
+
+	defer tx.Rollback(ctx)
+
+	_, err = qtx.CompleteUserExercise(ctx, db.CompleteUserExerciseParams{
+		UserUuid:     userUuid,
+		ExerciseUuid: exerciseUuid,
+	})
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
+	}
+
+	err = qtx.SyncProgressAfterExercise(ctx, db.SyncProgressAfterExerciseParams{
+		UserUuid:     userUuid,
+		ExerciseUuid: exerciseUuid,
+	})
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
+	}
+
+	courseAndLesson, err := qtx.GetExerciseLessonCourse(ctx, exerciseUuid)
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
+	}
+
+	userCourses, err := s.q.ListUserCoursesWithProgress(ctx, db.ListUserCoursesWithProgressParams{
+		UserUuid:   userUuid,
+		Language:   "en",
+		Limit:      1,
+		CourseUuid: &courseAndLesson.CourseUuid,
+	})
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrGetUserCoursesWithProgressFailed)
+	}
+
+	if len(userCourses) == 0 {
+		return nil, nil, e.NewAPIError(errors.New("user course not found"), ErrCompleteUserExerciseFailed)
+	}
+	userCourse := userCourses[0]
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
+	}
+
+	return userCourse.NextLessonUuid, userCourse.NextExerciseUuid, nil
+}
+
 // Conversion functions
 func toUserCourseWithProgress(d db.UserCourseWithProgress) (UserCourseWithProgress, error) {
 	courseWithTranslation, err := courses.ToCourseWithTranslation(d.CourseWithTranslation)

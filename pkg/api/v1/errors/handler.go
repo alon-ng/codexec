@@ -18,16 +18,20 @@ func HandleError(ctx *gin.Context, log *logger.Logger, err *APIError, statusCode
 			"status_code": statusCode,
 		}).Error(err.OriginalError)
 
-		ctx.JSON(statusCode, ErrorResponse{
-			Error: err.ErrorMessage,
-		})
+		if ctx != nil {
+			ctx.JSON(statusCode, ErrorResponse{
+				Error: err.ErrorMessage,
+			})
+		}
 	} else {
 		log.WithFields(map[string]interface{}{
 			"status_code": statusCode,
 		}).Error(err.OriginalError)
 
-		ctx.JSON(statusCode, ErrorResponse{
-			Error: err.ErrorMessage,
-		})
+		if ctx != nil {
+			ctx.JSON(statusCode, ErrorResponse{
+				Error: err.ErrorMessage,
+			})
+		}
 	}
 }

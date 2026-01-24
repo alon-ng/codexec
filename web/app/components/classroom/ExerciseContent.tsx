@@ -9,12 +9,14 @@ export interface ExerciseContentProps {
   exercise?: ExercisesExerciseWithTranslation;
   exerciseUuid?: string;
   language: string;
+  onExerciseComplete: (exerciseUuid: string, nextLessonUuid?: string, nextExerciseUuid?: string) => void;
 }
 
 export default function ExerciseContent({
   exercise,
   exerciseUuid,
   language,
+  onExerciseComplete,
 }: ExerciseContentProps) {
   const { t } = useTranslation();
 
@@ -60,6 +62,7 @@ export default function ExerciseContent({
           exercise={exercise}
           language={language}
           userExercise={userExerciseData}
+          onExerciseComplete={onExerciseComplete}
         />
       ) : (
         <ExerciseQuiz

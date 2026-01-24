@@ -23,4 +23,7 @@ export interface ExecuteResponse {
     memory: number;
     cpu: number;
     checker_results: CheckerResult[];
+    passed: boolean;
+    next_lesson_uuid?: string;
+    next_exercise_uuid?: string;
 }

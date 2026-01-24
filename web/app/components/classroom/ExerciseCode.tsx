@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePutMeExercisesExerciseUuid } from "~/api/generated/me/me";
 import type { ExercisesExerciseCodeData, ExercisesExerciseWithTranslation, MeSaveUserExerciseSubmissionRequestSubmission, MeUserExercise } from "~/api/generated/model";
+import type { ExecuteResponse } from '~/api/types';
+import errorSound from "~/assets/error.mp3";
 import { Button } from "~/components/base/Button";
 import { useWebSocket } from "~/hooks/useWebSocket";
 import { useLanguage } from '~/lib/useLanguage';
@@ -21,6 +23,7 @@ export interface ExerciseEditorProps {
   exercise: ExercisesExerciseWithTranslation;
   language: string;
   userExercise: MeUserExercise;
+  onExerciseComplete: (exerciseUuid: string, nextLessonUuid?: string, nextExerciseUuid?: string) => void;
 }
 
 function getCodeValue(submission: ExercisesExerciseCodeData | undefined): string {
@@ -43,48 +46,35 @@ export default function ExerciseCode({
   exercise,
   language,
   userExercise,
+  onExerciseComplete,
 }: ExerciseEditorProps) {
   const { t } = useTranslation();
-  const { submitCode, lastResult } = useWebSocket();
   const { dir } = useLanguage();
-  const saveMutation = usePutMeExercisesExerciseUuid();
+  const { mutate: saveMutation } = usePutMeExercisesExerciseUuid();
 
-  const { submission, initialCode } = useMemo(() => {
-    const userSubmission = userExercise.submission as unknown as ExercisesExerciseCodeData;
-    const hasUserSubmission = Boolean(userSubmission?.name && userSubmission?.content);
-
-    if (hasUserSubmission) {
-      return {
-        submission: userSubmission,
-        initialCode: getCodeValue(userSubmission),
-      };
-    }
-
-    const code = getCodeValue(exercise.code_data);
-    return {
-      submission: getSubmissionFromCode(code, language),
-      initialCode: code,
-    };
-  }, [userExercise.submission, exercise.code_data, language]);
-
+  const userSubmission = userExercise.submission as unknown as ExercisesExerciseCodeData;
+  const hasUserSubmission = Boolean(userSubmission?.name && userSubmission?.content);
+  const initialCode = getCodeValue(hasUserSubmission ? userSubmission : exercise.code_data);
   const [codeValue, setCodeValue] = useState(initialCode);
   const previousCodeRef = useRef<string>(initialCode);
   const codeValueRef = useRef<string>(initialCode);
   const [resultTab, setResultTab] = useState<string>("console");
   const [isRunning, setIsRunning] = useState(false);
 
-  useEffect(() => {
-    previousCodeRef.current = initialCode;
-    codeValueRef.current = initialCode;
-    setCodeValue(initialCode);
-  }, [initialCode]);
-
-  useEffect(() => {
+  function onSubmissionResponse(result: ExecuteResponse) {
     setIsRunning(false);
-    if (lastResult && lastResult.stderr) {
+    if (result.passed) {
+      onExerciseComplete(exercise.uuid, result.next_lesson_uuid, result.next_exercise_uuid);
+    } else {
+      const audio = new Audio(errorSound);
+      audio.play();
+    }
+
+    if (result.stderr) {
       setResultTab("errors");
     }
-  }, [lastResult]);
+  }
+  const { submitCode, lastResult } = useWebSocket(onSubmissionResponse);
 
   const readOnlyLines: number[] = [];
 
@@ -107,7 +97,7 @@ export default function ExerciseCode({
 
     const s = getSubmissionFromCode(currentCode, language);
 
-    saveMutation.mutate({
+    saveMutation({
       exerciseUuid: currentExerciseUuid,
       data: {
         type: "code",

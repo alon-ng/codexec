@@ -117,8 +117,9 @@ func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage,
 	}
 
 	c.hub.registerJob <- &JobClient{
-		JobID:  jobID.String(),
-		Client: c,
+		JobID:        jobID,
+		ExerciseUuid: submission.ExerciseUuid,
+		Client:       c,
 	}
 
 	err := c.hub.producer.PublishObject(context.Background(), "", queueName, req)

@@ -3,6 +3,7 @@ package progress
 import (
 	"codim/pkg/api/v1/modules/courses"
 	"codim/pkg/db"
+	"codim/pkg/executors/drivers/models"
 	"codim/pkg/fs"
 	"encoding/json"
 	"time"
@@ -76,3 +77,11 @@ type SaveUserExerciseSubmissionRequest struct {
 
 type UserExerciseSubmissionCode fs.Entry
 type UserExerciseSubmissionQuiz json.RawMessage
+
+type UserExerciseSubmissionResponse struct {
+	models.ExecuteResponse
+	Passed           bool       `json:"passed" binding:"required" example:"false"`
+	NextLessonUuid   *uuid.UUID `json:"next_lesson_uuid,omitempty"`
+	NextExerciseUuid *uuid.UUID `json:"next_exercise_uuid,omitempty"`
+	Reward           int32      `json:"reward" binding:"required" example:"10"`
+}
