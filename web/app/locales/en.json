@@ -12,6 +12,7 @@
         "run": "Run",
         "console": "Console",
         "errors": "Errors",
+        "tests": "Tests",
         "email": "Email",
         "password": "Password",
         "firstName": "First Name",
@@ -33,7 +34,8 @@
         "google": "Google",
         "readMore": "Read More",
         "noOutput": "No output",
-        "noErrors": "No errors"
+        "noErrors": "No errors",
+        "noTests": "No tests"
     },
     "auth": {
         "welcomeBack": "Welcome back",

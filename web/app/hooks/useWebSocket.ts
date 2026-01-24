@@ -1,15 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ExercisesExerciseCodeData } from '~/api/generated/model';
+import type { ExecuteResponse } from '~/api/types';
 
-interface ExecuteResponse {
-  job_id: string;
-  stdout: string;
-  stderr: string;
-  exit_code: number;
-  time: number;
-  memory: number;
-  cpu: number;
-}
 
 export const useWebSocket = () => {
   const [lastResult, setLastResult] = useState<ExecuteResponse | null>(null);

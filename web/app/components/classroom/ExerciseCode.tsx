@@ -1,7 +1,7 @@
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import CodeMirror from '@uiw/react-codemirror';
-import { Ban, ChevronRightSquare, Play } from "lucide-react";
+import { Ban, CheckCircle, ChevronRightSquare, FlaskConical, Play, XCircle } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,7 @@ import type { ExercisesExerciseCodeData, ExercisesExerciseWithTranslation, MeSav
 import { Button } from "~/components/base/Button";
 import { useWebSocket } from "~/hooks/useWebSocket";
 import { useLanguage } from '~/lib/useLanguage';
+import { cn } from '~/lib/utils';
 import { blurInVariants } from "~/utils/animations";
 import LANGUAGE_MAP from "~/utils/codeLang";
 import { getCodeMirrorExtensions } from "~/utils/codeMirror";
@@ -44,7 +45,7 @@ export default function ExerciseCode({
   userExercise,
 }: ExerciseEditorProps) {
   const { t } = useTranslation();
-  const { submitCode, lastResult, isConnected } = useWebSocket();
+  const { submitCode, lastResult } = useWebSocket();
   const { dir } = useLanguage();
   const saveMutation = usePutMeExercisesExerciseUuid();
 
@@ -82,8 +83,6 @@ export default function ExerciseCode({
     setIsRunning(false);
     if (lastResult && lastResult.stderr) {
       setResultTab("errors");
-    } else {
-      setResultTab("console");
     }
   }, [lastResult]);
 
@@ -194,6 +193,10 @@ export default function ExerciseCode({
                     <Ban className="size-3" />
                     {t("common.errors")}
                   </TabsTrigger>
+                  <TabsTrigger className="flex items-center gap-1.5 transition-colors cursor-pointer text-xs" value="tests">
+                    <FlaskConical className="size-3" />
+                    {t("common.tests")}
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent className="text-xs px-3 font-mono" value="console">
                   <div className="whitespace-pre-wrap">
@@ -204,6 +207,18 @@ export default function ExerciseCode({
                   <div className="text-red-400 whitespace-pre-wrap">
                     {lastResult.stderr || <span className="text-muted-foreground">{t("common.noErrors") || "No errors"}</span>}
                   </div>
+                </TabsContent>
+                <TabsContent className="text-xs font-mono" value="tests">
+                  {lastResult.checker_results?.length === 0 ? <span className="text-muted-foreground">{t("common.noTests") || "No tests"}</span> : (
+                    <>
+                      {lastResult.checker_results?.map((result) => (
+                        <div className={cn("flex items-center gap-1.5 py-1 px-3", result.success ? "text-green-400 bg-green-50" : "text-red-400 bg-red-50")} key={result.type}>
+                          {result.success ? <CheckCircle className="size-3" /> : <XCircle className="size-3" />}
+                          <span>{result.message}</span>
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </TabsContent>
               </Tabs>
             </motion.div>

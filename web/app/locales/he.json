@@ -12,6 +12,7 @@
     "run": "הרץ",
     "console": "קונסול",
     "errors": "שגיאות",
+    "tests": "בדיקות",
     "email": "דואר אלקטרוני",
     "password": "סיסמה",
     "firstName": "שם פרטי",
@@ -33,7 +34,8 @@
     "buy": "קנה",
     "readMore": "קרא עוד",
     "noOutput": "אין פלט",
-    "noErrors": "אין שגיאות"
+    "noErrors": "אין שגיאות",
+    "noTests": "אין בדיקות"
   },
   "auth": {
     "welcomeBack": "ברוכים הבאים",
