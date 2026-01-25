@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS "exercises" (
     "type"          exercise_type   NOT NULL,
     "code_data"     JSONB           NULL,
     "quiz_data"     JSONB           NULL,
+    "quiz_checker"  JSONB           NULL,
     "io_checker"    JSONB           NULL,
     "code_checker"  JSONB           NULL,
     CONSTRAINT fk_exercises_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE

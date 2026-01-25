@@ -76,7 +76,11 @@ type SaveUserExerciseSubmissionRequest struct {
 }
 
 type UserExerciseSubmissionCode fs.Entry
-type UserExerciseSubmissionQuiz json.RawMessage
+
+type UserExerciseSubmissionQuiz struct {
+	Answers map[string]string `json:"answers"`
+	Results map[string]bool   `json:"results,omitempty"`
+}
 
 type UserExerciseSubmissionResponse struct {
 	models.ExecuteResponse

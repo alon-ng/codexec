@@ -69,16 +69,14 @@ export const getGetExercisesResponseMock =
         name: faker.string.alpha({ length: { min: 10, max: 20 } }),
         quiz_data: faker.helpers.arrayElement([
           {
-            questions: Array.from(
-              { length: faker.number.int({ min: 1, max: 10 }) },
-              (_, i) => i + 1,
-            ).map(() => ({
-              answers: Array.from(
-                { length: faker.number.int({ min: 1, max: 10 }) },
-                (_, i) => i + 1,
-              ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+            [faker.string.alphanumeric(5)]: {
+              answers: {
+                [faker.string.alphanumeric(5)]: faker.string.alpha({
+                  length: { min: 10, max: 20 },
+                }),
+              },
               question: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            })),
+            },
           },
           undefined,
         ]),
@@ -101,16 +99,14 @@ export const getPostExercisesAddTranslationResponseMock = (
   name: faker.string.alpha({ length: { min: 10, max: 20 } }),
   quiz_data: faker.helpers.arrayElement([
     {
-      questions: Array.from(
-        { length: faker.number.int({ min: 1, max: 10 }) },
-        (_, i) => i + 1,
-      ).map(() => ({
-        answers: Array.from(
-          { length: faker.number.int({ min: 1, max: 10 }) },
-          (_, i) => i + 1,
-        ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+      [faker.string.alphanumeric(5)]: {
+        answers: {
+          [faker.string.alphanumeric(5)]: faker.string.alpha({
+            length: { min: 10, max: 20 },
+          }),
+        },
         question: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      })),
+      },
     },
     undefined,
   ]),
@@ -166,16 +162,14 @@ export const getPostExercisesCreateResponseMock = (
     name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     quiz_data: faker.helpers.arrayElement([
       {
-        questions: Array.from(
-          { length: faker.number.int({ min: 1, max: 10 }) },
-          (_, i) => i + 1,
-        ).map(() => ({
-          answers: Array.from(
-            { length: faker.number.int({ min: 1, max: 10 }) },
-            (_, i) => i + 1,
-          ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+        [faker.string.alphanumeric(5)]: {
+          answers: {
+            [faker.string.alphanumeric(5)]: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+          },
           question: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        })),
+        },
       },
       undefined,
     ]),
@@ -240,16 +234,14 @@ export const getPutExercisesUpdateResponseMock = (
     name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     quiz_data: faker.helpers.arrayElement([
       {
-        questions: Array.from(
-          { length: faker.number.int({ min: 1, max: 10 }) },
-          (_, i) => i + 1,
-        ).map(() => ({
-          answers: Array.from(
-            { length: faker.number.int({ min: 1, max: 10 }) },
-            (_, i) => i + 1,
-          ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+        [faker.string.alphanumeric(5)]: {
+          answers: {
+            [faker.string.alphanumeric(5)]: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+          },
           question: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        })),
+        },
       },
       undefined,
     ]),
@@ -308,16 +300,14 @@ export const getGetExercisesUuidResponseMock = (
     name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     quiz_data: faker.helpers.arrayElement([
       {
-        questions: Array.from(
-          { length: faker.number.int({ min: 1, max: 10 }) },
-          (_, i) => i + 1,
-        ).map(() => ({
-          answers: Array.from(
-            { length: faker.number.int({ min: 1, max: 10 }) },
-            (_, i) => i + 1,
-          ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+        [faker.string.alphanumeric(5)]: {
+          answers: {
+            [faker.string.alphanumeric(5)]: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+          },
           question: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        })),
+        },
       },
       undefined,
     ]),

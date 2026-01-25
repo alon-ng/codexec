@@ -68,6 +68,8 @@ export default function ExerciseContent({
         <ExerciseQuiz
           exercise={exercise}
           language={language}
+          userExercise={userExerciseData}
+          onExerciseComplete={onExerciseComplete}
         />
       )}
     </div>

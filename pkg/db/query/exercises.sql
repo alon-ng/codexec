@@ -20,10 +20,11 @@ INSERT INTO "exercises" (
   "type",
   "code_data",
   "quiz_data",
+  "quiz_checker",
   "io_checker",
   "code_checker"
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
+  $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
 RETURNING *;
 
@@ -34,6 +35,7 @@ SET "order_index" = COALESCE(sqlc.narg('order_index'), "order_index"),
     "type" = COALESCE(sqlc.narg('type'), "type"),
     "code_data" = COALESCE(sqlc.narg('code_data'), "code_data"),
     "quiz_data" = COALESCE(sqlc.narg('quiz_data'), "quiz_data"),
+    "quiz_checker" = COALESCE(sqlc.narg('quiz_checker'), "quiz_checker"),
     "io_checker" = COALESCE(sqlc.narg('io_checker'), "io_checker"),
     "code_checker" = COALESCE(sqlc.narg('code_checker'), "code_checker"),
     "modified_at" = NOW()
@@ -59,7 +61,7 @@ SELECT COUNT(*) FROM "exercises"
 WHERE "deleted_at" IS NULL;
 
 -- name: GetExerciseForSubmission :one
-SELECT "courses"."subject", "exercises"."type", "exercises"."code_checker", "exercises"."io_checker" FROM "courses"
+SELECT "courses"."subject", "exercises"."type", "exercises"."code_checker", "exercises"."io_checker", "exercises"."quiz_checker" FROM "courses"
 JOIN "lessons" ON "courses"."uuid" = "lessons"."course_uuid"
 JOIN "exercises" ON "lessons"."uuid" = "exercises"."lesson_uuid"
 WHERE "exercises"."uuid" = $1

@@ -17,10 +17,17 @@ export const customInstance = <T>(
   })
     .then(({ data }) => data)
     .catch((error) => {
+      if (error.response?.status === 401) {
+        AXIOS_INSTANCE.post("/auth/logout").then(() => {
+          window.location.href = '/login';
+        });
+        return Promise.reject(error);
+      }
+
       if (error.response?.data) {
         throw error.response.data;
       }
-      
+
       throw error;
     });
 

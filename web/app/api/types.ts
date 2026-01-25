@@ -1,5 +1,6 @@
 export interface UserExerciseQuizData {
-    [key: string]: string;
+    answers: Record<string, string>;
+    results?: Record<string, boolean>;
 }
 
 export interface UserExerciseCodeData {

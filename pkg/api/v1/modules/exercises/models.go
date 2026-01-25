@@ -50,12 +50,12 @@ type ExerciseTranslationCodeData struct {
 	Instructions string `json:"instructions" binding:"required" example:"<p>Hello! Start writing your exercise instructions here...</p>"`
 }
 
-type ExerciseTranslationQuizData struct {
-	Questions []struct {
-		Question string   `json:"question" binding:"required" example:"What is the capital of France?"`
-		Answers  []string `json:"answers" binding:"required" example:"[Paris, London, Berlin, Madrid]"`
-	} `json:"questions" binding:"required"`
+type ExerciseTranslationQuizDataQuestion struct {
+	Question string            `json:"question" binding:"required" example:"What is the capital of France?"`
+	Answers  map[string]string `json:"answers" binding:"required" example:"{\"1\": \"Paris\", \"2\": \"London\", \"3\": \"Berlin\", \"4\": \"Madrid\"}"`
 }
+
+type ExerciseTranslationQuizData = map[string]ExerciseTranslationQuizDataQuestion
 
 // Response types
 type Exercise struct {

@@ -140,3 +140,5 @@ export * from "./usersCreateUserRequest";
 export * from "./usersIDRequest";
 export * from "./usersUpdateUserRequest";
 export * from "./usersUser";
+export * from "./exercisesExerciseTranslationQuizDataQuestion";
+export * from "./exercisesExerciseTranslationQuizDataQuestionAnswers";

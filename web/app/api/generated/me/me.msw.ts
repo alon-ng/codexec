@@ -211,9 +211,6 @@ export const getGetMeExercisesExerciseUuidResponseMock = (
 export const getPutMeExercisesExerciseUuidResponseMock = (): string =>
   faker.word.sample();
 
-export const getPostMeExercisesExerciseUuidRunCodeResponseMock = (): string =>
-  faker.word.sample();
-
 export const getGetMeMockHandler = (
   overrideResponse?:
     | UsersUser
@@ -355,39 +352,10 @@ export const getPutMeExercisesExerciseUuidMockHandler = (
     options,
   );
 };
-
-export const getPostMeExercisesExerciseUuidRunCodeMockHandler = (
-  overrideResponse?:
-    | string
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<string> | string),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/me/exercises/:exerciseUuid/run/code",
-    async (info) => {
-      await delay(1000);
-
-      return new HttpResponse(
-        JSON.stringify(
-          overrideResponse !== undefined
-            ? typeof overrideResponse === "function"
-              ? await overrideResponse(info)
-              : overrideResponse
-            : getPostMeExercisesExerciseUuidRunCodeResponseMock(),
-        ),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      );
-    },
-    options,
-  );
-};
 export const getMeMock = () => [
   getGetMeMockHandler(),
   getGetMeCoursesMockHandler(),
   getGetMeCoursesCourseUuidMockHandler(),
   getGetMeExercisesExerciseUuidMockHandler(),
   getPutMeExercisesExerciseUuidMockHandler(),
-  getPostMeExercisesExerciseUuidRunCodeMockHandler(),
 ];

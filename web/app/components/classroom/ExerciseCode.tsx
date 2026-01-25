@@ -19,7 +19,7 @@ import { getCodeMirrorExtensions } from "~/utils/codeMirror";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import ExerciseHeader from "./ExerciseHeader";
 
-export interface ExerciseEditorProps {
+export interface ExerciseCodeProps {
   exercise: ExercisesExerciseWithTranslation;
   language: string;
   userExercise: MeUserExercise;
@@ -47,7 +47,7 @@ export default function ExerciseCode({
   language,
   userExercise,
   onExerciseComplete,
-}: ExerciseEditorProps) {
+}: ExerciseCodeProps) {
   const { t } = useTranslation();
   const { dir } = useLanguage();
   const { mutate: saveMutation } = usePutMeExercisesExerciseUuid();
@@ -74,7 +74,7 @@ export default function ExerciseCode({
       setResultTab("errors");
     }
   }
-  const { submitCode, lastResult } = useWebSocket(onSubmissionResponse);
+  const { submit, lastResult } = useWebSocket(onSubmissionResponse);
 
   const readOnlyLines: number[] = [];
 
@@ -136,7 +136,7 @@ export default function ExerciseCode({
   const handleRunCode = () => {
     const s = getSubmissionFromCode(codeValue, language);
     setIsRunning(true);
-    submitCode(exercise.uuid, s);
+    submit(exercise.uuid, s);
   };
 
   return (

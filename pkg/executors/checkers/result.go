@@ -5,6 +5,7 @@ type CheckerType string
 const (
 	CheckerTypeIO   CheckerType = "io"
 	CheckerTypeCode CheckerType = "code"
+	CheckerTypeQuiz CheckerType = "quiz"
 )
 
 type CheckerResult struct {

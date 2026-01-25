@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ExercisesExerciseCodeData } from '~/api/generated/model';
-import type { ExecuteResponse } from '~/api/types';
+import type { ExecuteResponse, UserExerciseQuizData } from '~/api/types';
 
 
 export const useWebSocket = (onSubmissionResponse?: (result: ExecuteResponse) => void) => {
@@ -74,7 +74,7 @@ export const useWebSocket = (onSubmissionResponse?: (result: ExecuteResponse) =>
     };
   }, []);
 
-  const submitCode = useCallback((exerciseUuid: string, submission: ExercisesExerciseCodeData) => {
+  const submit = useCallback((exerciseUuid: string, submission: ExercisesExerciseCodeData | UserExerciseQuizData) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify({ "exercise_uuid": exerciseUuid, "submission": submission }));
     } else {
@@ -82,5 +82,5 @@ export const useWebSocket = (onSubmissionResponse?: (result: ExecuteResponse) =>
     }
   }, []);
 
-  return { submitCode, lastResult, isConnected };
+  return { submit, lastResult, isConnected };
 };

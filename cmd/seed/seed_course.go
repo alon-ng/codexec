@@ -59,6 +59,7 @@ type ExerciseSeed struct {
 	Translations map[string]Translation
 	CodeChecker  *checkers.CodeChecker
 	IoChecker    *checkers.IOChecker
+	QuizChecker  *map[string]string
 }
 
 type LessonSeed struct {
@@ -135,8 +136,20 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 						Reward: 5,
 						Data:   map[string]interface{}{"question": "Is Python easy?", "options": []string{"Yes", "No"}, "answer": 0},
 						Translations: map[string]Translation{
-							"en": {Name: "Python Quiz", Description: "Simple question."},
-							"he": {Name: "בוחן פייתון", Description: "שאלה פשוטה."},
+							"en": {
+								Name:        "Python Quiz",
+								Description: "Simple question.",
+								QuizData:    createRawMessage([]byte(`{"1": {"question": "Is Python easy?", "answers": {"1": "Yes", "2": "No"}}, "2": {"question": "Is Python fun?", "answers": {"1": "Yes", "2": "No", "3": "Maybe", "4": "Not sure"}}}`)),
+							},
+							"he": {
+								Name:        "בוחן פייתון",
+								Description: "שאלה פשוטה.",
+								QuizData:    createRawMessage([]byte(`{"1": {"question": "האם פייתון קל?", "answers": {"1": "כן", "2": "לא"}}, "2": {"question": "האם פייתון כיף?", "answers": {"1": "כן", "2": "לא", "3": "אולי", "4": "לא ברור"}}}`)),
+							},
+						},
+						QuizChecker: &map[string]string{
+							"1": "1",
+							"2": "4",
 						},
 					},
 				},
@@ -390,6 +403,10 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			if eSeed.IoChecker != nil {
 				ioCheckerData, _ := json.Marshal(eSeed.IoChecker)
 				params.IoChecker = createRawMessage(ioCheckerData)
+			}
+			if eSeed.QuizChecker != nil {
+				quizCheckerData, _ := json.Marshal(eSeed.QuizChecker)
+				params.QuizChecker = createRawMessage(quizCheckerData)
 			}
 
 			e, err := queries.CreateExercise(ctx, params)

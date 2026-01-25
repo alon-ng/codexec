@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"codim/pkg/api/v1/modules/progress"
 	"codim/pkg/db"
 	"codim/pkg/executors/checkers"
 	"codim/pkg/executors/drivers/models"
@@ -38,8 +39,8 @@ type Client struct {
 }
 
 type SubmissionMessage struct {
-	ExerciseUuid uuid.UUID `json:"exercise_uuid" validate:"required"`
-	Submission   fs.Entry  `json:"submission" validate:"required"`
+	ExerciseUuid uuid.UUID   `json:"exercise_uuid" validate:"required"`
+	Submission   interface{} `json:"submission" validate:"required"`
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -77,20 +78,36 @@ func (c *Client) readPump() {
 			continue
 		}
 
-		jobID := uuid.New()
 		row, err := c.q.GetExerciseForSubmission(context.Background(), submission.ExerciseUuid)
 		if err != nil {
 			c.logger.Errorf("error getting exercise subject and type: %v", err)
 			continue
 		}
 
-		if row.Type == db.ExerciseTypeCode {
-			runCodeSubmission(c, jobID, submission, row)
+		switch row.Type {
+		case db.ExerciseTypeCode:
+			runCodeSubmission(c, submission, row)
+		case db.ExerciseTypeQuiz:
+			runQuizSubmission(c, submission, row)
 		}
 	}
 }
 
-func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage, exercise db.GetExerciseForSubmissionRow) {
+func runCodeSubmission(c *Client, submission SubmissionMessage, exercise db.GetExerciseForSubmissionRow) {
+	// Unmarshal the submission into the quiz submission struct
+	submissionBytes, err := json.Marshal(submission.Submission)
+	if err != nil {
+		c.logger.Errorf("error marshalling submission: %v", err)
+		return
+	}
+
+	var codeSubmission progress.UserExerciseSubmissionCode
+	if err := json.Unmarshal(submissionBytes, &codeSubmission); err != nil {
+		c.logger.Errorf("error unmarshalling code submission: %v", err)
+		return
+	}
+
+	jobID := uuid.New()
 	queueName := "codexec." + exercise.Subject
 
 	var codeChecker *checkers.CodeChecker
@@ -110,7 +127,7 @@ func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage,
 
 	req := models.ExecutionRequest{
 		JobID:       jobID,
-		Source:      submission.Submission,
+		Source:      fs.Entry(codeSubmission),
 		EntryPoint:  "main." + getExtension(exercise.Subject),
 		CodeChecker: codeChecker,
 		IOChecker:   ioChecker,
@@ -122,7 +139,77 @@ func runCodeSubmission(c *Client, jobID uuid.UUID, submission SubmissionMessage,
 		Client:       c,
 	}
 
-	err := c.hub.producer.PublishObject(context.Background(), "", queueName, req)
+	err = c.hub.producer.PublishObject(context.Background(), "", queueName, req)
+	if err != nil {
+		c.logger.Errorf("error publishing to rabbitmq: %v", err)
+	}
+}
+
+func runQuizSubmission(c *Client, submission SubmissionMessage, exercise db.GetExerciseForSubmissionRow) {
+	// Unmarshal the submission into the quiz submission struct
+	submissionBytes, err := json.Marshal(submission.Submission)
+	if err != nil {
+		c.logger.Errorf("error marshalling submission: %v", err)
+		return
+	}
+
+	var quizSubmission progress.UserExerciseSubmissionQuiz
+	if err := json.Unmarshal(submissionBytes, &quizSubmission); err != nil {
+		c.logger.Errorf("error unmarshalling quiz submission: %v", err)
+		return
+	}
+
+	var quizChecker map[string]string
+	if exercise.QuizChecker != nil {
+		if err := json.Unmarshal(*exercise.QuizChecker, &quizChecker); err != nil {
+			c.logger.Errorf("error unmarshalling quiz checker: %v", err)
+			return
+		}
+	}
+
+	jobID := uuid.New()
+	checkerResults := make([]checkers.CheckerResult, 0)
+
+	for question, answer := range quizSubmission.Answers {
+		correctAnswer, ok := quizChecker[question]
+		if !ok {
+			c.logger.Warnf("question %s not found in quiz data", question)
+			checkerResults = append(checkerResults, checkers.CheckerResult{
+				Type:    checkers.CheckerType(question),
+				Success: false,
+				Message: "",
+			})
+			continue
+		}
+
+		markAsCorrect := answer == correctAnswer
+		checkerResults = append(checkerResults, checkers.CheckerResult{
+			Type:    checkers.CheckerType(question),
+			Success: markAsCorrect,
+			Message: "",
+		})
+	}
+
+	res := models.ExecuteResponse{
+		JobID:          jobID,
+		Stdout:         "",
+		Stderr:         "",
+		ExitCode:       0,
+		Time:           0,
+		Memory:         0,
+		CPU:            0,
+		CheckerResults: checkerResults,
+	}
+
+	// Register job client so response can be routed back
+	c.hub.registerJob <- &JobClient{
+		JobID:        jobID,
+		ExerciseUuid: submission.ExerciseUuid,
+		Client:       c,
+	}
+
+	// Publish response to rabbitmq
+	err = c.hub.producer.PublishObject(context.Background(), "codexec.results", "", res)
 	if err != nil {
 		c.logger.Errorf("error publishing to rabbitmq: %v", err)
 	}

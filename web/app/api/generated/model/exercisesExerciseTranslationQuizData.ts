@@ -5,8 +5,8 @@
  * This is the Codim API server.
  * OpenAPI spec version: 1.0
  */
-import type { ExercisesExerciseTranslationQuizDataQuestionsItem } from "./exercisesExerciseTranslationQuizDataQuestionsItem";
+import type { ExercisesExerciseTranslationQuizDataQuestion } from "./exercisesExerciseTranslationQuizDataQuestion";
 
 export interface ExercisesExerciseTranslationQuizData {
-  questions: ExercisesExerciseTranslationQuizDataQuestionsItem[];
+  [key: string]: ExercisesExerciseTranslationQuizDataQuestion;
 }

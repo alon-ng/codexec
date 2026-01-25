@@ -71,7 +71,7 @@ func (q *Queries) DeleteExerciseTranslation(ctx context.Context, argUuid uuid.UU
 }
 
 const getExerciseTranslation = `-- name: GetExerciseTranslation :one
-SELECT exercise_translations.uuid, exercise_uuid, language, name, description, exercise_translations.code_data, exercise_translations.quiz_data, exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, exercises.code_data, exercises.quiz_data, io_checker, code_checker FROM "exercise_translations"
+SELECT exercise_translations.uuid, exercise_uuid, language, name, description, exercise_translations.code_data, exercise_translations.quiz_data, exercises.uuid, created_at, modified_at, deleted_at, lesson_uuid, order_index, reward, type, exercises.code_data, exercises.quiz_data, quiz_checker, io_checker, code_checker FROM "exercise_translations"
 JOIN "exercises" ON "exercise_translations"."exercise_uuid" = "exercises"."uuid"
 WHERE "exercise_translations"."uuid" = $1
 AND "exercises"."deleted_at" IS NULL
@@ -96,6 +96,7 @@ type GetExerciseTranslationRow struct {
 	Type         ExerciseType     `json:"type"`
 	CodeData_2   *json.RawMessage `json:"code_data_2"`
 	QuizData_2   *json.RawMessage `json:"quiz_data_2"`
+	QuizChecker  *json.RawMessage `json:"quiz_checker"`
 	IoChecker    *json.RawMessage `json:"io_checker"`
 	CodeChecker  *json.RawMessage `json:"code_checker"`
 }
@@ -121,6 +122,7 @@ func (q *Queries) GetExerciseTranslation(ctx context.Context, argUuid uuid.UUID)
 		&i.Type,
 		&i.CodeData_2,
 		&i.QuizData_2,
+		&i.QuizChecker,
 		&i.IoChecker,
 		&i.CodeChecker,
 	)

@@ -87,6 +87,7 @@ type Exercise struct {
 	Type        ExerciseType     `json:"type"`
 	CodeData    *json.RawMessage `json:"code_data"`
 	QuizData    *json.RawMessage `json:"quiz_data"`
+	QuizChecker *json.RawMessage `json:"quiz_checker"`
 	IoChecker   *json.RawMessage `json:"io_checker"`
 	CodeChecker *json.RawMessage `json:"code_checker"`
 }
