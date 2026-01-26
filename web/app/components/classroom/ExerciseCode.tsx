@@ -1,7 +1,7 @@
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import CodeMirror from '@uiw/react-codemirror';
-import { Ban, CheckCircle, ChevronRightSquare, FlaskConical, Play, XCircle } from "lucide-react";
+import { Play } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,11 +12,10 @@ import errorSound from "~/assets/error.mp3";
 import { Button } from "~/components/base/Button";
 import { useWebSocket } from "~/hooks/useWebSocket";
 import { useLanguage } from '~/lib/useLanguage';
-import { cn } from '~/lib/utils';
 import { blurInVariants } from "~/utils/animations";
 import LANGUAGE_MAP from "~/utils/codeLang";
 import { getCodeMirrorExtensions } from "~/utils/codeMirror";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import ExerciseCodeResults from './ExerciseCodeResults';
 import ExerciseHeader from "./ExerciseHeader";
 
 export interface ExerciseCodeProps {
@@ -160,7 +159,7 @@ export default function ExerciseCode({
       </div>
       <div className="w-1/2 h-full flex flex-col gap-2">
         <motion.div className="flex justify-end" variants={blurInVariants(0.5)} initial="hidden" animate="visible">
-          <Button variant="outline" onClick={handleRunCode} isLoading={isRunning}>
+          <Button variant="outline" onClick={handleRunCode} isLoading={isRunning} disabled={Boolean(userExercise.completed_at)}>
             {t("common.run")}
             <Play className="size-4" />
           </Button>
@@ -175,53 +174,7 @@ export default function ExerciseCode({
             extensions={extensions}
             theme="light"
           />
-          {lastResult && (
-            <motion.div
-              variants={blurInVariants()}
-              initial="hidden"
-              animate="visible"
-              className="flex h-48 text-xs overflow-auto"
-            >
-              <Tabs className="w-full" value={resultTab} onValueChange={setResultTab}>
-                <TabsList className="h-8 w-full justify-start rounded-none p-1 border-t shadow-sm" dir={dir}>
-                  <TabsTrigger className="flex items-center gap-1.5 transition-colors cursor-pointer text-xs" value="console">
-                    <ChevronRightSquare className="size-3" />
-                    {t("common.console")}
-                  </TabsTrigger>
-                  <TabsTrigger className="flex items-center gap-1.5 transition-colors cursor-pointer text-xs" value="errors">
-                    <Ban className="size-3" />
-                    {t("common.errors")}
-                  </TabsTrigger>
-                  <TabsTrigger className="flex items-center gap-1.5 transition-colors cursor-pointer text-xs" value="tests">
-                    <FlaskConical className="size-3" />
-                    {t("common.tests")}
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent className="text-xs px-3 font-mono" value="console">
-                  <div className="whitespace-pre-wrap">
-                    {lastResult.stdout || <span className="text-muted-foreground">{t("common.noOutput") || "No output"}</span>}
-                  </div>
-                </TabsContent>
-                <TabsContent className="text-xs px-3 font-mono" value="errors">
-                  <div className="text-red-400 whitespace-pre-wrap">
-                    {lastResult.stderr || <span className="text-muted-foreground">{t("common.noErrors") || "No errors"}</span>}
-                  </div>
-                </TabsContent>
-                <TabsContent className="text-xs font-mono" value="tests">
-                  {lastResult.checker_results?.length === 0 ? <span className="text-muted-foreground">{t("common.noTests") || "No tests"}</span> : (
-                    <>
-                      {lastResult.checker_results?.map((result) => (
-                        <div className={cn("flex items-center gap-1.5 py-1 px-3", result.success ? "text-green-400 bg-green-50" : "text-red-400 bg-red-50")} key={result.type}>
-                          {result.success ? <CheckCircle className="size-3" /> : <XCircle className="size-3" />}
-                          <span>{result.message}</span>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </motion.div>
-          )}
+          <ExerciseCodeResults resultTab={resultTab} setResultTab={setResultTab} lastResult={lastResult} />
         </motion.div>
       </div>
     </div>
