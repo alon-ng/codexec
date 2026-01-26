@@ -52,14 +52,23 @@ export default function ExerciseCode({
   const { dir } = useLanguage();
   const { mutate: saveMutation } = usePutMeExercisesExerciseUuid();
 
-  const userSubmission = userExercise.submission as unknown as ExercisesExerciseCodeData;
-  const hasUserSubmission = Boolean(userSubmission?.name && userSubmission?.content);
-  const initialCode = getCodeValue(hasUserSubmission ? userSubmission : exercise.code_data);
-  const [codeValue, setCodeValue] = useState(initialCode);
+  const initialCode = useMemo(() => {
+    const userSubmission = userExercise.submission as unknown as ExercisesExerciseCodeData;
+    const hasUserSubmission = Boolean(userSubmission?.name && userSubmission?.content);
+    return getCodeValue(hasUserSubmission ? userSubmission : exercise.code_data);
+  }, [userExercise.submission, exercise.code_data]);
+
   const previousCodeRef = useRef<string>(initialCode);
   const codeValueRef = useRef<string>(initialCode);
-  const [resultTab, setResultTab] = useState<string>("console");
+  const [codeValue, setCodeValue] = useState(initialCode);
+
   const [isRunning, setIsRunning] = useState(false);
+  const [resultTab, setResultTab] = useState<string>("console");
+
+  useEffect(() => {
+    codeValueRef.current = initialCode;
+    setCodeValue(initialCode);
+  }, [initialCode]);
 
   function onSubmissionResponse(result: ExecuteResponse) {
     setIsRunning(false);

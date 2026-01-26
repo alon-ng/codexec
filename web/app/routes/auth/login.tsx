@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router";
-import logoGradient from "~/assets/logo-gradient.svg";
 import loginImage from "~/assets/login.png";
+import logoGradient from "~/assets/logo-gradient.svg";
 import { LoginForm } from "~/components/login/LoginForm";
 import { SignupForm } from "~/components/login/SignupForm";
 import { useMeStore } from "~/stores/meStore";
@@ -12,25 +12,11 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const isSignup = searchParams.get("signup") === "true";
 
-  const { loadMe, isLoading, isLoggedIn } = useMeStore();
+  const { isLoggedIn, loadMe } = useMeStore();
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      loadMe();
-    }
+    loadMe();
   }, []);
-
-  // Show loading screen while authenticating
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-300 border-r-gray-600"></div>
-          <p className="text-gray-600">Authenticating...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoggedIn) {
     return <Navigate to="/classroom" />;

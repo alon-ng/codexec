@@ -17,7 +17,7 @@ export const customInstance = <T>(
   })
     .then(({ data }) => data)
     .catch((error) => {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 && window.location.pathname !== "/login") {
         AXIOS_INSTANCE.post("/auth/logout").then(() => {
           window.location.href = '/login';
         });

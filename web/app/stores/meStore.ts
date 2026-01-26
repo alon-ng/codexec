@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { getMe } from "~/api/generated/me/me";
-import { toast } from "sonner";
 
 interface MeState {
     firstName: string | null;

@@ -59,6 +59,7 @@ export default function ExerciseContent({
     <div className="flex flex-col h-full gap-4">
       {exercise.type === "code" ? (
         <ExerciseCode
+          key={exerciseUuid}
           exercise={exercise}
           language={language}
           userExercise={userExerciseData}
@@ -66,6 +67,7 @@ export default function ExerciseContent({
         />
       ) : (
         <ExerciseQuiz
+          key={exerciseUuid}
           exercise={exercise}
           language={language}
           userExercise={userExerciseData}
