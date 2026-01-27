@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { Outlet } from "react-router";
-import { useMeStore } from "~/stores/meStore";
+import { Navigate, Outlet } from "react-router";
 import { PlatformNavbar } from "~/components/navbar/PlatformNavbar";
+import { useMeStore } from "~/stores/meStore";
 
 const navigationItems = [
   {
@@ -15,10 +15,10 @@ const navigationItems = [
 ];
 
 export default function PlatformLayout() {
-  const { loadMe, isLoading, isLoggedIn } = useMeStore();
+  const { loadMe, isLoading, userUUID } = useMeStore();
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!userUUID) {
       loadMe();
     }
   }, []);
@@ -35,8 +35,8 @@ export default function PlatformLayout() {
     );
   }
 
-  if (!isLoggedIn) {
-    return null;
+  if (!userUUID) {
+    return <Navigate to="/login" />;
   }
 
   return (

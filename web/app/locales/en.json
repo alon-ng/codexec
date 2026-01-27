@@ -6,7 +6,9 @@
         "contact": "Contact",
         "overview": "Overview",
         "myCourses": "My Courses",
-        "classroom": "Classroom"
+        "classroom": "Classroom",
+        "login": "Login",
+        "signup": "Signup"
     },
     "common": {
         "run": "Run",

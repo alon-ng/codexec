@@ -1,18 +1,20 @@
+import { GraduationCap } from "lucide-react";
+import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import logoGradient from "~/assets/logo-gradient.svg";
+import { Button } from "~/components/base/Button";
+import { LanguageSelector } from "~/components/navbar/LanguageSelector";
+import { UserMenu } from "~/components/navbar/UserMenu";
 import {
     NavigationMenu,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
 } from "~/components/ui/navigation-menu";
-import { cn } from "~/lib/utils";
-import { LanguageSelector } from "./LanguageSelector";
-import { UserMenu } from "./UserMenu";
-import { useTranslation } from "react-i18next";
-import { motion } from "motion/react";
-import { blurInVariants } from "~/utils/animations";
 import { useLanguage } from "~/lib/useLanguage";
+import { cn } from "~/lib/utils";
+import { blurInVariants } from "~/utils/animations";
 
 export interface PlatformNavbarNavigationItem {
     label: string;
@@ -21,10 +23,12 @@ export interface PlatformNavbarNavigationItem {
 
 export interface PlatformNavbarProps {
     showUserMenu?: boolean;
+    showLoginButton?: boolean;
+    showClassroomButton?: boolean;
     navigationItems: PlatformNavbarNavigationItem[];
 }
 
-export function PlatformNavbar({ navigationItems, showUserMenu = false }: PlatformNavbarProps) {
+export function PlatformNavbar({ navigationItems, showUserMenu = false, showLoginButton = false, showClassroomButton = false }: PlatformNavbarProps) {
     const { t } = useTranslation();
     const { dir } = useLanguage();
 
@@ -46,7 +50,7 @@ export function PlatformNavbar({ navigationItems, showUserMenu = false }: Platfo
                             <NavigationMenuItem key={item.href}>
                                 <NavigationMenuLink
                                     asChild
-                                    className="group inline-flex opacity-80 text-sm font-medium transition-colors hover:bg-transparent hover:opacity-100 focus:bg-transparent focus:text-accent-foreground focus:outline-none"
+                                    className="group inline-flex rounded-md text-sm h-9 px-4 py-2 transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
                                 >
                                     <Link to={item.href}>{t(item.label)}</Link>
                                 </NavigationMenuLink>
@@ -58,6 +62,19 @@ export function PlatformNavbar({ navigationItems, showUserMenu = false }: Platfo
             <div className="flex items-center gap-2">
                 <LanguageSelector />
                 {showUserMenu && <UserMenu />}
+                {showLoginButton &&
+                    <>
+                        <Button className="font-normal" variant="ghost">
+                            <Link to="/login">{t("navigation.login")}</Link>
+                        </Button>
+                        <Button className="font-normal" variant="ghost" asChild>
+                            <Link to="/login?signup=true">{t("navigation.signup")}</Link>
+                        </Button>
+                    </>}
+                {showClassroomButton && <Button className="font-normal" variant="ghost">
+                    <GraduationCap className="w-4 h-4" />
+                    <Link to="/classroom">{t("navigation.classroom")}</Link>
+                </Button>}
             </div>
         </motion.nav >
     );

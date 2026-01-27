@@ -1,12 +1,12 @@
-import { Link } from "react-router";
+import { motion } from "motion/react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
+import { toast } from "sonner";
+import { usePostAuthLogin } from "~/api/generated/auth/auth";
 import { Button } from "~/components/base/Button";
 import { Input } from "~/components/base/Input";
-import { usePostAuthLogin } from "~/api/generated/auth/auth";
-import { toast } from "sonner";
 import { blurInVariants } from "~/utils/animations";
-import { motion } from "motion/react";
-import { useTranslation } from "react-i18next";
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -42,7 +42,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     };
 
     return (
-        <motion.div className="flex flex-col gap-12" variants={blurInVariants()} initial="hidden" animate="visible">
+        <motion.div className="flex flex-col gap-12" variants={blurInVariants(0.2)} initial="hidden" animate="visible">
             <div>
                 <div className="text-4xl font-bold">
                     {t("auth.welcomeBack")}
