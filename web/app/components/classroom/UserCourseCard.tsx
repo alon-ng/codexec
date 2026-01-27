@@ -1,11 +1,11 @@
 import type { MeUserCourseWithProgress } from "~/api/generated/model";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router";
+import Blob from "~/assets/blob.svg?react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { courseIcons } from "~/utils/course";
 import { Progress } from "../base/Progress";
-import { Link } from "react-router";
-import Blob from "~/assets/blob.svg?react";
 import { Skeleton } from "../ui/skeleton";
 
 export interface UserCourseCardProps {
@@ -14,6 +14,7 @@ export interface UserCourseCardProps {
 
 export default function UserCourseCard({ course }: UserCourseCardProps) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     if (!course) {
         return (
@@ -46,7 +47,7 @@ export default function UserCourseCard({ course }: UserCourseCardProps) {
     const nextExercisePath = `/classroom/${course.uuid}/${course.next_lesson_uuid}/${course.next_exercise_uuid}`;
 
     return (
-        <Card className="relative h-72 bg-transparent overflow-hidden hover:shadow-md hover:cursor-pointer hover:translate-y-[-4px] transition-all duration-200">
+        <Card className="relative h-72 bg-transparent overflow-hidden hover:shadow-md hover:cursor-pointer hover:translate-y-[-4px] transition-all duration-200" onClick={() => navigate(nextExercisePath)}>
             <CardHeader className="flex items-center gap-4 z-10">
                 <img src={courseIcons[course.subject as keyof typeof courseIcons]} alt={course.subject} className="h-10 w-10" />
                 <div>
@@ -63,14 +64,22 @@ export default function UserCourseCard({ course }: UserCourseCardProps) {
             <CardFooter className="flex flex-col items-start gap-1 z-10">
                 <Progress value={course.completed_exercises / course.total_exercises * 100} showPercentage={true} />
                 <div className="flex items-center gap-1 text-sm text-muted-foreground w-full">
-                    <span className="shrink-0">{t("classroom.continueWhereYouLeftOff")}:</span>
-                    <Link className="truncate underline hover:text-primary" to={nextExercisePath}>
-                        {course.next_lesson_name} ({course.next_exercise_name})
-                    </Link>
+                    {course.next_lesson_uuid && course.next_exercise_uuid ?
+                        <>
+                            <span className="shrink-0">{t("classroom.continueWhereYouLeftOff")}:</span>
+                            <Link className="truncate underline hover:text-primary" to={nextExercisePath}>
+                                {course.next_lesson_name} ({course.next_exercise_name})
+                            </Link>
+                        </>
+                        : <span className="shrink-0">{t("course.courseComplete")}</span>}
                 </div>
+
             </CardFooter>
             <Blob className="absolute -top-32 -start-24 size-128 z-0 blur-3xl text-codim-pink/5" />
             <Blob className="absolute -bottom-32 -end-24 size-128 z-0 blur-3xl text-codim-purple/5" />
+            {course.user_course_completed_at ? <div className="absolute top-0 right-0 bg-gradient-to-r from-codim-pink to-codim-purple text-white text-xs px-2 py-1 rounded-bl-lg shadow-md">
+                {t("course.courseComplete")}
+            </div> : null}
         </Card>
     );
 }

@@ -65,6 +65,11 @@ func (s *Service) CompleteUserExercise(ctx context.Context, userUuid uuid.UUID, 
 		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
 	}
 
+	err = tx.Commit(ctx)
+	if err != nil {
+		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
+	}
+
 	userCourses, err := s.q.ListUserCoursesWithProgress(ctx, db.ListUserCoursesWithProgressParams{
 		UserUuid:   userUuid,
 		Language:   "en",
@@ -79,11 +84,6 @@ func (s *Service) CompleteUserExercise(ctx context.Context, userUuid uuid.UUID, 
 		return nil, nil, e.NewAPIError(errors.New("user course not found"), ErrCompleteUserExerciseFailed)
 	}
 	userCourse := userCourses[0]
-
-	err = tx.Commit(ctx)
-	if err != nil {
-		return nil, nil, e.NewAPIError(err, ErrCompleteUserExerciseFailed)
-	}
 
 	return userCourse.NextLessonUuid, userCourse.NextExerciseUuid, nil
 }

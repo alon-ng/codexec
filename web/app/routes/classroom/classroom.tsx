@@ -1,20 +1,24 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { useGetCoursesUuid } from "~/api/generated/courses/courses";
 import { useGetMeCoursesCourseUuid } from "~/api/generated/me/me";
 import type { MeUserExerciseStatus } from "~/api/generated/model";
+import courseCompleteImage from "~/assets/course-complete.png";
 import successSound from "~/assets/success.mp3";
 import PageHeader, { type BreadcrumbProps } from "~/components/PageHeader";
+import { Button } from "~/components/base/Button";
 import ClassroomError from "~/components/classroom/ClassroomError";
 import ClassroomLoading from "~/components/classroom/ClassroomLoading";
 import ExerciseContent from "~/components/classroom/ExerciseContent";
 import LessonSidebar from "~/components/classroom/LessonSidebar";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 
 export default function Classroom() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const [showCourseCompletedDialog, setShowCourseCompletedDialog] = useState(false);
 
     const { courseUuid, lessonUuid, exerciseUuid } = useParams<{
         courseUuid: string;
@@ -66,7 +70,17 @@ export default function Classroom() {
 
         if (lessons.length === 0) return;
 
-        // Helper function to find first incomplete exercise in a lesson
+        if (userCourseData.is_completed) {
+            const firstLesson = lessons[0];
+            if (firstLesson.lesson_uuid && firstLesson.exercises && firstLesson.exercises.length > 0) {
+                const firstExercise = firstLesson.exercises[0];
+                if (firstExercise.exercise_uuid) {
+                    navigate(`/classroom/${courseUuid}/${firstLesson.lesson_uuid}/${firstExercise.exercise_uuid}`);
+                    return;
+                }
+            }
+        }
+
         const findFirstIncompleteExercise = (
             lessonExercises: MeUserExerciseStatus[] | undefined
         ) => {
@@ -75,11 +89,9 @@ export default function Classroom() {
             const incomplete = lessonExercises.find((ex: MeUserExerciseStatus) => !ex.is_completed);
             if (incomplete) return incomplete;
 
-            // If all completed, return the last one
             return lessonExercises[lessonExercises.length - 1];
         };
 
-        // Case 1: Only courseUuid provided - find first incomplete lesson and exercise
         if (!lessonUuid && !exerciseUuid) {
             for (const lesson of lessons) {
                 if (!lesson.lesson_uuid) continue;
@@ -91,7 +103,6 @@ export default function Classroom() {
                 }
             }
 
-            // If all lessons/exercises are completed, go to the last exercise of the last lesson
             if (lessons.length > 0) {
                 const lastLesson = lessons[lessons.length - 1];
                 if (lastLesson.lesson_uuid && lastLesson.exercises && lastLesson.exercises.length > 0) {
@@ -104,7 +115,6 @@ export default function Classroom() {
             }
         }
 
-        // Case 2: courseUuid + lessonUuid provided - find first incomplete exercise in that lesson
         if (lessonUuid && !exerciseUuid) {
             const lesson = lessons.find((l) => l.lesson_uuid === lessonUuid);
             if (lesson) {
@@ -116,10 +126,8 @@ export default function Classroom() {
             }
         }
 
-        // Case 3: All params provided - do nothing, just load everything
     }, [userCourseData, courseUuid, lessonUuid, exerciseUuid, navigate, isLoadingUserCourse, isLoadingCourse]);
 
-    // Handle accordion change - navigate to first exercise or lesson
     const handleAccordionChange = (value: string | undefined) => {
         if (!value || !userCourseData) return;
 
@@ -170,6 +178,15 @@ export default function Classroom() {
         audio.play();
 
         refetchUserCourse();
+
+        if (!nextExerciseUuid && !nextLessonUuid) {
+            // No next exercise or lesson, meaning the course is complete
+            setShowCourseCompletedDialog(true);
+        }
+    };
+
+    const showCertificate = () => {
+        console.log("TODO: Show certificate");
     };
 
     return (
@@ -198,6 +215,30 @@ export default function Classroom() {
                     />
                 </main>
             </div>
+            <Dialog open={showCourseCompletedDialog} onOpenChange={setShowCourseCompletedDialog}>
+                <DialogContent showCloseButton={false}>
+                    <DialogHeader className="flex flex-col items-center">
+                        <img src={courseCompleteImage} alt={t("common.courseComplete")} className="h-128 rounded-lg mb-4" />
+                        <DialogTitle>
+                            {t("course.courseComplete")}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {t("course.courseCompleteDescription")}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="justify-center! mt-4">
+                        <Button onClick={() => showCertificate()}>
+                            {t("course.showCertificate")}
+                        </Button>
+                        <Button onClick={() => navigate("/classroom/courses")}>
+                            {t("navigation.myCourses")}
+                        </Button>
+                        <Button variant="outline" onClick={() => setShowCourseCompletedDialog(false)}>
+                            {t("common.close")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

@@ -37,7 +37,8 @@
         "readMore": "Read More",
         "noOutput": "No output",
         "noErrors": "No errors",
-        "noTests": "No tests"
+        "noTests": "No tests",
+        "close": "Close"
     },
     "auth": {
         "welcomeBack": "Welcome back",
@@ -74,7 +75,10 @@
         "certificateNote": "Certificate of completion",
         "lessonsNote": "lessons",
         "exerciesNote": "exercises",
-        "durationNote": "hours total"
+        "durationNote": "hours total",
+        "courseComplete": "Course Complete",
+        "courseCompleteDescription": "You have completed the course. Congratulations!",
+        "showCertificate": "Show Certificate"
     },
     "classroom": {
         "continueWhereYouLeftOff": "Continue where you left off",

@@ -37,7 +37,8 @@
     "readMore": "קרא עוד",
     "noOutput": "אין פלט",
     "noErrors": "אין שגיאות",
-    "noTests": "אין בדיקות"
+    "noTests": "אין בדיקות",
+    "close": "סגירה"
   },
   "auth": {
     "welcomeBack": "ברוכים הבאים",
@@ -74,7 +75,10 @@
     "certificateNote": "הקורס כולל תעודת אישור",
     "lessonsNote": "שיעורים",
     "exerciesNote": "תרגילים",
-    "durationNote": "שעות לימוד"
+    "durationNote": "שעות לימוד",
+    "courseComplete": "הקורס הושלם",
+    "courseCompleteDescription": "סיימת את הקורס. ברכותיי!",
+    "showCertificate": "הצג תעודה"
   },
   "classroom": {
     "continueWhereYouLeftOff": "המשך מאיפה שסיימת",

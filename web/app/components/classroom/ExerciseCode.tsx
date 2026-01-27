@@ -11,7 +11,6 @@ import type { ExecuteResponse } from '~/api/types';
 import errorSound from "~/assets/error.mp3";
 import { Button } from "~/components/base/Button";
 import { useWebSocket } from "~/hooks/useWebSocket";
-import { useLanguage } from '~/lib/useLanguage';
 import { blurInVariants } from "~/utils/animations";
 import LANGUAGE_MAP from "~/utils/codeLang";
 import { getCodeMirrorExtensions } from "~/utils/codeMirror";
@@ -48,7 +47,6 @@ export default function ExerciseCode({
   onExerciseComplete,
 }: ExerciseCodeProps) {
   const { t } = useTranslation();
-  const { dir } = useLanguage();
   const { mutate: saveMutation } = usePutMeExercisesExerciseUuid();
 
   const initialCode = useMemo(() => {
@@ -173,6 +171,7 @@ export default function ExerciseCode({
             onChange={handleCodeChange}
             extensions={extensions}
             theme="light"
+            readOnly={Boolean(userExercise.completed_at)}
           />
           <ExerciseCodeResults resultTab={resultTab} setResultTab={setResultTab} lastResult={lastResult} />
         </motion.div>
