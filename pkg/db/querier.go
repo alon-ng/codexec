@@ -17,6 +17,7 @@ type Querier interface {
 	CountLessons(ctx context.Context) (int64, error)
 	CountLessonsByCourse(ctx context.Context, courseUuid uuid.UUID) (int64, error)
 	CountUsers(ctx context.Context) (int64, error)
+	CreateChatMessage(ctx context.Context, arg CreateChatMessageParams) (ChatMessage, error)
 	CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error)
 	CreateCourseTranslation(ctx context.Context, arg CreateCourseTranslationParams) (CourseTranslation, error)
 	CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error)
@@ -54,6 +55,7 @@ type Querier interface {
 	HardDeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 	HardDeleteUser(ctx context.Context, argUuid uuid.UUID) error
 	InitUserCourse(ctx context.Context, arg InitUserCourseParams) (InitUserCourseRow, error)
+	ListChatMessages(ctx context.Context, arg ListChatMessagesParams) ([]ChatMessage, error)
 	ListCourses(ctx context.Context, arg ListCoursesParams) ([]ListCoursesRow, error)
 	ListExercises(ctx context.Context, arg ListExercisesParams) ([]ListExercisesRow, error)
 	ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error)

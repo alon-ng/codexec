@@ -64,3 +64,10 @@ DROP INDEX IF EXISTS idx_courses_created_at;
 DROP INDEX IF EXISTS idx_courses_difficulty;
 
 DROP TABLE IF EXISTS courses;
+
+-- chat_messages
+DROP INDEX IF EXISTS idx_chat_messages_exercise;
+DROP INDEX IF EXISTS idx_chat_messages_user;
+DROP INDEX IF EXISTS idx_chat_messages_ts;
+
+DROP TABLE IF EXISTS chat_messages;

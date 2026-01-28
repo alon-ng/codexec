@@ -2,6 +2,7 @@ package api
 
 import (
 	apiDocs "codim/api"
+	"codim/pkg/ai"
 	authProvider "codim/pkg/api/auth"
 	"codim/pkg/api/v1/cache"
 	"codim/pkg/api/v1/middleware"
@@ -38,6 +39,7 @@ func NewRouter(
 	log *logger.Logger,
 	authProvider *authProvider.Provider,
 	redisClient *redis.Client,
+	aiClient *ai.Client,
 	wsHub *websocket.Hub,
 ) *gin.Engine {
 	// Disable Gin's default logger output
@@ -62,7 +64,7 @@ func NewRouter(
 		protected.Use(middleware.AuthMiddleware(authProvider, userCache, log))
 		{
 			protected.GET("/ws", wsHub.ServeWs)
-			me.RegisterRoutes(protected, q, p, log)
+			me.RegisterRoutes(protected, q, p, log, aiClient)
 			admin := protected.Group("/")
 			admin.Use(middleware.AdminMiddleware(log))
 			{

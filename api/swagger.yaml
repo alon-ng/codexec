@@ -32,6 +32,28 @@ definitions:
     - last_name
     - password
     type: object
+  chat.ChatMessage:
+    properties:
+      content:
+        type: string
+      exercise_uuid:
+        type: string
+      role:
+        type: string
+      ts:
+        type: string
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    required:
+    - content
+    - exercise_uuid
+    - role
+    - ts
+    - user_uuid
+    - uuid
+    type: object
   courses.AddCourseTranslationRequest:
     properties:
       bullets:
@@ -635,6 +657,22 @@ definitions:
     required:
     - submission
     - type
+    type: object
+  me.SendChatMessageRequest:
+    properties:
+      code:
+        example: print('Hello, world!')
+        type: string
+      content:
+        example: Hello, how are you?
+        type: string
+      exercise_instructions:
+        example: Write a function that prints 'Hello, world!'
+        type: string
+    required:
+    - code
+    - content
+    - exercise_instructions
     type: object
   me.UserExercise:
     properties:
@@ -1994,6 +2032,93 @@ paths:
       security:
       - CookieAuth: []
       summary: Save the user exercise submission
+      tags:
+      - me
+  /me/exercises/{exercise_uuid}/chat:
+    get:
+      consumes:
+      - application/json
+      description: List the chat messages
+      parameters:
+      - description: Exercise UUID
+        in: path
+        name: exercise_uuid
+        required: true
+        type: string
+      - default: 10
+        description: 'Limit (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: 'Offset (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/chat.ChatMessage'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: List the chat messages
+      tags:
+      - me
+    post:
+      consumes:
+      - application/json
+      description: Send a chat message
+      parameters:
+      - description: Exercise UUID
+        in: path
+        name: exercise_uuid
+        required: true
+        type: string
+      - description: Message
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/me.SendChatMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chat.ChatMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: Send a chat message
       tags:
       - me
   /users:

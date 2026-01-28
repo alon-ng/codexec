@@ -25,6 +25,7 @@ package main
 
 import (
 	"codim/cmd/api/config"
+	"codim/pkg/ai"
 	"codim/pkg/api/auth"
 	"codim/pkg/api/v1"
 	"codim/pkg/api/v1/websocket"
@@ -74,7 +75,8 @@ func main() {
 		cfg.API.JwtRenewalThreshold,
 	)
 
-	router := api.NewRouter(queries, pool, log, authProvider, redisClient, wsHub)
+	aiClient := ai.NewClient(cfg.AI)
+	router := api.NewRouter(queries, pool, log, authProvider, redisClient, aiClient, wsHub)
 
 	addr := fmt.Sprintf(":%d", cfg.API.Port)
 	log.Infof("Starting server on %s", addr)

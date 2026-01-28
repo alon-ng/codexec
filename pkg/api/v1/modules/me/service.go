@@ -1,7 +1,9 @@
 package me
 
 import (
+	"codim/pkg/ai"
 	e "codim/pkg/api/v1/errors"
+	"codim/pkg/api/v1/modules/chat"
 	"codim/pkg/api/v1/modules/progress"
 	"codim/pkg/api/v1/modules/users"
 	"codim/pkg/db"
@@ -17,10 +19,13 @@ type Service struct {
 	q           *db.Queries
 	p           *pgxpool.Pool
 	progressSvc *progress.Service
+	chatSvc     *chat.Service
 }
 
-func NewService(q *db.Queries, p *pgxpool.Pool, progressSvc *progress.Service) *Service {
-	return &Service{q: q, p: p, progressSvc: progressSvc}
+func NewService(q *db.Queries, p *pgxpool.Pool, aiClient *ai.Client) *Service {
+	progressSvc := progress.NewService(q, p)
+	chatSvc := chat.NewService(q, p, aiClient)
+	return &Service{q: q, p: p, progressSvc: progressSvc, chatSvc: chatSvc}
 }
 
 // Conversion functions
@@ -67,4 +72,12 @@ func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exercis
 
 func (s *Service) SaveUserExerciseSubmission(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req SaveUserExerciseSubmissionRequest) *e.APIError {
 	return s.progressSvc.SaveUserExerciseSubmission(ctx, meUUID, exerciseUUID, req)
+}
+
+func (s *Service) ListChatMessages(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req ListChatMessagesRequest) ([]chat.ChatMessage, *e.APIError) {
+	return s.chatSvc.ListChatMessages(ctx, exerciseUUID, meUUID, req, nil)
+}
+
+func (s *Service) SendChatMessage(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req SendChatMessageRequest) (chat.ChatMessage, *e.APIError) {
+	return s.chatSvc.SendChatMessage(ctx, exerciseUUID, meUUID, req)
 }

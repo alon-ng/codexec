@@ -1,6 +1,7 @@
 package me
 
 import (
+	"codim/pkg/api/v1/modules/chat"
 	"codim/pkg/api/v1/modules/progress"
 )
 
@@ -11,6 +12,9 @@ type UserCourseFull = progress.UserCourseFull
 type UserCourseWithProgress = progress.UserCourseWithProgress
 type UserExercise = progress.UserExercise
 type SaveUserExerciseSubmissionRequest = progress.SaveUserExerciseSubmissionRequest
+
+type ListChatMessagesRequest = chat.ListChatMessagesRequest
+type SendChatMessageRequest = chat.SendChatMessageRequest
 
 type RunUserExerciseCodeSubmissionRequest struct {
 	Submission progress.UserExerciseSubmissionCode

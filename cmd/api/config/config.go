@@ -1,6 +1,7 @@
 package config
 
 import (
+	"codim/pkg/ai"
 	"codim/pkg/api/v1"
 	"codim/pkg/db"
 	"codim/pkg/rabbitmq"
@@ -18,11 +19,12 @@ var (
 )
 
 type Config struct {
-	Logger logger.Config
+	Logger   logger.Config
 	API      api.Config
 	DB       db.Config
 	Redis    redis.Config
 	RabbitMQ rabbitmq.Config
+	AI       ai.Config
 }
 
 func Load() (Config, error) {
@@ -61,6 +63,13 @@ func Load() (Config, error) {
 			return
 		}
 		config.RabbitMQ = rmqCfg
+
+		aiCfg, err := ai.LoadConfig()
+		if err != nil {
+			loadErr = err
+			return
+		}
+		config.AI = aiCfg
 
 		// Parse the remaining fields using caarlos0/env
 		if err := env.Parse(&config); err != nil {

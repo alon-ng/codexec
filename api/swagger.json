@@ -1760,6 +1760,140 @@
                 }
             }
         },
+        "/me/exercises/{exercise_uuid}/chat": {
+            "get": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "description": "List the chat messages",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "me"
+                ],
+                "summary": "List the chat messages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exercise UUID",
+                        "name": "exercise_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit (default: 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset (default: 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/chat.ChatMessage"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "description": "Send a chat message",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "me"
+                ],
+                "summary": "Send a chat message",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exercise UUID",
+                        "name": "exercise_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Message",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/me.SendChatMessageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chat.ChatMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -2155,6 +2289,37 @@
                 "password": {
                     "type": "string",
                     "example": "password"
+                }
+            }
+        },
+        "chat.ChatMessage": {
+            "type": "object",
+            "required": [
+                "content",
+                "exercise_uuid",
+                "role",
+                "ts",
+                "user_uuid",
+                "uuid"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "exercise_uuid": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "ts": {
+                    "type": "string"
+                },
+                "user_uuid": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
                 }
             }
         },
@@ -2994,6 +3159,28 @@
                         }
                     ],
                     "example": "code"
+                }
+            }
+        },
+        "me.SendChatMessageRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "content",
+                "exercise_instructions"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "print('Hello, world!')"
+                },
+                "content": {
+                    "type": "string",
+                    "example": "Hello, how are you?"
+                },
+                "exercise_instructions": {
+                    "type": "string",
+                    "example": "Write a function that prints 'Hello, world!'"
                 }
             }
         },

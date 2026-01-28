@@ -55,6 +55,17 @@ func (ns NullExerciseType) Value() (driver.Value, error) {
 	return string(ns.ExerciseType), nil
 }
 
+type ChatMessage struct {
+	Uuid             uuid.UUID `json:"uuid"`
+	Ts               time.Time `json:"ts"`
+	ExerciseUuid     uuid.UUID `json:"exercise_uuid"`
+	UserUuid         uuid.UUID `json:"user_uuid"`
+	Role             string    `json:"role"`
+	Content          string    `json:"content"`
+	PromptTokens     int32     `json:"prompt_tokens"`
+	CompletionTokens int32     `json:"completion_tokens"`
+}
+
 type Course struct {
 	Uuid       uuid.UUID  `json:"uuid"`
 	CreatedAt  time.Time  `json:"created_at"`

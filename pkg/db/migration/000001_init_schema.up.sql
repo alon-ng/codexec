@@ -170,3 +170,21 @@ CREATE TABLE IF NOT EXISTS "user_exercises" (
 CREATE UNIQUE INDEX uq_user_exercises_user_exercise ON "user_exercises" ("user_uuid", "exercise_uuid");
 CREATE INDEX        idx_user_exercises_user         ON "user_exercises" ("user_uuid");
 CREATE INDEX        idx_user_exercises_exercise     ON "user_exercises" ("exercise_uuid");
+
+-- chat_messages
+CREATE TABLE IF NOT EXISTS "chat_messages" (
+    "uuid"              UUID            PRIMARY KEY DEFAULT uuidv7(),
+    "ts"                TIMESTAMP       NOT NULL    DEFAULT NOW(),
+    "exercise_uuid"     UUID            NOT NULL,
+    "user_uuid"         UUID            NOT NULL,
+    "role"              VARCHAR(20)     NOT NULL,
+    "content"           TEXT            NOT NULL,
+    "prompt_tokens"     INTEGER         NOT NULL    DEFAULT 0,
+    "completion_tokens" INTEGER         NOT NULL    DEFAULT 0,
+    CONSTRAINT fk_chat_messages_exercise FOREIGN KEY ("exercise_uuid")  REFERENCES "exercises"("uuid")  ON DELETE CASCADE,
+    CONSTRAINT fk_chat_messages_user     FOREIGN KEY ("user_uuid")      REFERENCES "users"("uuid")      ON DELETE CASCADE
+);
+
+CREATE INDEX        idx_chat_messages_exercise     ON "chat_messages" ("exercise_uuid");
+CREATE INDEX        idx_chat_messages_user         ON "chat_messages" ("user_uuid");
+CREATE INDEX        idx_chat_messages_ts           ON "chat_messages" ("ts");

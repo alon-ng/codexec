@@ -2,7 +2,6 @@ package me
 
 import (
 	e "codim/pkg/api/v1/errors"
-	"codim/pkg/api/v1/modules/progress"
 	"codim/pkg/utils/logger"
 	"net/http"
 
@@ -15,7 +14,7 @@ type Controller struct {
 	log *logger.Logger
 }
 
-func NewController(svc *Service, progressSvc *progress.Service, log *logger.Logger) *Controller {
+func NewController(svc *Service, log *logger.Logger) *Controller {
 	return &Controller{svc: svc, log: log}
 }
 
@@ -156,4 +155,69 @@ func (c *Controller) SaveUserExerciseSubmission(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+// ListChatMessages godoc
+// @Summary      List the chat messages
+// @Description  List the chat messages
+// @Tags         me
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        exercise_uuid path string true "Exercise UUID"
+// @Param        limit       query    int     false  "Limit (default: 10)"  default(10)
+// @Param        offset      query    int     false  "Offset (default: 0)"  default(0)
+// @Success      200     {array}   chat.ChatMessage
+// @Failure      400     {object}  errors.ErrorResponse
+// @Failure      401     {object}  errors.ErrorResponse
+// @Failure      500     {object}  errors.ErrorResponse
+// @Router       /me/exercises/{exercise_uuid}/chat [get]
+func (c *Controller) ListChatMessages(ctx *gin.Context) {
+	meUUID := uuid.MustParse(ctx.GetString("user_uuid"))
+	exerciseUUID := uuid.MustParse(ctx.Param("exercise_uuid"))
+	var req ListChatMessagesRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
+		return
+	}
+
+	messages, err := c.svc.ListChatMessages(ctx.Request.Context(), meUUID, exerciseUUID, req)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, messages)
+}
+
+// SendChatMessage godoc
+// @Summary      Send a chat message
+// @Description  Send a chat message
+// @Tags         me
+// @Accept       json
+// @Produce      json
+// @Security     CookieAuth
+// @Param        exercise_uuid path string true "Exercise UUID"
+// @Param        message body SendChatMessageRequest true "Message"
+// @Success      200     {object}  chat.ChatMessage
+// @Failure      400     {object}  errors.ErrorResponse
+// @Failure      401     {object}  errors.ErrorResponse
+// @Failure      500     {object}  errors.ErrorResponse
+// @Router       /me/exercises/{exercise_uuid}/chat [post]
+func (c *Controller) SendChatMessage(ctx *gin.Context) {
+	meUUID := uuid.MustParse(ctx.GetString("user_uuid"))
+	exerciseUUID := uuid.MustParse(ctx.Param("exercise_uuid"))
+	var req SendChatMessageRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		e.HandleError(ctx, c.log, e.NewAPIError(err, "Invalid request data"), http.StatusBadRequest)
+		return
+	}
+
+	message, err := c.svc.SendChatMessage(ctx.Request.Context(), meUUID, exerciseUUID, req)
+	if err != nil {
+		e.HandleError(ctx, c.log, err, http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, message)
 }

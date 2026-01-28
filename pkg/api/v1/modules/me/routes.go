@@ -1,7 +1,7 @@
 package me
 
 import (
-	"codim/pkg/api/v1/modules/progress"
+	"codim/pkg/ai"
 	"codim/pkg/db"
 	"codim/pkg/utils/logger"
 
@@ -9,10 +9,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func RegisterRoutes(router *gin.RouterGroup, q *db.Queries, p *pgxpool.Pool, log *logger.Logger) {
-	progressSvc := progress.NewService(q, p)
-	svc := NewService(q, p, progressSvc)
-	ctrl := NewController(svc, progressSvc, log)
+func RegisterRoutes(router *gin.RouterGroup, q *db.Queries, p *pgxpool.Pool, log *logger.Logger, aiClient *ai.Client) {
+	svc := NewService(q, p, aiClient)
+	ctrl := NewController(svc, log)
 
 	meGroup := router.Group("/me")
 	{
@@ -21,6 +20,8 @@ func RegisterRoutes(router *gin.RouterGroup, q *db.Queries, p *pgxpool.Pool, log
 		meGroup.GET("/courses/:course_uuid", ctrl.GetUserCourseFull)
 		meGroup.GET("/exercises/:exercise_uuid", ctrl.GetUserExercise)
 		meGroup.PUT("/exercises/:exercise_uuid", ctrl.SaveUserExerciseSubmission)
+		meGroup.GET("/exercises/:exercise_uuid/chat", ctrl.ListChatMessages)
+		meGroup.POST("/exercises/:exercise_uuid/chat", ctrl.SendChatMessage)
 	}
 
 }
