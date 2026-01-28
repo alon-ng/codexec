@@ -11,6 +11,7 @@ import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type {
+  ChatChatMessage,
   MeUserExercise,
   ProgressUserCourseFull,
   ProgressUserCourseWithProgress,
@@ -211,6 +212,32 @@ export const getGetMeExercisesExerciseUuidResponseMock = (
 export const getPutMeExercisesExerciseUuidResponseMock = (): string =>
   faker.word.sample();
 
+export const getGetMeExercisesExerciseUuidChatResponseMock =
+  (): ChatChatMessage[] =>
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      content: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      exercise_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      role: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      ts: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      user_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    }));
+
+export const getPostMeExercisesExerciseUuidChatResponseMock = (
+  overrideResponse: Partial<ChatChatMessage> = {},
+): ChatChatMessage => ({
+  content: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  exercise_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  role: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  ts: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  user_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  ...overrideResponse,
+});
+
 export const getGetMeMockHandler = (
   overrideResponse?:
     | UsersUser
@@ -352,10 +379,68 @@ export const getPutMeExercisesExerciseUuidMockHandler = (
     options,
   );
 };
+
+export const getGetMeExercisesExerciseUuidChatMockHandler = (
+  overrideResponse?:
+    | ChatChatMessage[]
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<ChatChatMessage[]> | ChatChatMessage[]),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/me/exercises/:exerciseUuid/chat",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetMeExercisesExerciseUuidChatResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostMeExercisesExerciseUuidChatMockHandler = (
+  overrideResponse?:
+    | ChatChatMessage
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<ChatChatMessage> | ChatChatMessage),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/me/exercises/:exerciseUuid/chat",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostMeExercisesExerciseUuidChatResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
 export const getMeMock = () => [
   getGetMeMockHandler(),
   getGetMeCoursesMockHandler(),
   getGetMeCoursesCourseUuidMockHandler(),
   getGetMeExercisesExerciseUuidMockHandler(),
   getPutMeExercisesExerciseUuidMockHandler(),
+  getGetMeExercisesExerciseUuidChatMockHandler(),
+  getPostMeExercisesExerciseUuidChatMockHandler(),
 ];

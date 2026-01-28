@@ -22,9 +22,12 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  ChatChatMessage,
   ErrorsErrorResponse,
   GetMeCoursesParams,
+  GetMeExercisesExerciseUuidChatParams,
   MeSaveUserExerciseSubmissionRequest,
+  MeSendChatMessageRequest,
   MeUserExercise,
   ProgressUserCourseFull,
   ProgressUserCourseWithProgress,
@@ -749,6 +752,298 @@ export const usePutMeExercisesExerciseUuid = <
   TContext
 > => {
   const mutationOptions = getPutMeExercisesExerciseUuidMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * List the chat messages
+ * @summary List the chat messages
+ */
+export const getMeExercisesExerciseUuidChat = (
+  exerciseUuid: string,
+  params?: GetMeExercisesExerciseUuidChatParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<ChatChatMessage[]>(
+    {
+      url: `/me/exercises/${exerciseUuid}/chat`,
+      method: "GET",
+      params,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetMeExercisesExerciseUuidChatQueryKey = (
+  exerciseUuid?: string,
+  params?: GetMeExercisesExerciseUuidChatParams,
+) => {
+  return [
+    `/me/exercises/${exerciseUuid}/chat`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetMeExercisesExerciseUuidChatQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  params?: GetMeExercisesExerciseUuidChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetMeExercisesExerciseUuidChatQueryKey(exerciseUuid, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>
+  > = ({ signal }) =>
+    getMeExercisesExerciseUuidChat(
+      exerciseUuid,
+      params,
+      requestOptions,
+      signal,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!exerciseUuid,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMeExercisesExerciseUuidChatQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>
+>;
+export type GetMeExercisesExerciseUuidChatQueryError = ErrorsErrorResponse;
+
+export function useGetMeExercisesExerciseUuidChat<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  params: undefined | GetMeExercisesExerciseUuidChatParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+          TError,
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMeExercisesExerciseUuidChat<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  params?: GetMeExercisesExerciseUuidChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+          TError,
+          Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMeExercisesExerciseUuidChat<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  params?: GetMeExercisesExerciseUuidChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary List the chat messages
+ */
+
+export function useGetMeExercisesExerciseUuidChat<
+  TData = Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+  TError = ErrorsErrorResponse,
+>(
+  exerciseUuid: string,
+  params?: GetMeExercisesExerciseUuidChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMeExercisesExerciseUuidChat>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMeExercisesExerciseUuidChatQueryOptions(
+    exerciseUuid,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Send a chat message
+ * @summary Send a chat message
+ */
+export const postMeExercisesExerciseUuidChat = (
+  exerciseUuid: string,
+  meSendChatMessageRequest: MeSendChatMessageRequest,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<ChatChatMessage>(
+    {
+      url: `/me/exercises/${exerciseUuid}/chat`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: meSendChatMessageRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostMeExercisesExerciseUuidChatMutationOptions = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postMeExercisesExerciseUuidChat>>,
+    TError,
+    { exerciseUuid: string; data: MeSendChatMessageRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postMeExercisesExerciseUuidChat>>,
+  TError,
+  { exerciseUuid: string; data: MeSendChatMessageRequest },
+  TContext
+> => {
+  const mutationKey = ["postMeExercisesExerciseUuidChat"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postMeExercisesExerciseUuidChat>>,
+    { exerciseUuid: string; data: MeSendChatMessageRequest }
+  > = (props) => {
+    const { exerciseUuid, data } = props ?? {};
+
+    return postMeExercisesExerciseUuidChat(exerciseUuid, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostMeExercisesExerciseUuidChatMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postMeExercisesExerciseUuidChat>>
+>;
+export type PostMeExercisesExerciseUuidChatMutationBody =
+  MeSendChatMessageRequest;
+export type PostMeExercisesExerciseUuidChatMutationError = ErrorsErrorResponse;
+
+/**
+ * @summary Send a chat message
+ */
+export const usePostMeExercisesExerciseUuidChat = <
+  TError = ErrorsErrorResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postMeExercisesExerciseUuidChat>>,
+      TError,
+      { exerciseUuid: string; data: MeSendChatMessageRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postMeExercisesExerciseUuidChat>>,
+  TError,
+  { exerciseUuid: string; data: MeSendChatMessageRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostMeExercisesExerciseUuidChatMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

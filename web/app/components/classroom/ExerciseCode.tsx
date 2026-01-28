@@ -8,14 +8,16 @@ import { useTranslation } from "react-i18next";
 import { usePutMeExercisesExerciseUuid } from "~/api/generated/me/me";
 import type { ExercisesExerciseCodeData, ExercisesExerciseWithTranslation, MeSaveUserExerciseSubmissionRequestSubmission, MeUserExercise } from "~/api/generated/model";
 import type { ExecuteResponse } from '~/api/types';
+import codyAvatar from "~/assets/cody-256.png";
 import errorSound from "~/assets/error.mp3";
 import { Button } from "~/components/base/Button";
+import Chat from '~/components/chat/Chat';
+import ExerciseCodeResults from '~/components/classroom/ExerciseCodeResults';
+import ExerciseHeader from '~/components/classroom/ExerciseHeader';
 import { useWebSocket } from "~/hooks/useWebSocket";
 import { blurInVariants } from "~/utils/animations";
 import LANGUAGE_MAP from "~/utils/codeLang";
 import { getCodeMirrorExtensions } from "~/utils/codeMirror";
-import ExerciseCodeResults from './ExerciseCodeResults';
-import ExerciseHeader from "./ExerciseHeader";
 
 export interface ExerciseCodeProps {
   exercise: ExercisesExerciseWithTranslation;
@@ -61,6 +63,7 @@ export default function ExerciseCode({
 
   const [isRunning, setIsRunning] = useState(false);
   const [resultTab, setResultTab] = useState<string>("console");
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     codeValueRef.current = initialCode;
@@ -146,8 +149,8 @@ export default function ExerciseCode({
   };
 
   return (
-    <div className="flex justify-start h-full">
-      <div className="flex flex-col w-1/2 gap-4">
+    <div className="flex justify-start h-full gap-2">
+      <div className="flex-1 flex flex-col gap-4">
         <motion.div variants={blurInVariants(0.2)} initial="hidden" animate="visible">
           <ExerciseHeader exercise={exercise} />
         </motion.div>
@@ -155,14 +158,14 @@ export default function ExerciseCode({
           <EditorContent className="prose prose-sm dark:prose-invert" editor={editor} />
         </motion.div>
       </div>
-      <div className="w-1/2 h-full flex flex-col gap-2">
-        <motion.div className="flex justify-end" variants={blurInVariants(0.5)} initial="hidden" animate="visible">
+      <div className="flex-1 h-full flex flex-col gap-2">
+        <motion.div className="flex justify-end gap-2" variants={blurInVariants(0.5)} initial="hidden" animate="visible">
           <Button variant="outline" onClick={handleRunCode} isLoading={isRunning} disabled={Boolean(userExercise.completed_at)}>
             {t("common.run")}
             <Play className="size-4" />
           </Button>
         </motion.div>
-        <motion.div className="flex flex-col flex-1 border rounded-lg overflow-hidden" variants={blurInVariants(0.4)} initial="hidden" animate="visible">
+        <motion.div className="flex flex-col flex-1 border rounded-lg overflow-hidden relative" variants={blurInVariants(0.4)} initial="hidden" animate="visible">
           <CodeMirror
             dir="ltr"
             className="flex-1"
@@ -174,8 +177,10 @@ export default function ExerciseCode({
             readOnly={Boolean(userExercise.completed_at)}
           />
           <ExerciseCodeResults resultTab={resultTab} setResultTab={setResultTab} lastResult={lastResult} />
+          <img src={codyAvatar} className="size-16 absolute bottom-2 right-2 cursor-pointer hover:translate-y-[-0.25rem] transition-all duration-200" onClick={() => setIsChatOpen(!isChatOpen)} />
         </motion.div>
       </div>
+      {isChatOpen && <Chat exerciseInstructions={exercise.translation?.code_data?.instructions || ""} exerciseCode={codeValue} exerciseUuid={exercise.uuid} />}
     </div>
   );
 }

@@ -55,25 +55,27 @@ export default function ExerciseContent({
     );
   }
 
-  return (
-    <div className="flex flex-col h-full gap-4">
-      {exercise.type === "code" ? (
-        <ExerciseCode
-          key={exerciseUuid}
-          exercise={exercise}
-          language={language}
-          userExercise={userExerciseData}
-          onExerciseComplete={onExerciseComplete}
-        />
-      ) : (
-        <ExerciseQuiz
-          key={exerciseUuid}
-          exercise={exercise}
-          language={language}
-          userExercise={userExerciseData}
-          onExerciseComplete={onExerciseComplete}
-        />
-      )}
-    </div>
-  );
+  if (exercise.type === "code") {
+    return (
+      <ExerciseCode
+        key={exerciseUuid}
+        exercise={exercise}
+        language={language}
+        userExercise={userExerciseData}
+        onExerciseComplete={onExerciseComplete}
+      />
+    );
+  }
+
+  if (exercise.type === "quiz") {
+    return (
+      <ExerciseQuiz
+        key={exerciseUuid}
+        exercise={exercise}
+        language={language}
+        userExercise={userExerciseData}
+        onExerciseComplete={onExerciseComplete}
+      />
+    );
+  }
 }

@@ -50,6 +50,7 @@
     "@react-router/dev": "7.10.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "4.1.18",
+    "@tiptap/markdown": "^3.17.1",
     "@types/node": "^22",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

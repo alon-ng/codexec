@@ -84,5 +84,8 @@
         "continueWhereYouLeftOff": "Continue where you left off",
         "instructions": "Instructions",
         "codeEditor": "Code Editor"
+    },
+    "cody": {
+        "greeting": "Hello, I'm Cody. I'm here to help you learn how to code."
     }
 }
