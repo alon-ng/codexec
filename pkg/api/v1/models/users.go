@@ -1,27 +1,12 @@
-package users
+package models
 
 import (
+	"codim/pkg/db"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-type CreateUserRequest struct {
-	FirstName  string `json:"first_name" binding:"required" example:"John"`
-	LastName   string `json:"last_name" binding:"required" example:"Doe"`
-	Email      string `json:"email" binding:"required,email" example:"john.doe@example.com"`
-	Password   string `json:"password" binding:"required" example:"password"`
-	IsVerified bool   `json:"is_verified" example:"false"`
-	IsAdmin    bool   `json:"is_admin" example:"false"`
-}
-
-type UpdateUserRequest struct {
-	Uuid      uuid.UUID `json:"uuid" binding:"required"`
-	FirstName *string   `json:"first_name" example:"John"`
-	LastName  *string   `json:"last_name" example:"Doe"`
-}
-
-// Response types
 type User struct {
 	Uuid       uuid.UUID  `json:"uuid" binding:"required"`
 	CreatedAt  time.Time  `json:"created_at" binding:"required"`
@@ -34,4 +19,20 @@ type User struct {
 	Streak     int32      `json:"streak" example:"0"`
 	Score      int32      `json:"score" example:"0"`
 	IsAdmin    bool       `json:"is_admin" example:"false"`
+}
+
+func ToUser(d db.User) User {
+	return User{
+		Uuid:       d.Uuid,
+		CreatedAt:  d.CreatedAt,
+		ModifiedAt: d.ModifiedAt,
+		DeletedAt:  d.DeletedAt,
+		FirstName:  d.FirstName,
+		LastName:   d.LastName,
+		Email:      d.Email,
+		IsVerified: d.IsVerified,
+		Streak:     d.Streak,
+		Score:      d.Score,
+		IsAdmin:    d.IsAdmin,
+	}
 }

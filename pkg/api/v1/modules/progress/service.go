@@ -2,7 +2,7 @@ package progress
 
 import (
 	e "codim/pkg/api/v1/errors"
-	"codim/pkg/api/v1/modules/courses"
+	"codim/pkg/api/v1/models"
 	"codim/pkg/db"
 	"context"
 	"encoding/json"
@@ -88,81 +88,7 @@ func (s *Service) CompleteUserExercise(ctx context.Context, userUuid uuid.UUID, 
 	return userCourse.NextLessonUuid, userCourse.NextExerciseUuid, nil
 }
 
-// Conversion functions
-func toUserCourseWithProgress(d db.UserCourseWithProgress) (UserCourseWithProgress, error) {
-	courseWithTranslation, err := courses.ToCourseWithTranslation(d.CourseWithTranslation)
-	if err != nil {
-		return UserCourseWithProgress{}, err
-	}
-
-	return UserCourseWithProgress{
-		CourseWithTranslation:    courseWithTranslation,
-		UserCourseStartedAt:      d.UserCourseStartedAt,
-		UserCourseLastAccessedAt: d.UserCourseLastAccessedAt,
-		UserCourseCompletedAt:    d.UserCourseCompletedAt,
-		TotalExercises:           d.TotalExercises,
-		CompletedExercises:       d.CompletedExercises,
-		NextLessonUuid:           d.NextLessonUuid,
-		NextLessonName:           d.NextLessonName,
-		NextExerciseUuid:         d.NextExerciseUuid,
-		NextExerciseName:         d.NextExerciseName,
-	}, nil
-}
-
-func toUserCourseFull(d db.UserCourseFull) UserCourseFull {
-	lessons := make([]UserLessonStatus, len(d.Lessons))
-	for i, lesson := range d.Lessons {
-		lessons[i] = toUserLessonStatus(lesson)
-	}
-	return UserCourseFull{
-		CourseUuid:     d.CourseUuid,
-		StartedAt:      d.StartedAt,
-		LastAccessedAt: d.LastAccessedAt,
-		IsCompleted:    d.IsCompleted,
-		CompletedAt:    d.CompletedAt,
-		Lessons:        lessons,
-	}
-}
-
-func toUserLessonStatus(d db.UserLessonStatus) UserLessonStatus {
-	exercises := make([]UserExerciseStatus, len(d.Exercises))
-	for i, exercise := range d.Exercises {
-		exercises[i] = toUserExerciseStatus(exercise)
-	}
-	return UserLessonStatus{
-		LessonUuid:     d.LessonUuid,
-		StartedAt:      d.StartedAt,
-		LastAccessedAt: d.LastAccessedAt,
-		IsCompleted:    d.IsCompleted,
-		CompletedAt:    d.CompletedAt,
-		Exercises:      exercises,
-	}
-}
-
-func toUserExerciseStatus(d db.UserExerciseStatus) UserExerciseStatus {
-	return UserExerciseStatus{
-		ExerciseUuid:   d.ExerciseUuid,
-		StartedAt:      d.StartedAt,
-		LastAccessedAt: d.LastAccessedAt,
-		IsCompleted:    d.IsCompleted,
-		CompletedAt:    d.CompletedAt,
-	}
-}
-
-func toUserExercise(d db.UserExercise) UserExercise {
-	return UserExercise{
-		Uuid:           d.Uuid,
-		StartedAt:      d.StartedAt,
-		LastAccessedAt: d.LastAccessedAt,
-		UserUuid:       d.UserUuid,
-		ExerciseUuid:   d.ExerciseUuid,
-		Submission:     d.Submission,
-		Attempts:       d.Attempts,
-		CompletedAt:    d.CompletedAt,
-	}
-}
-
-func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.UUID, req ListUserCoursesWithProgressRequest) ([]UserCourseWithProgress, *e.APIError) {
+func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.UUID, req ListUserCoursesWithProgressRequest) ([]models.UserCourseWithProgress, *e.APIError) {
 	userCourses, err := s.q.ListUserCoursesWithProgress(ctx, db.ListUserCoursesWithProgressParams{
 		UserUuid: meUUID,
 		Language: req.Language,
@@ -175,9 +101,9 @@ func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.U
 		return nil, e.NewAPIError(err, ErrGetUserCoursesWithProgressFailed)
 	}
 
-	userCoursesWithProgress := make([]UserCourseWithProgress, len(userCourses))
+	userCoursesWithProgress := make([]models.UserCourseWithProgress, len(userCourses))
 	for i, userCourse := range userCourses {
-		userCourseWithProgress, err := toUserCourseWithProgress(userCourse.ToUserCourseWithProgress())
+		userCourseWithProgress, err := models.ToUserCourseWithProgress(userCourse.ToUserCourseWithProgress())
 		if err != nil {
 			return nil, e.NewAPIError(err, ErrGetUserCoursesWithProgressFailed)
 		}
@@ -187,25 +113,25 @@ func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.U
 	return userCoursesWithProgress, nil
 }
 
-func (s *Service) GetUserCourseFull(ctx context.Context, meUUID uuid.UUID, courseUUID uuid.UUID) (UserCourseFull, *e.APIError) {
+func (s *Service) GetUserCourseFull(ctx context.Context, meUUID uuid.UUID, courseUUID uuid.UUID) (models.UserCourseFull, *e.APIError) {
 	userCourse, err := s.q.GetUserCourseFull(ctx, meUUID, courseUUID)
 	if err != nil {
-		return UserCourseFull{}, e.NewAPIError(err, ErrGetUserCourseFullFailed)
+		return models.UserCourseFull{}, e.NewAPIError(err, ErrGetUserCourseFullFailed)
 	}
 
-	return toUserCourseFull(userCourse), nil
+	return models.ToUserCourseFull(userCourse), nil
 }
 
-func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID) (UserExercise, *e.APIError) {
+func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID) (models.UserExercise, *e.APIError) {
 	userExercise, err := s.q.GetUserExercise(ctx, db.GetUserExerciseParams{
 		UserUuid:     meUUID,
 		ExerciseUuid: exerciseUUID,
 	})
 	if err != nil {
-		return UserExercise{}, e.NewAPIError(err, ErrGetUserExerciseFailed)
+		return models.UserExercise{}, e.NewAPIError(err, ErrGetUserExerciseFailed)
 	}
 
-	return toUserExercise(userExercise), nil
+	return models.ToUserExercise(userExercise), nil
 }
 
 func (s *Service) SaveUserExerciseSubmission(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, submission SaveUserExerciseSubmissionRequest) *e.APIError {
@@ -232,7 +158,7 @@ func (s *Service) ValidateSubmission(submission SaveUserExerciseSubmissionReques
 
 	switch submission.Type {
 	case db.ExerciseTypeCode:
-		var userExerciseSubmissionCode UserExerciseSubmissionCode
+		var userExerciseSubmissionCode models.UserExerciseSubmissionCode
 		err := json.Unmarshal(submission.Submission, &userExerciseSubmissionCode)
 		if err != nil {
 			return nil, err

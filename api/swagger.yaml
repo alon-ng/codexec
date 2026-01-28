@@ -32,28 +32,6 @@ definitions:
     - last_name
     - password
     type: object
-  chat.ChatMessage:
-    properties:
-      content:
-        type: string
-      exercise_uuid:
-        type: string
-      role:
-        type: string
-      ts:
-        type: string
-      user_uuid:
-        type: string
-      uuid:
-        type: string
-    required:
-    - content
-    - exercise_uuid
-    - role
-    - ts
-    - user_uuid
-    - uuid
-    type: object
   courses.AddCourseTranslationRequest:
     properties:
       bullets:
@@ -77,107 +55,6 @@ definitions:
     - description
     - language
     - name
-    type: object
-  courses.CourseFull:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      lessons:
-        items:
-          $ref: '#/definitions/lessons.LessonFull'
-        type: array
-      modified_at:
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-      translation:
-        $ref: '#/definitions/courses.CourseTranslation'
-      uuid:
-        type: string
-    required:
-    - created_at
-    - modified_at
-    - price
-    - subject
-    - translation
-    - uuid
-    type: object
-  courses.CourseTranslation:
-    properties:
-      bullets:
-        example: |-
-          Learn basics
-          Practice exercises
-        type: string
-      course_uuid:
-        type: string
-      description:
-        example: Learn Python basics
-        type: string
-      language:
-        example: en
-        type: string
-      name:
-        example: Introduction to Python
-        type: string
-      uuid:
-        type: string
-    required:
-    - course_uuid
-    - description
-    - language
-    - name
-    - uuid
-    type: object
-  courses.CourseWithTranslation:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      difficulty:
-        example: 1
-        type: integer
-      discount:
-        example: 0
-        type: integer
-      is_active:
-        example: true
-        type: boolean
-      modified_at:
-        type: string
-      price:
-        example: 99
-        type: integer
-      subject:
-        example: Programming
-        type: string
-      translation:
-        $ref: '#/definitions/courses.CourseTranslation'
-      uuid:
-        type: string
-    required:
-    - created_at
-    - modified_at
-    - price
-    - subject
-    - translation
-    - uuid
     type: object
   courses.CreateCourseRequest:
     properties:
@@ -329,116 +206,6 @@ definitions:
     - reward
     - type
     type: object
-  exercises.ExerciseCodeData:
-    properties:
-      children:
-        items:
-          $ref: '#/definitions/fs.Entry'
-        type: array
-      content:
-        type: string
-      name:
-        type: string
-    required:
-    - name
-    type: object
-  exercises.ExerciseQuizData:
-    additionalProperties: true
-    type: object
-  exercises.ExerciseTranslation:
-    properties:
-      code_data:
-        $ref: '#/definitions/exercises.ExerciseTranslationCodeData'
-      description:
-        example: Print Hello World
-        type: string
-      exercise_uuid:
-        type: string
-      language:
-        example: en
-        type: string
-      name:
-        example: Hello World
-        type: string
-      quiz_data:
-        $ref: '#/definitions/exercises.ExerciseTranslationQuizData'
-      uuid:
-        type: string
-    required:
-    - description
-    - exercise_uuid
-    - language
-    - name
-    - uuid
-    type: object
-  exercises.ExerciseTranslationCodeData:
-    properties:
-      instructions:
-        example: <p>Hello! Start writing your exercise instructions here...</p>
-        type: string
-    required:
-    - instructions
-    type: object
-  exercises.ExerciseTranslationQuizData:
-    additionalProperties:
-      $ref: '#/definitions/exercises.ExerciseTranslationQuizDataQuestion'
-    type: object
-  exercises.ExerciseTranslationQuizDataQuestion:
-    properties:
-      answers:
-        additionalProperties:
-          type: string
-        example:
-          ' "2"': ' "London"'
-          ' "3"': ' "Berlin"'
-          ' "4"': ' "Madrid"}'
-          '{"1"': ' "Paris"'
-        type: object
-      question:
-        example: What is the capital of France?
-        type: string
-    required:
-    - answers
-    - question
-    type: object
-  exercises.ExerciseWithTranslation:
-    properties:
-      code_data:
-        $ref: '#/definitions/exercises.ExerciseCodeData'
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      lesson_uuid:
-        type: string
-      modified_at:
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      quiz_data:
-        $ref: '#/definitions/exercises.ExerciseQuizData'
-      reward:
-        example: 10
-        type: integer
-      translation:
-        $ref: '#/definitions/exercises.ExerciseTranslation'
-      type:
-        allOf:
-        - $ref: '#/definitions/db.ExerciseType'
-        example: quiz
-      uuid:
-        type: string
-    required:
-    - created_at
-    - lesson_uuid
-    - modified_at
-    - order_index
-    - reward
-    - translation
-    - type
-    - uuid
-    type: object
   exercises.IDRequest:
     properties:
       uuid:
@@ -541,88 +308,6 @@ definitions:
     required:
     - uuid
     type: object
-  lessons.LessonFull:
-    properties:
-      course_uuid:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/exercises.ExerciseWithTranslation'
-        type: array
-      is_public:
-        example: false
-        type: boolean
-      modified_at:
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      translation:
-        $ref: '#/definitions/lessons.LessonTranslation'
-      uuid:
-        type: string
-    required:
-    - course_uuid
-    - created_at
-    - modified_at
-    - order_index
-    - translation
-    - uuid
-    type: object
-  lessons.LessonTranslation:
-    properties:
-      description:
-        example: Learn Python fundamentals
-        type: string
-      language:
-        example: en
-        type: string
-      lesson_uuid:
-        type: string
-      name:
-        example: Python Basics
-        type: string
-      uuid:
-        type: string
-    required:
-    - description
-    - language
-    - lesson_uuid
-    - name
-    - uuid
-    type: object
-  lessons.LessonWithTranslation:
-    properties:
-      course_uuid:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      is_public:
-        example: false
-        type: boolean
-      modified_at:
-        type: string
-      order_index:
-        example: 1
-        type: integer
-      translation:
-        $ref: '#/definitions/lessons.LessonTranslation'
-      uuid:
-        type: string
-    required:
-    - course_uuid
-    - created_at
-    - modified_at
-    - order_index
-    - translation
-    - uuid
-    type: object
   lessons.UpdateLessonRequest:
     properties:
       description:
@@ -674,34 +359,361 @@ definitions:
     - content
     - exercise_instructions
     type: object
-  me.UserExercise:
+  models.ChatMessage:
     properties:
-      attempts:
-        example: 0
-        type: integer
-      completed_at:
+      content:
         type: string
       exercise_uuid:
         type: string
-      last_accessed_at:
+      role:
         type: string
-      started_at:
+      ts:
         type: string
-      submission:
-        type: object
       user_uuid:
         type: string
       uuid:
         type: string
     required:
-    - attempts
+    - content
     - exercise_uuid
-    - started_at
-    - submission
+    - role
+    - ts
     - user_uuid
     - uuid
     type: object
-  progress.UserCourseFull:
+  models.CourseFull:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      lessons:
+        items:
+          $ref: '#/definitions/models.LessonFull'
+        type: array
+      modified_at:
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+      translation:
+        $ref: '#/definitions/models.CourseTranslation'
+      uuid:
+        type: string
+    required:
+    - created_at
+    - modified_at
+    - price
+    - subject
+    - translation
+    - uuid
+    type: object
+  models.CourseTranslation:
+    properties:
+      bullets:
+        example: |-
+          Learn basics
+          Practice exercises
+        type: string
+      course_uuid:
+        type: string
+      description:
+        example: Learn Python basics
+        type: string
+      language:
+        example: en
+        type: string
+      name:
+        example: Introduction to Python
+        type: string
+      uuid:
+        type: string
+    required:
+    - course_uuid
+    - description
+    - language
+    - name
+    - uuid
+    type: object
+  models.CourseWithTranslation:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      difficulty:
+        example: 1
+        type: integer
+      discount:
+        example: 0
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      modified_at:
+        type: string
+      price:
+        example: 99
+        type: integer
+      subject:
+        example: Programming
+        type: string
+      translation:
+        $ref: '#/definitions/models.CourseTranslation'
+      uuid:
+        type: string
+    required:
+    - created_at
+    - modified_at
+    - price
+    - subject
+    - translation
+    - uuid
+    type: object
+  models.ExerciseCodeData:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/fs.Entry'
+        type: array
+      content:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.ExerciseQuizData:
+    additionalProperties: true
+    type: object
+  models.ExerciseTranslation:
+    properties:
+      code_data:
+        $ref: '#/definitions/models.ExerciseTranslationCodeData'
+      description:
+        example: Print Hello World
+        type: string
+      exercise_uuid:
+        type: string
+      language:
+        example: en
+        type: string
+      name:
+        example: Hello World
+        type: string
+      quiz_data:
+        $ref: '#/definitions/models.ExerciseTranslationQuizData'
+      uuid:
+        type: string
+    required:
+    - description
+    - exercise_uuid
+    - language
+    - name
+    - uuid
+    type: object
+  models.ExerciseTranslationCodeData:
+    properties:
+      instructions:
+        example: <p>Hello! Start writing your exercise instructions here...</p>
+        type: string
+    required:
+    - instructions
+    type: object
+  models.ExerciseTranslationQuizData:
+    additionalProperties:
+      $ref: '#/definitions/models.ExerciseTranslationQuizDataQuestion'
+    type: object
+  models.ExerciseTranslationQuizDataQuestion:
+    properties:
+      answers:
+        additionalProperties:
+          type: string
+        example:
+          ' "2"': ' "London"'
+          ' "3"': ' "Berlin"'
+          ' "4"': ' "Madrid"}'
+          '{"1"': ' "Paris"'
+        type: object
+      question:
+        example: What is the capital of France?
+        type: string
+    required:
+    - answers
+    - question
+    type: object
+  models.ExerciseWithTranslation:
+    properties:
+      code_data:
+        $ref: '#/definitions/models.ExerciseCodeData'
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      lesson_uuid:
+        type: string
+      modified_at:
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      quiz_data:
+        $ref: '#/definitions/models.ExerciseQuizData'
+      reward:
+        example: 10
+        type: integer
+      translation:
+        $ref: '#/definitions/models.ExerciseTranslation'
+      type:
+        allOf:
+        - $ref: '#/definitions/db.ExerciseType'
+        example: quiz
+      uuid:
+        type: string
+    required:
+    - created_at
+    - lesson_uuid
+    - modified_at
+    - order_index
+    - reward
+    - translation
+    - type
+    - uuid
+    type: object
+  models.LessonFull:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/models.ExerciseWithTranslation'
+        type: array
+      is_public:
+        example: false
+        type: boolean
+      modified_at:
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      translation:
+        $ref: '#/definitions/models.LessonTranslation'
+      uuid:
+        type: string
+    required:
+    - course_uuid
+    - created_at
+    - modified_at
+    - order_index
+    - translation
+    - uuid
+    type: object
+  models.LessonTranslation:
+    properties:
+      description:
+        example: Learn Python fundamentals
+        type: string
+      language:
+        example: en
+        type: string
+      lesson_uuid:
+        type: string
+      name:
+        example: Python Basics
+        type: string
+      uuid:
+        type: string
+    required:
+    - description
+    - language
+    - lesson_uuid
+    - name
+    - uuid
+    type: object
+  models.LessonWithTranslation:
+    properties:
+      course_uuid:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      is_public:
+        example: false
+        type: boolean
+      modified_at:
+        type: string
+      order_index:
+        example: 1
+        type: integer
+      translation:
+        $ref: '#/definitions/models.LessonTranslation'
+      uuid:
+        type: string
+    required:
+    - course_uuid
+    - created_at
+    - modified_at
+    - order_index
+    - translation
+    - uuid
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        example: john.doe@example.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      is_admin:
+        example: false
+        type: boolean
+      is_verified:
+        example: false
+        type: boolean
+      last_name:
+        example: Doe
+        type: string
+      modified_at:
+        type: string
+      score:
+        example: 0
+        type: integer
+      streak:
+        example: 0
+        type: integer
+      uuid:
+        type: string
+    required:
+    - created_at
+    - email
+    - first_name
+    - last_name
+    - modified_at
+    - uuid
+    type: object
+  models.UserCourseFull:
     properties:
       completed_at:
         type: string
@@ -714,14 +726,14 @@ definitions:
         type: string
       lessons:
         items:
-          $ref: '#/definitions/progress.UserLessonStatus'
+          $ref: '#/definitions/models.UserLessonStatus'
         type: array
       started_at:
         type: string
     required:
     - course_uuid
     type: object
-  progress.UserCourseWithProgress:
+  models.UserCourseWithProgress:
     properties:
       completed_exercises:
         example: 5
@@ -759,7 +771,7 @@ definitions:
         example: 10
         type: integer
       translation:
-        $ref: '#/definitions/courses.CourseTranslation'
+        $ref: '#/definitions/models.CourseTranslation'
       user_course_completed_at:
         type: string
       user_course_last_accessed_at:
@@ -779,7 +791,34 @@ definitions:
     - user_course_started_at
     - uuid
     type: object
-  progress.UserExerciseStatus:
+  models.UserExercise:
+    properties:
+      attempts:
+        example: 0
+        type: integer
+      completed_at:
+        type: string
+      exercise_uuid:
+        type: string
+      last_accessed_at:
+        type: string
+      started_at:
+        type: string
+      submission:
+        type: object
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    required:
+    - attempts
+    - exercise_uuid
+    - started_at
+    - submission
+    - user_uuid
+    - uuid
+    type: object
+  models.UserExerciseStatus:
     properties:
       completed_at:
         type: string
@@ -795,13 +834,13 @@ definitions:
     required:
     - exercise_uuid
     type: object
-  progress.UserLessonStatus:
+  models.UserLessonStatus:
     properties:
       completed_at:
         type: string
       exercises:
         items:
-          $ref: '#/definitions/progress.UserExerciseStatus'
+          $ref: '#/definitions/models.UserExerciseStatus'
         type: array
       is_completed:
         example: false
@@ -859,45 +898,6 @@ definitions:
       uuid:
         type: string
     required:
-    - uuid
-    type: object
-  users.User:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      email:
-        example: john.doe@example.com
-        type: string
-      first_name:
-        example: John
-        type: string
-      is_admin:
-        example: false
-        type: boolean
-      is_verified:
-        example: false
-        type: boolean
-      last_name:
-        example: Doe
-        type: string
-      modified_at:
-        type: string
-      score:
-        example: 0
-        type: integer
-      streak:
-        example: 0
-        type: integer
-      uuid:
-        type: string
-    required:
-    - created_at
-    - email
-    - first_name
-    - last_name
-    - modified_at
     - uuid
     type: object
 host: localhost:8080
@@ -1036,7 +1036,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/courses.CourseWithTranslation'
+              $ref: '#/definitions/models.CourseWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -1077,7 +1077,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/courses.CourseFull'
+            $ref: '#/definitions/models.CourseFull'
         "400":
           description: Bad Request
           schema:
@@ -1117,7 +1117,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/courses.CourseTranslation'
+            $ref: '#/definitions/models.CourseTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1153,7 +1153,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/courses.CourseWithTranslation'
+            $ref: '#/definitions/models.CourseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1264,7 +1264,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/courses.CourseWithTranslation'
+            $ref: '#/definitions/models.CourseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1315,7 +1315,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/exercises.ExerciseWithTranslation'
+              $ref: '#/definitions/models.ExerciseWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -1357,7 +1357,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/exercises.ExerciseWithTranslation'
+            $ref: '#/definitions/models.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1397,7 +1397,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/exercises.ExerciseTranslation'
+            $ref: '#/definitions/models.ExerciseTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1433,7 +1433,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/exercises.ExerciseWithTranslation'
+            $ref: '#/definitions/models.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1544,7 +1544,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/exercises.ExerciseWithTranslation'
+            $ref: '#/definitions/models.ExerciseWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1590,7 +1590,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/lessons.LessonWithTranslation'
+              $ref: '#/definitions/models.LessonWithTranslation'
             type: array
         "400":
           description: Bad Request
@@ -1632,7 +1632,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/lessons.LessonWithTranslation'
+            $ref: '#/definitions/models.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1672,7 +1672,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/lessons.LessonTranslation'
+            $ref: '#/definitions/models.LessonTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1708,7 +1708,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/lessons.LessonWithTranslation'
+            $ref: '#/definitions/models.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1819,7 +1819,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/lessons.LessonWithTranslation'
+            $ref: '#/definitions/models.LessonWithTranslation'
         "400":
           description: Bad Request
           schema:
@@ -1848,7 +1848,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/users.User'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
           schema:
@@ -1905,7 +1905,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/progress.UserCourseWithProgress'
+              $ref: '#/definitions/models.UserCourseWithProgress'
             type: array
         "400":
           description: Bad Request
@@ -1941,7 +1941,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/progress.UserCourseFull'
+            $ref: '#/definitions/models.UserCourseFull'
         "400":
           description: Bad Request
           schema:
@@ -1976,7 +1976,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/me.UserExercise'
+            $ref: '#/definitions/models.UserExercise'
         "400":
           description: Bad Request
           schema:
@@ -2062,7 +2062,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/chat.ChatMessage'
+              $ref: '#/definitions/models.ChatMessage'
             type: array
         "400":
           description: Bad Request
@@ -2103,7 +2103,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/chat.ChatMessage'
+            $ref: '#/definitions/models.ChatMessage'
         "400":
           description: Bad Request
           schema:
@@ -2144,7 +2144,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/users.User'
+              $ref: '#/definitions/models.User'
             type: array
         "400":
           description: Bad Request
@@ -2180,7 +2180,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/users.User'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
           schema:
@@ -2220,7 +2220,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/users.User'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
           schema:
@@ -2327,7 +2327,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/users.User'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
           schema:

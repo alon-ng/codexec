@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise  body      CreateExerciseRequest  true  "Exercise creation data"
-// @Success      201       {object}  ExerciseWithTranslation
+// @Success      201       {object}  models.ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      409       {object}  errors.ErrorResponse
@@ -57,7 +57,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise  body      UpdateExerciseRequest  true  "Exercise update data"
-// @Success      200       {object}  ExerciseWithTranslation
+// @Success      200       {object}  models.ExerciseWithTranslation
 // @Failure      400       {object}  errors.ErrorResponse
 // @Failure      401       {object}  errors.ErrorResponse
 // @Failure      500       {object}  errors.ErrorResponse
@@ -76,10 +76,6 @@ func (c *Controller) Update(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, exercise)
-}
-
-type IDRequest struct {
-	Uuid uuid.UUID `json:"uuid" binding:"required"`
 }
 
 // Delete godoc
@@ -155,7 +151,7 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Param        offset      query     int      false  "Offset (default: 0)"  default(0)
 // @Param        lesson_uuid query     string   false  "Filter by lesson UUID"
 // @Param        language    query     string   false  "Filter by language"  default(en)
-// @Success      200         {array}   ExerciseWithTranslation
+// @Success      200         {array}   models.ExerciseWithTranslation
 // @Failure      400         {object}  errors.ErrorResponse
 // @Failure      401         {object}  errors.ErrorResponse
 // @Failure      500         {object}  errors.ErrorResponse
@@ -185,7 +181,7 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        uuid  		path      string  true  	"Exercise UUID"
 // @Param        language   query     string  false  	"Language"  	default(en) example(en)
-// @Success      200   {object}  ExerciseWithTranslation
+// @Success      200   {object}  models.ExerciseWithTranslation
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse
@@ -226,7 +222,7 @@ func (c *Controller) Get(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        translation  body      AddExerciseTranslationRequest  true  "Translation data"
-// @Success      201          {object}  ExerciseTranslation
+// @Success      201          {object}  models.ExerciseTranslation
 // @Failure      400          {object}  errors.ErrorResponse
 // @Failure      401          {object}  errors.ErrorResponse
 // @Failure      500          {object}  errors.ErrorResponse

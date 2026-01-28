@@ -2,6 +2,7 @@ package chat
 
 import (
 	"codim/pkg/ai"
+	"codim/pkg/api/v1/models"
 	"codim/pkg/db"
 	"context"
 	"errors"
@@ -25,18 +26,7 @@ func NewService(q *db.Queries, p *pgxpool.Pool, aiClient *ai.Client) *Service {
 	return &Service{q: q, p: p, aiClient: aiClient}
 }
 
-func ToChatMessage(d db.ChatMessage) ChatMessage {
-	return ChatMessage{
-		Uuid:         d.Uuid,
-		Ts:           d.Ts,
-		ExerciseUuid: d.ExerciseUuid,
-		UserUuid:     d.UserUuid,
-		Role:         d.Role,
-		Content:      d.Content,
-	}
-}
-
-func (s *Service) ListChatMessages(ctx context.Context, exerciseUUID uuid.UUID, userUUID uuid.UUID, req ListChatMessagesRequest, qtx *db.Queries) ([]ChatMessage, *e.APIError) {
+func (s *Service) ListChatMessages(ctx context.Context, exerciseUUID uuid.UUID, userUUID uuid.UUID, req ListChatMessagesRequest, qtx *db.Queries) ([]models.ChatMessage, *e.APIError) {
 	if qtx == nil {
 		qtx = s.q
 	}
@@ -50,15 +40,15 @@ func (s *Service) ListChatMessages(ctx context.Context, exerciseUUID uuid.UUID, 
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []ChatMessage{}, nil
+			return []models.ChatMessage{}, nil
 		}
 
 		return nil, e.NewAPIError(err, ErrListChatMessagesFailed)
 	}
 
-	m := make([]ChatMessage, len(messages))
+	m := make([]models.ChatMessage, len(messages))
 	for i, message := range messages {
-		m[i] = ToChatMessage(message)
+		m[i] = models.ToChatMessage(message)
 	}
 
 	return m, nil
@@ -69,10 +59,10 @@ func (s *Service) SendChatMessage(
 	exerciseUUID uuid.UUID,
 	userUUID uuid.UUID,
 	req SendChatMessageRequest,
-) (ChatMessage, *e.APIError) {
+) (models.ChatMessage, *e.APIError) {
 	tx, err := s.p.Begin(ctx)
 	if err != nil {
-		return ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
+		return models.ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
 	}
 	defer tx.Rollback(ctx)
 
@@ -85,7 +75,7 @@ func (s *Service) SendChatMessage(
 		Content:      req.Content,
 	})
 	if err != nil {
-		return ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
+		return models.ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
 	}
 
 	messageHistory, apiErr := s.ListChatMessages(ctx, exerciseUUID, userUUID, ListChatMessagesRequest{
@@ -94,14 +84,14 @@ func (s *Service) SendChatMessage(
 	}, qtx)
 
 	if apiErr != nil {
-		return ChatMessage{}, apiErr
+		return models.ChatMessage{}, apiErr
 	}
 
 	openaiMessages := s.constructOpenaiMessages(req, messageHistory)
 
 	r, err := s.aiClient.SendMessage(ctx, openaiMessages)
 	if err != nil {
-		return ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
+		return models.ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
 	}
 
 	message, err := qtx.CreateChatMessage(ctx, db.CreateChatMessageParams{
@@ -113,18 +103,18 @@ func (s *Service) SendChatMessage(
 		CompletionTokens: int32(r.CompletionTokens),
 	})
 	if err != nil {
-		return ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
+		return models.ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
 	}
 
 	err = tx.Commit(ctx)
 	if err != nil {
-		return ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
+		return models.ChatMessage{}, e.NewAPIError(err, ErrSendChatMessageFailed)
 	}
 
-	return ToChatMessage(message), nil
+	return models.ToChatMessage(message), nil
 }
 
-func (s *Service) constructOpenaiMessages(req SendChatMessageRequest, messageHistory []ChatMessage) []openai.ChatCompletionMessageParamUnion {
+func (s *Service) constructOpenaiMessages(req SendChatMessageRequest, messageHistory []models.ChatMessage) []openai.ChatCompletionMessageParamUnion {
 	openaiMessages := make([]openai.ChatCompletionMessageParamUnion, len(messageHistory)+2)
 	openaiMessages[0] = openai.SystemMessage(`You are an expert AI Programming Tutor on a code learning platform. Your goal is to help the user complete the exercise described in <ExerciseInstructions> based on their current progress in <UserCode>.
 

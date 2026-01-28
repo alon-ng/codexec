@@ -1,9 +1,8 @@
-package progress
+package models
 
 import (
-	"codim/pkg/api/v1/modules/courses"
 	"codim/pkg/db"
-	"codim/pkg/executors/drivers/models"
+	execmodels "codim/pkg/executors/drivers/models"
 	"codim/pkg/fs"
 	"encoding/json"
 	"time"
@@ -11,15 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type ListUserCoursesWithProgressRequest struct {
-	Subject  *string `json:"subject" form:"subject" example:"Programming" query:"subject"`
-	IsActive *bool   `json:"is_active" form:"is_active,default=true" example:"true" query:"is_active"`
-	Limit    int32   `json:"limit" form:"limit,default=10" example:"10" query:"limit"`
-	Offset   int32   `json:"offset" form:"offset,default=0" example:"0" query:"offset"`
-	Language string  `json:"language" form:"language,default=en" example:"en" query:"language"`
-}
-
-// Response types
 type UserExerciseStatus struct {
 	ExerciseUuid   uuid.UUID  `json:"exercise_uuid" binding:"required"`
 	StartedAt      *time.Time `json:"started_at,omitempty"`
@@ -47,7 +37,7 @@ type UserCourseFull struct {
 }
 
 type UserCourseWithProgress struct {
-	courses.CourseWithTranslation
+	CourseWithTranslation
 	UserCourseStartedAt      time.Time  `json:"user_course_started_at" binding:"required"`
 	UserCourseLastAccessedAt *time.Time `json:"user_course_last_accessed_at,omitempty"`
 	UserCourseCompletedAt    *time.Time `json:"user_course_completed_at,omitempty"`
@@ -70,12 +60,7 @@ type UserExercise struct {
 	CompletedAt    *time.Time      `json:"completed_at,omitempty"`
 }
 
-type SaveUserExerciseSubmissionRequest struct {
-	Type       db.ExerciseType `json:"type" binding:"required" example:"code"`
-	Submission json.RawMessage `json:"submission" binding:"required"`
-}
-
-type UserExerciseSubmissionCode fs.Entry
+type UserExerciseSubmissionCode = fs.Entry
 
 type UserExerciseSubmissionQuiz struct {
 	Answers map[string]string `json:"answers"`
@@ -83,9 +68,82 @@ type UserExerciseSubmissionQuiz struct {
 }
 
 type UserExerciseSubmissionResponse struct {
-	models.ExecuteResponse
+	execmodels.ExecuteResponse
 	Passed           bool       `json:"passed" binding:"required" example:"false"`
 	NextLessonUuid   *uuid.UUID `json:"next_lesson_uuid,omitempty"`
 	NextExerciseUuid *uuid.UUID `json:"next_exercise_uuid,omitempty"`
 	Reward           int32      `json:"reward" binding:"required" example:"10"`
+}
+
+func ToUserExerciseStatus(d db.UserExerciseStatus) UserExerciseStatus {
+	return UserExerciseStatus{
+		ExerciseUuid:   d.ExerciseUuid,
+		StartedAt:      d.StartedAt,
+		LastAccessedAt: d.LastAccessedAt,
+		IsCompleted:    d.IsCompleted,
+		CompletedAt:    d.CompletedAt,
+	}
+}
+
+func ToUserLessonStatus(d db.UserLessonStatus) UserLessonStatus {
+	exercises := make([]UserExerciseStatus, len(d.Exercises))
+	for i, exercise := range d.Exercises {
+		exercises[i] = ToUserExerciseStatus(exercise)
+	}
+	return UserLessonStatus{
+		LessonUuid:     d.LessonUuid,
+		StartedAt:      d.StartedAt,
+		LastAccessedAt: d.LastAccessedAt,
+		IsCompleted:    d.IsCompleted,
+		CompletedAt:    d.CompletedAt,
+		Exercises:      exercises,
+	}
+}
+
+func ToUserCourseFull(d db.UserCourseFull) UserCourseFull {
+	lessons := make([]UserLessonStatus, len(d.Lessons))
+	for i, lesson := range d.Lessons {
+		lessons[i] = ToUserLessonStatus(lesson)
+	}
+	return UserCourseFull{
+		CourseUuid:     d.CourseUuid,
+		StartedAt:      d.StartedAt,
+		LastAccessedAt: d.LastAccessedAt,
+		IsCompleted:    d.IsCompleted,
+		CompletedAt:    d.CompletedAt,
+		Lessons:        lessons,
+	}
+}
+
+func ToUserCourseWithProgress(d db.UserCourseWithProgress) (UserCourseWithProgress, error) {
+	courseWithTranslation, err := ToCourseWithTranslation(d.CourseWithTranslation)
+	if err != nil {
+		return UserCourseWithProgress{}, err
+	}
+
+	return UserCourseWithProgress{
+		CourseWithTranslation:    courseWithTranslation,
+		UserCourseStartedAt:      d.UserCourseStartedAt,
+		UserCourseLastAccessedAt: d.UserCourseLastAccessedAt,
+		UserCourseCompletedAt:    d.UserCourseCompletedAt,
+		TotalExercises:           d.TotalExercises,
+		CompletedExercises:       d.CompletedExercises,
+		NextLessonUuid:           d.NextLessonUuid,
+		NextLessonName:           d.NextLessonName,
+		NextExerciseUuid:         d.NextExerciseUuid,
+		NextExerciseName:         d.NextExerciseName,
+	}, nil
+}
+
+func ToUserExercise(d db.UserExercise) UserExercise {
+	return UserExercise{
+		Uuid:           d.Uuid,
+		StartedAt:      d.StartedAt,
+		LastAccessedAt: d.LastAccessedAt,
+		UserUuid:       d.UserUuid,
+		ExerciseUuid:   d.ExerciseUuid,
+		Submission:     d.Submission,
+		Attempts:       d.Attempts,
+		CompletedAt:    d.CompletedAt,
+	}
 }

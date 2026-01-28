@@ -211,7 +211,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/courses.CourseWithTranslation"
+                                "$ref": "#/definitions/models.CourseWithTranslation"
                             }
                         }
                     },
@@ -269,7 +269,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/courses.CourseTranslation"
+                            "$ref": "#/definitions/models.CourseTranslation"
                         }
                     },
                     "400": {
@@ -326,7 +326,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/courses.CourseWithTranslation"
+                            "$ref": "#/definitions/models.CourseWithTranslation"
                         }
                     },
                     "400": {
@@ -501,7 +501,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/courses.CourseWithTranslation"
+                            "$ref": "#/definitions/models.CourseWithTranslation"
                         }
                     },
                     "400": {
@@ -563,7 +563,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/courses.CourseFull"
+                            "$ref": "#/definitions/models.CourseFull"
                         }
                     },
                     "400": {
@@ -646,7 +646,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/exercises.ExerciseWithTranslation"
+                                "$ref": "#/definitions/models.ExerciseWithTranslation"
                             }
                         }
                     },
@@ -704,7 +704,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/exercises.ExerciseTranslation"
+                            "$ref": "#/definitions/models.ExerciseTranslation"
                         }
                     },
                     "400": {
@@ -761,7 +761,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/exercises.ExerciseWithTranslation"
+                            "$ref": "#/definitions/models.ExerciseWithTranslation"
                         }
                     },
                     "400": {
@@ -936,7 +936,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/exercises.ExerciseWithTranslation"
+                            "$ref": "#/definitions/models.ExerciseWithTranslation"
                         }
                     },
                     "400": {
@@ -999,7 +999,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/exercises.ExerciseWithTranslation"
+                            "$ref": "#/definitions/models.ExerciseWithTranslation"
                         }
                     },
                     "400": {
@@ -1075,7 +1075,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/lessons.LessonWithTranslation"
+                                "$ref": "#/definitions/models.LessonWithTranslation"
                             }
                         }
                     },
@@ -1133,7 +1133,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/lessons.LessonTranslation"
+                            "$ref": "#/definitions/models.LessonTranslation"
                         }
                     },
                     "400": {
@@ -1190,7 +1190,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/lessons.LessonWithTranslation"
+                            "$ref": "#/definitions/models.LessonWithTranslation"
                         }
                     },
                     "400": {
@@ -1365,7 +1365,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/lessons.LessonWithTranslation"
+                            "$ref": "#/definitions/models.LessonWithTranslation"
                         }
                     },
                     "400": {
@@ -1428,7 +1428,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/lessons.LessonWithTranslation"
+                            "$ref": "#/definitions/models.LessonWithTranslation"
                         }
                     },
                     "400": {
@@ -1480,7 +1480,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/users.User"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "400": {
@@ -1566,7 +1566,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/progress.UserCourseWithProgress"
+                                "$ref": "#/definitions/models.UserCourseWithProgress"
                             }
                         }
                     },
@@ -1622,7 +1622,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/progress.UserCourseFull"
+                            "$ref": "#/definitions/models.UserCourseFull"
                         }
                     },
                     "400": {
@@ -1677,7 +1677,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/me.UserExercise"
+                            "$ref": "#/definitions/models.UserExercise"
                         }
                     },
                     "400": {
@@ -1810,7 +1810,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/chat.ChatMessage"
+                                "$ref": "#/definitions/models.ChatMessage"
                             }
                         }
                     },
@@ -1873,7 +1873,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/chat.ChatMessage"
+                            "$ref": "#/definitions/models.ChatMessage"
                         }
                     },
                     "400": {
@@ -1937,7 +1937,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/users.User"
+                                "$ref": "#/definitions/models.User"
                             }
                         }
                     },
@@ -1995,7 +1995,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/users.User"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "400": {
@@ -2164,7 +2164,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/users.User"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "400": {
@@ -2219,7 +2219,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/users.User"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "400": {
@@ -2295,37 +2295,6 @@ const docTemplate = `{
                 }
             }
         },
-        "chat.ChatMessage": {
-            "type": "object",
-            "required": [
-                "content",
-                "exercise_uuid",
-                "role",
-                "ts",
-                "user_uuid",
-                "uuid"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "exercise_uuid": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "ts": {
-                    "type": "string"
-                },
-                "user_uuid": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "courses.AddCourseTranslationRequest": {
             "type": "object",
             "required": [
@@ -2353,142 +2322,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Introducción a Python"
-                }
-            }
-        },
-        "courses.CourseFull": {
-            "type": "object",
-            "required": [
-                "created_at",
-                "modified_at",
-                "price",
-                "subject",
-                "translation",
-                "uuid"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "difficulty": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "discount": {
-                    "type": "integer",
-                    "example": 0
-                },
-                "is_active": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "lessons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/lessons.LessonFull"
-                    }
-                },
-                "modified_at": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer",
-                    "example": 99
-                },
-                "subject": {
-                    "type": "string",
-                    "example": "Programming"
-                },
-                "translation": {
-                    "$ref": "#/definitions/courses.CourseTranslation"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "courses.CourseTranslation": {
-            "type": "object",
-            "required": [
-                "course_uuid",
-                "description",
-                "language",
-                "name",
-                "uuid"
-            ],
-            "properties": {
-                "bullets": {
-                    "type": "string",
-                    "example": "Learn basics\nPractice exercises"
-                },
-                "course_uuid": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "Learn Python basics"
-                },
-                "language": {
-                    "type": "string",
-                    "example": "en"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Introduction to Python"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "courses.CourseWithTranslation": {
-            "type": "object",
-            "required": [
-                "created_at",
-                "modified_at",
-                "price",
-                "subject",
-                "translation",
-                "uuid"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "difficulty": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "discount": {
-                    "type": "integer",
-                    "example": 0
-                },
-                "is_active": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "modified_at": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer",
-                    "example": 99
-                },
-                "subject": {
-                    "type": "string",
-                    "example": "Programming"
-                },
-                "translation": {
-                    "$ref": "#/definitions/courses.CourseTranslation"
-                },
-                "uuid": {
-                    "type": "string"
                 }
             }
         },
@@ -2694,164 +2527,6 @@ const docTemplate = `{
                 }
             }
         },
-        "exercises.ExerciseCodeData": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "children": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/fs.Entry"
-                    }
-                },
-                "content": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "exercises.ExerciseQuizData": {
-            "type": "object",
-            "additionalProperties": true
-        },
-        "exercises.ExerciseTranslation": {
-            "type": "object",
-            "required": [
-                "description",
-                "exercise_uuid",
-                "language",
-                "name",
-                "uuid"
-            ],
-            "properties": {
-                "code_data": {
-                    "$ref": "#/definitions/exercises.ExerciseTranslationCodeData"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "Print Hello World"
-                },
-                "exercise_uuid": {
-                    "type": "string"
-                },
-                "language": {
-                    "type": "string",
-                    "example": "en"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Hello World"
-                },
-                "quiz_data": {
-                    "$ref": "#/definitions/exercises.ExerciseTranslationQuizData"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "exercises.ExerciseTranslationCodeData": {
-            "type": "object",
-            "required": [
-                "instructions"
-            ],
-            "properties": {
-                "instructions": {
-                    "type": "string",
-                    "example": "\u003cp\u003eHello! Start writing your exercise instructions here...\u003c/p\u003e"
-                }
-            }
-        },
-        "exercises.ExerciseTranslationQuizData": {
-            "type": "object",
-            "additionalProperties": {
-                "$ref": "#/definitions/exercises.ExerciseTranslationQuizDataQuestion"
-            }
-        },
-        "exercises.ExerciseTranslationQuizDataQuestion": {
-            "type": "object",
-            "required": [
-                "answers",
-                "question"
-            ],
-            "properties": {
-                "answers": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        " \"2\"": " \"London\"",
-                        " \"3\"": " \"Berlin\"",
-                        " \"4\"": " \"Madrid\"}",
-                        "{\"1\"": " \"Paris\""
-                    }
-                },
-                "question": {
-                    "type": "string",
-                    "example": "What is the capital of France?"
-                }
-            }
-        },
-        "exercises.ExerciseWithTranslation": {
-            "type": "object",
-            "required": [
-                "created_at",
-                "lesson_uuid",
-                "modified_at",
-                "order_index",
-                "reward",
-                "translation",
-                "type",
-                "uuid"
-            ],
-            "properties": {
-                "code_data": {
-                    "$ref": "#/definitions/exercises.ExerciseCodeData"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "lesson_uuid": {
-                    "type": "string"
-                },
-                "modified_at": {
-                    "type": "string"
-                },
-                "order_index": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "quiz_data": {
-                    "$ref": "#/definitions/exercises.ExerciseQuizData"
-                },
-                "reward": {
-                    "type": "integer",
-                    "example": 10
-                },
-                "translation": {
-                    "$ref": "#/definitions/exercises.ExerciseTranslation"
-                },
-                "type": {
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/db.ExerciseType"
-                        }
-                    ],
-                    "example": "quiz"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "exercises.IDRequest": {
             "type": "object",
             "required": [
@@ -2999,120 +2674,6 @@ const docTemplate = `{
                 }
             }
         },
-        "lessons.LessonFull": {
-            "type": "object",
-            "required": [
-                "course_uuid",
-                "created_at",
-                "modified_at",
-                "order_index",
-                "translation",
-                "uuid"
-            ],
-            "properties": {
-                "course_uuid": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "exercises": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/exercises.ExerciseWithTranslation"
-                    }
-                },
-                "is_public": {
-                    "type": "boolean",
-                    "example": false
-                },
-                "modified_at": {
-                    "type": "string"
-                },
-                "order_index": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "translation": {
-                    "$ref": "#/definitions/lessons.LessonTranslation"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "lessons.LessonTranslation": {
-            "type": "object",
-            "required": [
-                "description",
-                "language",
-                "lesson_uuid",
-                "name",
-                "uuid"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string",
-                    "example": "Learn Python fundamentals"
-                },
-                "language": {
-                    "type": "string",
-                    "example": "en"
-                },
-                "lesson_uuid": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Python Basics"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "lessons.LessonWithTranslation": {
-            "type": "object",
-            "required": [
-                "course_uuid",
-                "created_at",
-                "modified_at",
-                "order_index",
-                "translation",
-                "uuid"
-            ],
-            "properties": {
-                "course_uuid": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "is_public": {
-                    "type": "boolean",
-                    "example": false
-                },
-                "modified_at": {
-                    "type": "string"
-                },
-                "order_index": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "translation": {
-                    "$ref": "#/definitions/lessons.LessonTranslation"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "lessons.UpdateLessonRequest": {
             "type": "object",
             "required": [
@@ -3187,35 +2748,28 @@ const docTemplate = `{
                 }
             }
         },
-        "me.UserExercise": {
+        "models.ChatMessage": {
             "type": "object",
             "required": [
-                "attempts",
+                "content",
                 "exercise_uuid",
-                "started_at",
-                "submission",
+                "role",
+                "ts",
                 "user_uuid",
                 "uuid"
             ],
             "properties": {
-                "attempts": {
-                    "type": "integer",
-                    "example": 0
-                },
-                "completed_at": {
+                "content": {
                     "type": "string"
                 },
                 "exercise_uuid": {
                     "type": "string"
                 },
-                "last_accessed_at": {
+                "role": {
                     "type": "string"
                 },
-                "started_at": {
+                "ts": {
                     "type": "string"
-                },
-                "submission": {
-                    "type": "object"
                 },
                 "user_uuid": {
                     "type": "string"
@@ -3225,7 +2779,468 @@ const docTemplate = `{
                 }
             }
         },
-        "progress.UserCourseFull": {
+        "models.CourseFull": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "modified_at",
+                "price",
+                "subject",
+                "translation",
+                "uuid"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "difficulty": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "discount": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.LessonFull"
+                    }
+                },
+                "modified_at": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 99
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "Programming"
+                },
+                "translation": {
+                    "$ref": "#/definitions/models.CourseTranslation"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CourseTranslation": {
+            "type": "object",
+            "required": [
+                "course_uuid",
+                "description",
+                "language",
+                "name",
+                "uuid"
+            ],
+            "properties": {
+                "bullets": {
+                    "type": "string",
+                    "example": "Learn basics\nPractice exercises"
+                },
+                "course_uuid": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Learn Python basics"
+                },
+                "language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Introduction to Python"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CourseWithTranslation": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "modified_at",
+                "price",
+                "subject",
+                "translation",
+                "uuid"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "difficulty": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "discount": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "modified_at": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 99
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "Programming"
+                },
+                "translation": {
+                    "$ref": "#/definitions/models.CourseTranslation"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExerciseCodeData": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fs.Entry"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExerciseQuizData": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "models.ExerciseTranslation": {
+            "type": "object",
+            "required": [
+                "description",
+                "exercise_uuid",
+                "language",
+                "name",
+                "uuid"
+            ],
+            "properties": {
+                "code_data": {
+                    "$ref": "#/definitions/models.ExerciseTranslationCodeData"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Print Hello World"
+                },
+                "exercise_uuid": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Hello World"
+                },
+                "quiz_data": {
+                    "$ref": "#/definitions/models.ExerciseTranslationQuizData"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExerciseTranslationCodeData": {
+            "type": "object",
+            "required": [
+                "instructions"
+            ],
+            "properties": {
+                "instructions": {
+                    "type": "string",
+                    "example": "\u003cp\u003eHello! Start writing your exercise instructions here...\u003c/p\u003e"
+                }
+            }
+        },
+        "models.ExerciseTranslationQuizData": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/models.ExerciseTranslationQuizDataQuestion"
+            }
+        },
+        "models.ExerciseTranslationQuizDataQuestion": {
+            "type": "object",
+            "required": [
+                "answers",
+                "question"
+            ],
+            "properties": {
+                "answers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        " \"2\"": " \"London\"",
+                        " \"3\"": " \"Berlin\"",
+                        " \"4\"": " \"Madrid\"}",
+                        "{\"1\"": " \"Paris\""
+                    }
+                },
+                "question": {
+                    "type": "string",
+                    "example": "What is the capital of France?"
+                }
+            }
+        },
+        "models.ExerciseWithTranslation": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "lesson_uuid",
+                "modified_at",
+                "order_index",
+                "reward",
+                "translation",
+                "type",
+                "uuid"
+            ],
+            "properties": {
+                "code_data": {
+                    "$ref": "#/definitions/models.ExerciseCodeData"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "lesson_uuid": {
+                    "type": "string"
+                },
+                "modified_at": {
+                    "type": "string"
+                },
+                "order_index": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quiz_data": {
+                    "$ref": "#/definitions/models.ExerciseQuizData"
+                },
+                "reward": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "translation": {
+                    "$ref": "#/definitions/models.ExerciseTranslation"
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/db.ExerciseType"
+                        }
+                    ],
+                    "example": "quiz"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LessonFull": {
+            "type": "object",
+            "required": [
+                "course_uuid",
+                "created_at",
+                "modified_at",
+                "order_index",
+                "translation",
+                "uuid"
+            ],
+            "properties": {
+                "course_uuid": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "exercises": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ExerciseWithTranslation"
+                    }
+                },
+                "is_public": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "modified_at": {
+                    "type": "string"
+                },
+                "order_index": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "translation": {
+                    "$ref": "#/definitions/models.LessonTranslation"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LessonTranslation": {
+            "type": "object",
+            "required": [
+                "description",
+                "language",
+                "lesson_uuid",
+                "name",
+                "uuid"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Learn Python fundamentals"
+                },
+                "language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "lesson_uuid": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Python Basics"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LessonWithTranslation": {
+            "type": "object",
+            "required": [
+                "course_uuid",
+                "created_at",
+                "modified_at",
+                "order_index",
+                "translation",
+                "uuid"
+            ],
+            "properties": {
+                "course_uuid": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "modified_at": {
+                    "type": "string"
+                },
+                "order_index": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "translation": {
+                    "$ref": "#/definitions/models.LessonTranslation"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "email",
+                "first_name",
+                "last_name",
+                "modified_at",
+                "uuid"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "is_admin": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "is_verified": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Doe"
+                },
+                "modified_at": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "streak": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserCourseFull": {
             "type": "object",
             "required": [
                 "course_uuid"
@@ -3247,7 +3262,7 @@ const docTemplate = `{
                 "lessons": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/progress.UserLessonStatus"
+                        "$ref": "#/definitions/models.UserLessonStatus"
                     }
                 },
                 "started_at": {
@@ -3255,7 +3270,7 @@ const docTemplate = `{
                 }
             }
         },
-        "progress.UserCourseWithProgress": {
+        "models.UserCourseWithProgress": {
             "type": "object",
             "required": [
                 "completed_exercises",
@@ -3319,7 +3334,7 @@ const docTemplate = `{
                     "example": 10
                 },
                 "translation": {
-                    "$ref": "#/definitions/courses.CourseTranslation"
+                    "$ref": "#/definitions/models.CourseTranslation"
                 },
                 "user_course_completed_at": {
                     "type": "string"
@@ -3335,7 +3350,45 @@ const docTemplate = `{
                 }
             }
         },
-        "progress.UserExerciseStatus": {
+        "models.UserExercise": {
+            "type": "object",
+            "required": [
+                "attempts",
+                "exercise_uuid",
+                "started_at",
+                "submission",
+                "user_uuid",
+                "uuid"
+            ],
+            "properties": {
+                "attempts": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "exercise_uuid": {
+                    "type": "string"
+                },
+                "last_accessed_at": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "submission": {
+                    "type": "object"
+                },
+                "user_uuid": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserExerciseStatus": {
             "type": "object",
             "required": [
                 "exercise_uuid"
@@ -3359,7 +3412,7 @@ const docTemplate = `{
                 }
             }
         },
-        "progress.UserLessonStatus": {
+        "models.UserLessonStatus": {
             "type": "object",
             "required": [
                 "lesson_uuid"
@@ -3371,7 +3424,7 @@ const docTemplate = `{
                 "exercises": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/progress.UserExerciseStatus"
+                        "$ref": "#/definitions/models.UserExerciseStatus"
                     }
                 },
                 "is_completed": {
@@ -3448,59 +3501,6 @@ const docTemplate = `{
                 "last_name": {
                     "type": "string",
                     "example": "Doe"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "users.User": {
-            "type": "object",
-            "required": [
-                "created_at",
-                "email",
-                "first_name",
-                "last_name",
-                "modified_at",
-                "uuid"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                },
-                "first_name": {
-                    "type": "string",
-                    "example": "John"
-                },
-                "is_admin": {
-                    "type": "boolean",
-                    "example": false
-                },
-                "is_verified": {
-                    "type": "boolean",
-                    "example": false
-                },
-                "last_name": {
-                    "type": "string",
-                    "example": "Doe"
-                },
-                "modified_at": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "integer",
-                    "example": 0
-                },
-                "streak": {
-                    "type": "integer",
-                    "example": 0
                 },
                 "uuid": {
                     "type": "string"

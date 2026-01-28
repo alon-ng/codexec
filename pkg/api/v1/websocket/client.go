@@ -1,10 +1,10 @@
 package websocket
 
 import (
-	"codim/pkg/api/v1/modules/progress"
+	"codim/pkg/api/v1/models"
 	"codim/pkg/db"
 	"codim/pkg/executors/checkers"
-	"codim/pkg/executors/drivers/models"
+	d_models "codim/pkg/executors/drivers/models"
 	"codim/pkg/fs"
 	"codim/pkg/utils/logger"
 	"context"
@@ -101,7 +101,7 @@ func runCodeSubmission(c *Client, submission SubmissionMessage, exercise db.GetE
 		return
 	}
 
-	var codeSubmission progress.UserExerciseSubmissionCode
+	var codeSubmission models.UserExerciseSubmissionCode
 	if err := json.Unmarshal(submissionBytes, &codeSubmission); err != nil {
 		c.logger.Errorf("error unmarshalling code submission: %v", err)
 		return
@@ -125,7 +125,7 @@ func runCodeSubmission(c *Client, submission SubmissionMessage, exercise db.GetE
 		}
 	}
 
-	req := models.ExecutionRequest{
+	req := d_models.ExecutionRequest{
 		JobID:       jobID,
 		Source:      fs.Entry(codeSubmission),
 		EntryPoint:  "main." + getExtension(exercise.Subject),
@@ -153,7 +153,7 @@ func runQuizSubmission(c *Client, submission SubmissionMessage, exercise db.GetE
 		return
 	}
 
-	var quizSubmission progress.UserExerciseSubmissionQuiz
+	var quizSubmission models.UserExerciseSubmissionQuiz
 	if err := json.Unmarshal(submissionBytes, &quizSubmission); err != nil {
 		c.logger.Errorf("error unmarshalling quiz submission: %v", err)
 		return
@@ -190,7 +190,7 @@ func runQuizSubmission(c *Client, submission SubmissionMessage, exercise db.GetE
 		})
 	}
 
-	res := models.ExecuteResponse{
+	res := d_models.ExecuteResponse{
 		JobID:          jobID,
 		Stdout:         "",
 		Stderr:         "",

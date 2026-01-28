@@ -2,9 +2,10 @@ package websocket
 
 import (
 	"codim/pkg/api/v1/errors"
+	"codim/pkg/api/v1/models"
 	"codim/pkg/api/v1/modules/progress"
 	"codim/pkg/db"
-	"codim/pkg/executors/drivers/models"
+	d_models "codim/pkg/executors/drivers/models"
 	"codim/pkg/rabbitmq"
 	"codim/pkg/utils/logger"
 	"context"
@@ -149,7 +150,7 @@ func (h *Hub) ListenToRabbitMQ(ctx context.Context, exchangeName string) error {
 }
 
 func (h *Hub) messageHandler(ctx context.Context, body []byte) error {
-	var res models.ExecuteResponse
+	var res d_models.ExecuteResponse
 	if err := json.Unmarshal(body, &res); err != nil {
 		h.logger.Errorf("failed to unmarshal execute response: %v", err)
 		return err
@@ -162,7 +163,7 @@ func (h *Hub) messageHandler(ctx context.Context, body []byte) error {
 	}
 	h.jobMutex.Unlock()
 
-	response := progress.UserExerciseSubmissionResponse{
+	response := models.UserExerciseSubmissionResponse{
 		ExecuteResponse: res,
 		Passed:          res.Passed(),
 	}

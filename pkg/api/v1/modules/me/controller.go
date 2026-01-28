@@ -25,7 +25,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Accept       json
 // @Produce      json
 // @Security     CookieAuth
-// @Success      200   {object}  users.User
+// @Success      200   {object}  models.User
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      500   {object}  errors.ErrorResponse
@@ -53,7 +53,7 @@ func (c *Controller) Me(ctx *gin.Context) {
 // @Param        subject 	query    string  false  "Filter by subject"
 // @Param        language 	query    string  false  "Filter by language"  default(en) 	example(en)
 // @Param        is_active 	query    bool    false  "Filter by is_active" default(true) example(true)
-// @Success      200     {array}   progress.UserCourseWithProgress
+// @Success      200     {array}   models.UserCourseWithProgress
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -83,7 +83,7 @@ func (c *Controller) ListUserCoursesWithProgress(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course_uuid path string true "Course UUID"
-// @Success      200     {object}  progress.UserCourseFull
+// @Success      200     {object}  models.UserCourseFull
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -108,7 +108,7 @@ func (c *Controller) GetUserCourseFull(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        exercise_uuid path string true "Exercise UUID"
-// @Success      200     {object}  UserExercise
+// @Success      200     {object}  models.UserExercise
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -167,7 +167,7 @@ func (c *Controller) SaveUserExerciseSubmission(ctx *gin.Context) {
 // @Param        exercise_uuid path string true "Exercise UUID"
 // @Param        limit       query    int     false  "Limit (default: 10)"  default(10)
 // @Param        offset      query    int     false  "Offset (default: 0)"  default(0)
-// @Success      200     {array}   chat.ChatMessage
+// @Success      200     {array}   models.ChatMessage
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -199,7 +199,7 @@ func (c *Controller) ListChatMessages(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        exercise_uuid path string true "Exercise UUID"
 // @Param        message body SendChatMessageRequest true "Message"
-// @Success      200     {object}  chat.ChatMessage
+// @Success      200     {object}  models.ChatMessage
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse

@@ -3,9 +3,9 @@ package me
 import (
 	"codim/pkg/ai"
 	e "codim/pkg/api/v1/errors"
+	"codim/pkg/api/v1/models"
 	"codim/pkg/api/v1/modules/chat"
 	"codim/pkg/api/v1/modules/progress"
-	"codim/pkg/api/v1/modules/users"
 	"codim/pkg/db"
 	"context"
 	"errors"
@@ -28,45 +28,28 @@ func NewService(q *db.Queries, p *pgxpool.Pool, aiClient *ai.Client) *Service {
 	return &Service{q: q, p: p, progressSvc: progressSvc, chatSvc: chatSvc}
 }
 
-// Conversion functions
-func toUser(d db.User) users.User {
-	return users.User{
-		Uuid:       d.Uuid,
-		CreatedAt:  d.CreatedAt,
-		ModifiedAt: d.ModifiedAt,
-		DeletedAt:  d.DeletedAt,
-		FirstName:  d.FirstName,
-		LastName:   d.LastName,
-		Email:      d.Email,
-		IsVerified: d.IsVerified,
-		Streak:     d.Streak,
-		Score:      d.Score,
-		IsAdmin:    d.IsAdmin,
-	}
-}
-
-func (s *Service) Me(ctx context.Context, meUUID uuid.UUID) (users.User, *e.APIError) {
+func (s *Service) Me(ctx context.Context, meUUID uuid.UUID) (models.User, *e.APIError) {
 	u, err := s.q.GetUser(ctx, meUUID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return users.User{}, e.NewAPIError(err, ErrMeFailed)
+			return models.User{}, e.NewAPIError(err, ErrMeFailed)
 		}
 
-		return users.User{}, e.NewAPIError(err, ErrMeFailed)
+		return models.User{}, e.NewAPIError(err, ErrMeFailed)
 	}
 
-	return toUser(u), nil
+	return models.ToUser(u), nil
 }
 
-func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.UUID, req ListUserCoursesWithProgressRequest) ([]UserCourseWithProgress, *e.APIError) {
+func (s *Service) ListUserCoursesWithProgress(ctx context.Context, meUUID uuid.UUID, req ListUserCoursesWithProgressRequest) ([]models.UserCourseWithProgress, *e.APIError) {
 	return s.progressSvc.ListUserCoursesWithProgress(ctx, meUUID, req)
 }
 
-func (s *Service) GetUserCourseFull(ctx context.Context, meUUID uuid.UUID, courseUUID uuid.UUID) (UserCourseFull, *e.APIError) {
+func (s *Service) GetUserCourseFull(ctx context.Context, meUUID uuid.UUID, courseUUID uuid.UUID) (models.UserCourseFull, *e.APIError) {
 	return s.progressSvc.GetUserCourseFull(ctx, meUUID, courseUUID)
 }
 
-func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID) (UserExercise, *e.APIError) {
+func (s *Service) GetUserExercise(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID) (models.UserExercise, *e.APIError) {
 	return s.progressSvc.GetUserExercise(ctx, meUUID, exerciseUUID)
 }
 
@@ -74,10 +57,10 @@ func (s *Service) SaveUserExerciseSubmission(ctx context.Context, meUUID uuid.UU
 	return s.progressSvc.SaveUserExerciseSubmission(ctx, meUUID, exerciseUUID, req)
 }
 
-func (s *Service) ListChatMessages(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req ListChatMessagesRequest) ([]chat.ChatMessage, *e.APIError) {
+func (s *Service) ListChatMessages(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req ListChatMessagesRequest) ([]models.ChatMessage, *e.APIError) {
 	return s.chatSvc.ListChatMessages(ctx, exerciseUUID, meUUID, req, nil)
 }
 
-func (s *Service) SendChatMessage(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req SendChatMessageRequest) (chat.ChatMessage, *e.APIError) {
+func (s *Service) SendChatMessage(ctx context.Context, meUUID uuid.UUID, exerciseUUID uuid.UUID, req SendChatMessageRequest) (models.ChatMessage, *e.APIError) {
 	return s.chatSvc.SendChatMessage(ctx, exerciseUUID, meUUID, req)
 }

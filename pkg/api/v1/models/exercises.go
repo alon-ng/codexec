@@ -1,47 +1,13 @@
-package exercises
+package models
 
 import (
 	"codim/pkg/db"
 	"codim/pkg/fs"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 )
-
-type CreateExerciseRequest struct {
-	LessonUuid  uuid.UUID       `json:"lesson_uuid" binding:"required"`
-	Type        db.ExerciseType `json:"type" binding:"required" example:"quiz"`
-	OrderIndex  int16           `json:"order_index" binding:"required" example:"1"`
-	Reward      int16           `json:"reward" binding:"required" example:"10"`
-	Language    string          `json:"language" binding:"required" example:"en"`
-	Name        string          `json:"name" binding:"required" example:"Hello World"`
-	Description string          `json:"description" binding:"required" example:"Print Hello World"`
-}
-
-type UpdateExerciseRequest struct {
-	Uuid        uuid.UUID        `json:"uuid" binding:"required"`
-	Language    string           `json:"language" binding:"required" example:"en"`
-	LessonUuid  *uuid.UUID       `json:"lesson_uuid" example:"123e4567-e89b-12d3-a456-426614174000"`
-	OrderIndex  *int16           `json:"order_index" example:"1"`
-	Reward      *int16           `json:"reward" example:"10"`
-	Type        *db.ExerciseType `json:"type" example:"quiz"`
-	Name        *string          `json:"name" example:"Hello World"`
-	Description *string          `json:"description" example:"Print Hello World"`
-}
-
-type ListExercisesRequest struct {
-	Limit      int32      `json:"limit" form:"limit,default=10" example:"10"`
-	Offset     int32      `json:"offset" form:"offset,default=0" example:"0"`
-	LessonUuid *uuid.UUID `json:"lesson_uuid" form:"lesson_uuid"`
-	Language   string     `json:"language" form:"language,default=en" example:"en"`
-}
-
-type AddExerciseTranslationRequest struct {
-	ExerciseUuid uuid.UUID `json:"exercise_uuid" binding:"required"`
-	Language     string    `json:"language" binding:"required" example:"es"`
-	Name         string    `json:"name" binding:"required" example:"Hola Mundo"`
-	Description  string    `json:"description" binding:"required" example:"Imprime Hola Mundo"`
-}
 
 type ExerciseCodeData = fs.Entry
 type ExerciseQuizData = map[string]interface{}
@@ -57,7 +23,6 @@ type ExerciseTranslationQuizDataQuestion struct {
 
 type ExerciseTranslationQuizData = map[string]ExerciseTranslationQuizDataQuestion
 
-// Response types
 type Exercise struct {
 	Uuid       uuid.UUID         `json:"uuid" binding:"required"`
 	CreatedAt  time.Time         `json:"created_at" binding:"required"`
@@ -84,4 +49,79 @@ type ExerciseTranslation struct {
 type ExerciseWithTranslation struct {
 	Exercise
 	Translation ExerciseTranslation `json:"translation" binding:"required"`
+}
+
+func ToExercise(d db.Exercise) (Exercise, error) {
+	var codeData *ExerciseCodeData
+	var quizData *ExerciseQuizData
+	if d.CodeData != nil {
+		err := json.Unmarshal(*d.CodeData, &codeData)
+		if err != nil {
+			return Exercise{}, err
+		}
+	}
+	if d.QuizData != nil {
+		err := json.Unmarshal(*d.QuizData, &quizData)
+		if err != nil {
+			return Exercise{}, err
+		}
+	}
+
+	return Exercise{
+		Uuid:       d.Uuid,
+		CreatedAt:  d.CreatedAt,
+		ModifiedAt: d.ModifiedAt,
+		DeletedAt:  d.DeletedAt,
+		LessonUuid: d.LessonUuid,
+		OrderIndex: d.OrderIndex,
+		Reward:     d.Reward,
+		Type:       d.Type,
+		CodeData:   codeData,
+		QuizData:   quizData,
+	}, nil
+}
+
+func ToExerciseTranslation(d db.ExerciseTranslation) (ExerciseTranslation, error) {
+	var codeData *ExerciseTranslationCodeData
+	var quizData *ExerciseTranslationQuizData
+
+	if d.CodeData != nil {
+		err := json.Unmarshal(*d.CodeData, &codeData)
+		if err != nil {
+			return ExerciseTranslation{}, err
+		}
+	}
+	if d.QuizData != nil {
+		err := json.Unmarshal(*d.QuizData, &quizData)
+		if err != nil {
+			return ExerciseTranslation{}, err
+		}
+	}
+
+	return ExerciseTranslation{
+		Uuid:         d.Uuid,
+		ExerciseUuid: d.ExerciseUuid,
+		Language:     d.Language,
+		Name:         d.Name,
+		Description:  d.Description,
+		CodeData:     codeData,
+		QuizData:     quizData,
+	}, nil
+}
+
+func ToExerciseWithTranslation(d db.ExerciseWithTranslation) (ExerciseWithTranslation, error) {
+	exercise, err := ToExercise(d.Exercise)
+	if err != nil {
+		return ExerciseWithTranslation{}, err
+	}
+
+	translation, err := ToExerciseTranslation(d.Translation)
+	if err != nil {
+		return ExerciseWithTranslation{}, err
+	}
+
+	return ExerciseWithTranslation{
+		Exercise:    exercise,
+		Translation: translation,
+	}, nil
 }

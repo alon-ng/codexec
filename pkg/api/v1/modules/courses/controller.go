@@ -27,7 +27,7 @@ func NewController(svc *Service, log *logger.Logger) *Controller {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course  body      CreateCourseRequest  true  "Course creation data"
-// @Success      201     {object}  CourseWithTranslation
+// @Success      201     {object}  models.CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      409     {object}  errors.ErrorResponse
@@ -57,7 +57,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        course  body      UpdateCourseRequest  true  "Course update data"
-// @Success      200     {object}  CourseWithTranslation
+// @Success      200     {object}  models.CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -76,10 +76,6 @@ func (c *Controller) Update(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, course)
-}
-
-type IDRequest struct {
-	Uuid uuid.UUID `json:"uuid" binding:"required"`
 }
 
 // Delete godoc
@@ -156,7 +152,7 @@ func (c *Controller) Restore(ctx *gin.Context) {
 // @Param        subject query     string  false  "Filter by subject"
 // @Param        language query     string  false  "Filter by language"  default(en) example(en)
 // @Param        is_active query     bool    false  "Filter by is_active"  default(true) example(true)
-// @Success      200     {array}   CourseWithTranslation
+// @Success      200     {array}   models.CourseWithTranslation
 // @Failure      400     {object}  errors.ErrorResponse
 // @Failure      401     {object}  errors.ErrorResponse
 // @Failure      500     {object}  errors.ErrorResponse
@@ -186,7 +182,7 @@ func (c *Controller) List(ctx *gin.Context) {
 // @Security     CookieAuth
 // @Param        uuid  		path      string  true   "Course UUID"
 // @Param        language 	query     string  false  "Language"  default(en)
-// @Success      200   {object}  CourseFull
+// @Success      200   {object}  models.CourseFull
 // @Failure      400   {object}  errors.ErrorResponse
 // @Failure      401   {object}  errors.ErrorResponse
 // @Failure      404   {object}  errors.ErrorResponse
@@ -227,7 +223,7 @@ func (c *Controller) Get(ctx *gin.Context) {
 // @Produce      json
 // @Security     CookieAuth
 // @Param        translation  body      AddCourseTranslationRequest  true  "Translation data"
-// @Success      201          {object}  CourseTranslation
+// @Success      201          {object}  models.CourseTranslation
 // @Failure      400          {object}  errors.ErrorResponse
 // @Failure      401          {object}  errors.ErrorResponse
 // @Failure      500          {object}  errors.ErrorResponse
