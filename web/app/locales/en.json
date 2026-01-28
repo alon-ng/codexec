@@ -87,5 +87,66 @@
     },
     "cody": {
         "greeting": "Hello, I'm Cody. I'm here to help you learn how to code."
+    },
+    "landing": {
+        "hero": {
+            "title": "Learning, Practicing, Mastering.",
+            "subtitle": "Write code. Pass tests. Move forward.",
+            "cta": "Start Coding for Free",
+            "demoPlaceholder": "Product Demo Video/Animation"
+        },
+        "testFeedback": {
+            "title": "Instant Test Feedback",
+            "description": "Get real-time feedback from automated tests as you code. See exactly what's working and what needs improvement before moving forward.",
+            "output": "Output",
+            "errors": "Errors",
+            "tests": "Tests",
+            "noOutput": "No output",
+            "noErrors": "No errors",
+            "testPassed": "PASSED",
+            "testFailed": "FAILED",
+            "caption": "Real-time test feedback helps you understand what's working and what needs improvement."
+        },
+        "aiMentor": {
+            "title": "Stuck? Ask your AI Pair Programmer",
+            "description": "Get instant help debugging your code and understanding concepts. Our integrated AI mentor is always ready to guide you through challenging problems.",
+            "userMessage1": "Why is my list comprehension returning None?",
+            "botMessage1": "It looks like you're using a list comprehension without a return expression. List comprehensions need to return a value.",
+            "botMessage2": "Try changing:",
+            "botCode1": "[x for x in range(10) if x % 2]",
+            "botMessage3": "To:",
+            "botCode2": "[x * 2 for x in range(10) if x % 2]",
+            "userMessage2": "Thanks! That fixed it.",
+            "altText": "AI Mentor"
+        },
+        "quiz": {
+            "title": "Knowledge Checks",
+            "description": "Interactive quizzes are intermixed with coding challenges to reinforce your understanding through active recall.",
+            "question": "What is the primary purpose of a database index?",
+            "answerA": "To store backup copies of data",
+            "answerB": "To speed up query performance by creating a sorted data structure",
+            "answerC": "To encrypt sensitive information",
+            "answerD": "To compress large tables"
+        },
+        "curriculum": {
+            "title": "Comprehensive Curriculum",
+            "description": "Master backend engineering through structured tracks covering essential technologies and concepts.",
+            "python": {
+                "title": "Python",
+                "description": "Master Python programming from fundamentals to advanced topics like async programming, decorators, and web frameworks."
+            },
+            "nodejs": {
+                "title": "Node.js",
+                "description": "Build scalable backend applications with Node.js, Express, and modern JavaScript features including async/await and event-driven architecture."
+            },
+            "java": {
+                "title": "Java",
+                "description": "Learn enterprise Java development with Spring Boot, JVM internals, multithreading, and building robust REST APIs."
+            },
+            "sql": {
+                "title": "SQL",
+                "description": "Master database design, query optimization, transactions, and advanced SQL features across PostgreSQL, MySQL, and SQLite."
+            }
+        }
     }
 }

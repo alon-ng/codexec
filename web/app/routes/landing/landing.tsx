@@ -1,7 +1,5 @@
+import LandingPage from "~/components/landing/LandingPage";
+
 export default function Landing() {
-  return (
-    <div className="flex flex-col">
-      Home
-    </div>
-  );
+  return <LandingPage />;
 }

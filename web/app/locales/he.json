@@ -84,5 +84,66 @@
     "continueWhereYouLeftOff": "המשך מאיפה שסיימת",
     "instructions": "הוראות",
     "codeEditor": "עורך קוד"
+  },
+  "landing": {
+    "hero": {
+      "title": "למידה, תרגול, הצלחה.",
+      "subtitle": "כתוב קוד. עבור בדיקות. התקדם קדימה.",
+      "cta": "התחל ללמוד בחינם",
+      "demoPlaceholder": "סרטון הדגמה/אנימציה"
+    },
+    "testFeedback": {
+      "title": "משוב מיידי מבדיקות",
+      "description": "קבל משוב בזמן אמת מבדיקות אוטומטיות בזמן שאתה כותב קוד. ראה בדיוק מה עובד ומה צריך שיפור לפני שתמשיך הלאה.",
+      "output": "פלט",
+      "errors": "שגיאות",
+      "tests": "בדיקות",
+      "noOutput": "אין פלט",
+      "noErrors": "אין שגיאות",
+      "testPassed": "עבר",
+      "testFailed": "נכשל",
+      "caption": "משוב מיידי מבדיקות עוזר לך להבין מה עובד ומה צריך שיפור."
+    },
+    "aiMentor": {
+      "title": "תקוע? שאל את ה-AI Pair Programmer שלך",
+      "description": "קבל עזרה מיידית בדיבוג הקוד שלך והבנת מושגים. המנטור AI המשולב שלנו תמיד מוכן להדריך אותך דרך בעיות מאתגרות.",
+      "userMessage1": "למה ה-list comprehension שלי מחזיר None?",
+      "botMessage1": "נראה שאתה משתמש ב-list comprehension בלי ביטוי החזרה. List comprehensions צריכים להחזיר ערך.",
+      "botMessage2": "נסה לשנות:",
+      "botCode1": "[x for x in range(10) if x % 2]",
+      "botMessage3": "ל:",
+      "botCode2": "[x * 2 for x in range(10) if x % 2]",
+      "userMessage2": "תודה! זה תיקן את זה.",
+      "altText": "מנטור AI"
+    },
+    "quiz": {
+      "title": "בדיקות ידע",
+      "description": "חידונים אינטראקטיביים משולבים עם אתגרי קוד כדי לחזק את ההבנה שלך באמצעות זכירה פעילה.",
+      "question": "מה המטרה העיקרית של אינדקס מסד נתונים?",
+      "answerA": "לאחסן עותקי גיבוי של נתונים",
+      "answerB": "להאיץ ביצועי שאילתות על ידי יצירת מבנה נתונים ממוין",
+      "answerC": "להצפין מידע רגיש",
+      "answerD": "לדחוס טבלאות גדולות"
+    },
+    "curriculum": {
+      "title": "תוכנית לימודים מקיפה",
+      "description": "שלוט בהנדסת backend דרך מסלולים מובנים המכסים טכנולוגיות ומושגים חיוניים.",
+      "python": {
+        "title": "Python",
+        "description": "שלוט בתכנות Python מיסודות ועד נושאים מתקדמים כמו תכנות אסינכרוני, decorators ומסגרות web."
+      },
+      "nodejs": {
+        "title": "Node.js",
+        "description": "בנה אפליקציות backend מדרגיות עם Node.js, Express ותכונות JavaScript מודרניות כולל async/await וארכיטקטורה מונעת אירועים."
+      },
+      "java": {
+        "title": "Java",
+        "description": "למד פיתוח Java ארגוני עם Spring Boot, פנימיות JVM, multithreading ובניית REST APIs חזקים."
+      },
+      "sql": {
+        "title": "SQL",
+        "description": "שלוט בעיצוב מסדי נתונים, אופטימיזציה של שאילתות, טרנזקציות ותכונות SQL מתקדמות ב-PostgreSQL, MySQL ו-SQLite."
+      }
+    }
   }
 }
