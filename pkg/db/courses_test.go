@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-openapi/testify/v2/assert"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -391,4 +392,75 @@ func TestCreateCourseTranslationWithConflict(t *testing.T) {
 	})
 
 	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "uq_course_translations_course_language"))
+}
+
+func TestGetCourseFullWithEmptyResult(t *testing.T) {
+	// Test GetCourseFull with non-existent course UUID
+	nonExistentUUID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	courseFull, err := testQueries.GetCourseFull(context.Background(), nonExistentUUID, "en")
+	require.NoError(t, err)
+	// When no results, GetCourseFull returns empty CourseFull
+	require.Equal(t, uuid.Nil, courseFull.CourseWithTranslation.Course.Uuid)
+	require.Empty(t, courseFull.Lessons)
+	require.Empty(t, courseFull.CourseWithTranslation.Translation.Uuid)
+}
+
+func TestListCoursesRowToCourseWithTranslation(t *testing.T) {
+	course := createRandomCourse(t)
+
+	params := db.ListCoursesParams{
+		Limit:    10,
+		Offset:   0,
+		Language: "en",
+		Subject:  nil,
+		IsActive: nil,
+	}
+
+	courses, err := testQueries.ListCourses(context.Background(), params)
+	require.NoError(t, err)
+
+	var foundCourse *db.ListCoursesRow
+	for i := range courses {
+		if courses[i].Uuid == course.Uuid {
+			foundCourse = &courses[i]
+			break
+		}
+	}
+
+	require.NotNil(t, foundCourse)
+	courseWithTranslation := foundCourse.ToCourseWithTranslation()
+	require.Equal(t, course.Uuid, courseWithTranslation.Uuid)
+	require.Equal(t, course.Translation.Name, courseWithTranslation.Translation.Name)
+	require.Equal(t, course.Translation.Description, courseWithTranslation.Translation.Description)
+}
+
+func TestDeleteCourseTranslation(t *testing.T) {
+	course := createRandomCourse(t)
+
+	err := testQueries.DeleteCourseTranslation(context.Background(), course.Uuid)
+	require.NoError(t, err)
+
+	// Verify translation is deleted
+	gotCourse, err := testQueries.GetCourse(context.Background(), db.GetCourseParams{
+		Uuid:     course.Uuid,
+		Language: "en",
+	})
+	require.Error(t, err)
+	require.Empty(t, gotCourse)
+}
+
+func TestGetCourseTranslation(t *testing.T) {
+	course := createRandomCourse(t)
+
+	translation, err := testQueries.GetCourseTranslation(context.Background(), course.Translation.Uuid)
+	require.NoError(t, err)
+	require.NotEmpty(t, translation)
+
+	require.Equal(t, course.Translation.Uuid, translation.Uuid)
+	require.Equal(t, course.Translation.CourseUuid, translation.CourseUuid)
+	require.Equal(t, course.Translation.Language, translation.Language)
+	require.Equal(t, course.Translation.Name, translation.Name)
+	require.Equal(t, course.Translation.Description, translation.Description)
+	require.Equal(t, course.Translation.Bullets, translation.Bullets)
+	require.Equal(t, course.Uuid, translation.Uuid_2)
 }

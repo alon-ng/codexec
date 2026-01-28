@@ -422,3 +422,100 @@ func TestCreateExerciseTranslationWithConflict(t *testing.T) {
 	})
 	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "uq_exercise_translations_exercise_language"))
 }
+
+func TestGetExerciseRowToExerciseWithTranslation(t *testing.T) {
+	exercise := createRandomExercise(t, nil)
+
+	gotExercise, err := testQueries.GetExercise(context.Background(), db.GetExerciseParams{
+		Uuid:     exercise.Uuid,
+		Language: "en",
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, gotExercise)
+
+	exerciseWithTranslation := gotExercise.ToExerciseWithTranslation()
+	require.Equal(t, exercise.Uuid, exerciseWithTranslation.Uuid)
+	require.Equal(t, exercise.Translation.Name, exerciseWithTranslation.Translation.Name)
+	require.Equal(t, exercise.Translation.Description, exerciseWithTranslation.Translation.Description)
+}
+
+func TestListExercisesRowToExerciseWithTranslation(t *testing.T) {
+	exercise := createRandomExercise(t, nil)
+
+	params := db.ListExercisesParams{
+		Limit:      10,
+		Offset:     0,
+		Language:   "en",
+		LessonUuid: nil,
+	}
+
+	exercises, err := testQueries.ListExercises(context.Background(), params)
+	require.NoError(t, err)
+
+	var foundExercise *db.ListExercisesRow
+	for i := range exercises {
+		if exercises[i].Uuid == exercise.Uuid {
+			foundExercise = &exercises[i]
+			break
+		}
+	}
+
+	require.NotNil(t, foundExercise)
+	exerciseWithTranslation := foundExercise.ToExerciseWithTranslation()
+	require.Equal(t, exercise.Uuid, exerciseWithTranslation.Uuid)
+	require.Equal(t, exercise.Translation.Name, exerciseWithTranslation.Translation.Name)
+	require.Equal(t, exercise.Translation.Description, exerciseWithTranslation.Translation.Description)
+}
+
+func TestGetExerciseForSubmission(t *testing.T) {
+	exercise := createRandomExercise(t, nil)
+
+	result, err := testQueries.GetExerciseForSubmission(context.Background(), exercise.Uuid)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+
+	require.Equal(t, exercise.Type, result.Type)
+}
+
+func TestGetExerciseLessonCourse(t *testing.T) {
+	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
+	exercise := createRandomExercise(t, &lesson)
+
+	result, err := testQueries.GetExerciseLessonCourse(context.Background(), exercise.Uuid)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+
+	require.Equal(t, course.Uuid, result.Uuid)
+	require.Equal(t, lesson.Uuid, result.Uuid_2)
+	require.Equal(t, lesson.CourseUuid, result.CourseUuid)
+}
+
+func TestDeleteExerciseTranslation(t *testing.T) {
+	exercise := createRandomExercise(t, nil)
+
+	err := testQueries.DeleteExerciseTranslation(context.Background(), exercise.Uuid)
+	require.NoError(t, err)
+
+	// Verify translation is deleted
+	gotExercise, err := testQueries.GetExercise(context.Background(), db.GetExerciseParams{
+		Uuid:     exercise.Uuid,
+		Language: "en",
+	})
+	require.Error(t, err)
+	require.Empty(t, gotExercise)
+}
+
+func TestGetExerciseTranslation(t *testing.T) {
+	exercise := createRandomExercise(t, nil)
+
+	translation, err := testQueries.GetExerciseTranslation(context.Background(), exercise.Translation.Uuid)
+	require.NoError(t, err)
+	require.NotEmpty(t, translation)
+
+	require.Equal(t, exercise.Translation.Uuid, translation.Uuid)
+	require.Equal(t, exercise.Translation.ExerciseUuid, translation.ExerciseUuid)
+	require.Equal(t, exercise.Translation.Language, translation.Language)
+	require.Equal(t, exercise.Translation.Name, translation.Name)
+	require.Equal(t, exercise.Translation.Description, translation.Description)
+}

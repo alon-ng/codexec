@@ -333,3 +333,77 @@ func TestCreateLessonTranslationWithConflict(t *testing.T) {
 	})
 	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "uq_lesson_translations_lesson_language"))
 }
+
+func TestGetLessonRowToLessonWithTranslation(t *testing.T) {
+	lesson := createRandomLesson(t, nil)
+
+	gotLesson, err := testQueries.GetLesson(context.Background(), db.GetLessonParams{
+		Uuid:     lesson.Uuid,
+		Language: "en",
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, gotLesson)
+
+	lessonWithTranslation := gotLesson.ToLessonWithTranslation()
+	require.Equal(t, lesson.Uuid, lessonWithTranslation.Uuid)
+	require.Equal(t, lesson.Translation.Name, lessonWithTranslation.Translation.Name)
+	require.Equal(t, lesson.Translation.Description, lessonWithTranslation.Translation.Description)
+}
+
+func TestListLessonsRowToLessonWithTranslation(t *testing.T) {
+	lesson := createRandomLesson(t, nil)
+
+	params := db.ListLessonsParams{
+		Limit:      10,
+		Offset:     0,
+		Language:   "en",
+		CourseUuid: nil,
+	}
+
+	lessons, err := testQueries.ListLessons(context.Background(), params)
+	require.NoError(t, err)
+
+	var foundLesson *db.ListLessonsRow
+	for i := range lessons {
+		if lessons[i].Uuid == lesson.Uuid {
+			foundLesson = &lessons[i]
+			break
+		}
+	}
+
+	require.NotNil(t, foundLesson)
+	lessonWithTranslation := foundLesson.ToLessonWithTranslation()
+	require.Equal(t, lesson.Uuid, lessonWithTranslation.Uuid)
+	require.Equal(t, lesson.Translation.Name, lessonWithTranslation.Translation.Name)
+	require.Equal(t, lesson.Translation.Description, lessonWithTranslation.Translation.Description)
+}
+
+func TestDeleteLessonTranslation(t *testing.T) {
+	lesson := createRandomLesson(t, nil)
+
+	err := testQueries.DeleteLessonTranslation(context.Background(), lesson.Uuid)
+	require.NoError(t, err)
+
+	// Verify translation is deleted
+	gotLesson, err := testQueries.GetLesson(context.Background(), db.GetLessonParams{
+		Uuid:     lesson.Uuid,
+		Language: "en",
+	})
+	require.Error(t, err)
+	require.Empty(t, gotLesson)
+}
+
+func TestGetLessonTranslation(t *testing.T) {
+	lesson := createRandomLesson(t, nil)
+
+	translation, err := testQueries.GetLessonTranslation(context.Background(), lesson.Translation.Uuid)
+	require.NoError(t, err)
+	require.NotEmpty(t, translation)
+
+	require.Equal(t, lesson.Translation.Uuid, translation.Uuid)
+	require.Equal(t, lesson.Translation.LessonUuid, translation.LessonUuid)
+	require.Equal(t, lesson.Translation.Language, translation.Language)
+	require.Equal(t, lesson.Translation.Name, translation.Name)
+	require.Equal(t, lesson.Translation.Description, translation.Description)
+	require.Equal(t, lesson.Uuid, translation.Uuid_2)
+}

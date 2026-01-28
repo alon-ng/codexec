@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-openapi/testify/v2/assert"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -208,4 +209,98 @@ func TestGetUserCourseFullWithCompletedItems(t *testing.T) {
 	require.Len(t, result.Lessons[0].Exercises, 1)
 	require.Equal(t, true, result.Lessons[0].Exercises[0].IsCompleted)
 	require.NotNil(t, result.Lessons[0].Exercises[0].CompletedAt)
+}
+
+func TestGetUserCourseFullWithEmptyResult(t *testing.T) {
+	user := createRandomUser(t)
+	nonExistentUUID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+
+	result, err := testQueries.GetUserCourseFull(context.Background(), user.Uuid, nonExistentUUID)
+	require.NoError(t, err)
+	require.Equal(t, uuid.Nil, result.CourseUuid)
+	require.Empty(t, result.Lessons)
+}
+
+func TestInitUserCourse(t *testing.T) {
+	user := createRandomUser(t)
+	course := createRandomCourse(t)
+	lesson := createRandomLesson(t, &course)
+	_ = createRandomExercise(t, &lesson)
+
+	result, err := testQueries.InitUserCourse(context.Background(), db.InitUserCourseParams{
+		UserUuid:   user.Uuid,
+		CourseUuid: course.Uuid,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+
+	require.Equal(t, user.Uuid, result.UserUuid)
+	require.Equal(t, course.Uuid, result.CourseUuid)
+	require.NotZero(t, result.Uuid)
+	require.NotZero(t, result.StartedAt)
+	require.Nil(t, result.CompletedAt)
+}
+
+func TestListUserCoursesWithProgress(t *testing.T) {
+	userCourse := createRandomUserCourse(t)
+
+	params := db.ListUserCoursesWithProgressParams{
+		UserUuid:   userCourse.UserUuid,
+		Language:   "en",
+		Limit:      10,
+		Offset:     0,
+		CourseUuid: nil,
+		Subject:    nil,
+		IsActive:   nil,
+	}
+
+	courses, err := testQueries.ListUserCoursesWithProgress(context.Background(), params)
+	require.NoError(t, err)
+	require.GreaterOrEqual(t, len(courses), 1)
+
+	var foundCourse *db.ListUserCoursesWithProgressRow
+	for i := range courses {
+		if courses[i].CourseUuid == userCourse.CourseUuid {
+			foundCourse = &courses[i]
+			break
+		}
+	}
+
+	require.NotNil(t, foundCourse)
+	courseWithProgress := foundCourse.ToUserCourseWithProgress()
+	require.Equal(t, userCourse.CourseUuid, courseWithProgress.Uuid)
+	require.NotZero(t, courseWithProgress.UserCourseStartedAt)
+}
+
+func TestListUserCoursesWithProgressWithFilters(t *testing.T) {
+	user := createRandomUser(t)
+	course := createRandomCourse(t)
+	userCourseParams := db.CreateUserCourseParams{
+		UserUuid:    user.Uuid,
+		CourseUuid:  course.Uuid,
+		CompletedAt: nil,
+	}
+	_, err := testQueries.CreateUserCourse(context.Background(), userCourseParams)
+	require.NoError(t, err)
+
+	subject := course.Subject
+	isActive := course.IsActive
+	params := db.ListUserCoursesWithProgressParams{
+		UserUuid:   user.Uuid,
+		Language:   "en",
+		Limit:      10,
+		Offset:     0,
+		CourseUuid: nil,
+		Subject:    &subject,
+		IsActive:   &isActive,
+	}
+
+	courses, err := testQueries.ListUserCoursesWithProgress(context.Background(), params)
+	require.NoError(t, err)
+	require.GreaterOrEqual(t, len(courses), 1)
+
+	for _, c := range courses {
+		require.Equal(t, subject, c.CourseSubject)
+		require.Equal(t, isActive, c.CourseIsActive)
+	}
 }
