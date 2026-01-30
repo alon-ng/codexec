@@ -11,16 +11,16 @@ import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type {
-  ChatChatMessage,
-  MeUserExercise,
-  ProgressUserCourseFull,
-  ProgressUserCourseWithProgress,
-  UsersUser,
+  ModelsChatMessage,
+  ModelsUser,
+  ModelsUserCourseFull,
+  ModelsUserCourseWithProgress,
+  ModelsUserExercise,
 } from ".././model";
 
 export const getGetMeResponseMock = (
-  overrideResponse: Partial<UsersUser> = {},
-): UsersUser => ({
+  overrideResponse: Partial<ModelsUser> = {},
+): ModelsUser => ({
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -47,78 +47,77 @@ export const getGetMeResponseMock = (
   ...overrideResponse,
 });
 
-export const getGetMeCoursesResponseMock =
-  (): ProgressUserCourseWithProgress[] =>
-    Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
-      completed_exercises: faker.number.int({ min: undefined, max: undefined }),
-      created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      deleted_at: faker.helpers.arrayElement([
+export const getGetMeCoursesResponseMock = (): ModelsUserCourseWithProgress[] =>
+  Array.from(
+    { length: faker.number.int({ min: 1, max: 10 }) },
+    (_, i) => i + 1,
+  ).map(() => ({
+    completed_exercises: faker.number.int({ min: undefined, max: undefined }),
+    created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    deleted_at: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    difficulty: faker.helpers.arrayElement([
+      faker.number.int({ min: undefined, max: undefined }),
+      undefined,
+    ]),
+    discount: faker.helpers.arrayElement([
+      faker.number.int({ min: undefined, max: undefined }),
+      undefined,
+    ]),
+    is_active: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    next_exercise_name: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    next_exercise_uuid: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    next_lesson_name: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    next_lesson_uuid: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    price: faker.number.int({ min: undefined, max: undefined }),
+    subject: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    total_exercises: faker.number.int({ min: undefined, max: undefined }),
+    translation: {
+      bullets: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
       ]),
-      difficulty: faker.helpers.arrayElement([
-        faker.number.int({ min: undefined, max: undefined }),
-        undefined,
-      ]),
-      discount: faker.helpers.arrayElement([
-        faker.number.int({ min: undefined, max: undefined }),
-        undefined,
-      ]),
-      is_active: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      next_exercise_name: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      next_exercise_uuid: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      next_lesson_name: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      next_lesson_uuid: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      price: faker.number.int({ min: undefined, max: undefined }),
-      subject: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      total_exercises: faker.number.int({ min: undefined, max: undefined }),
-      translation: {
-        bullets: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
-        course_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        description: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        language: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      },
-      user_course_completed_at: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      user_course_last_accessed_at: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      user_course_started_at: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
+      course_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      language: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
       uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    }));
+    },
+    user_course_completed_at: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    user_course_last_accessed_at: faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      undefined,
+    ]),
+    user_course_started_at: faker.string.alpha({
+      length: { min: 10, max: 20 },
+    }),
+    uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  }));
 
 export const getGetMeCoursesCourseUuidResponseMock = (
-  overrideResponse: Partial<ProgressUserCourseFull> = {},
-): ProgressUserCourseFull => ({
+  overrideResponse: Partial<ModelsUserCourseFull> = {},
+): ModelsUserCourseFull => ({
   completed_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
@@ -190,8 +189,8 @@ export const getGetMeCoursesCourseUuidResponseMock = (
 });
 
 export const getGetMeExercisesExerciseUuidResponseMock = (
-  overrideResponse: Partial<MeUserExercise> = {},
-): MeUserExercise => ({
+  overrideResponse: Partial<ModelsUserExercise> = {},
+): ModelsUserExercise => ({
   attempts: faker.number.int({ min: undefined, max: undefined }),
   completed_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -213,7 +212,7 @@ export const getPutMeExercisesExerciseUuidResponseMock = (): string =>
   faker.word.sample();
 
 export const getGetMeExercisesExerciseUuidChatResponseMock =
-  (): ChatChatMessage[] =>
+  (): ModelsChatMessage[] =>
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
@@ -227,8 +226,8 @@ export const getGetMeExercisesExerciseUuidChatResponseMock =
     }));
 
 export const getPostMeExercisesExerciseUuidChatResponseMock = (
-  overrideResponse: Partial<ChatChatMessage> = {},
-): ChatChatMessage => ({
+  overrideResponse: Partial<ModelsChatMessage> = {},
+): ModelsChatMessage => ({
   content: faker.string.alpha({ length: { min: 10, max: 20 } }),
   exercise_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
   role: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -240,10 +239,10 @@ export const getPostMeExercisesExerciseUuidChatResponseMock = (
 
 export const getGetMeMockHandler = (
   overrideResponse?:
-    | UsersUser
+    | ModelsUser
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<UsersUser> | UsersUser),
+      ) => Promise<ModelsUser> | ModelsUser),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -268,12 +267,12 @@ export const getGetMeMockHandler = (
 
 export const getGetMeCoursesMockHandler = (
   overrideResponse?:
-    | ProgressUserCourseWithProgress[]
+    | ModelsUserCourseWithProgress[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<ProgressUserCourseWithProgress[]>
-        | ProgressUserCourseWithProgress[]),
+        | Promise<ModelsUserCourseWithProgress[]>
+        | ModelsUserCourseWithProgress[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -298,10 +297,10 @@ export const getGetMeCoursesMockHandler = (
 
 export const getGetMeCoursesCourseUuidMockHandler = (
   overrideResponse?:
-    | ProgressUserCourseFull
+    | ModelsUserCourseFull
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ProgressUserCourseFull> | ProgressUserCourseFull),
+      ) => Promise<ModelsUserCourseFull> | ModelsUserCourseFull),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -326,10 +325,10 @@ export const getGetMeCoursesCourseUuidMockHandler = (
 
 export const getGetMeExercisesExerciseUuidMockHandler = (
   overrideResponse?:
-    | MeUserExercise
+    | ModelsUserExercise
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<MeUserExercise> | MeUserExercise),
+      ) => Promise<ModelsUserExercise> | ModelsUserExercise),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -382,10 +381,10 @@ export const getPutMeExercisesExerciseUuidMockHandler = (
 
 export const getGetMeExercisesExerciseUuidChatMockHandler = (
   overrideResponse?:
-    | ChatChatMessage[]
+    | ModelsChatMessage[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ChatChatMessage[]> | ChatChatMessage[]),
+      ) => Promise<ModelsChatMessage[]> | ModelsChatMessage[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -410,10 +409,10 @@ export const getGetMeExercisesExerciseUuidChatMockHandler = (
 
 export const getPostMeExercisesExerciseUuidChatMockHandler = (
   overrideResponse?:
-    | ChatChatMessage
+    | ModelsChatMessage
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<ChatChatMessage> | ChatChatMessage),
+      ) => Promise<ModelsChatMessage> | ModelsChatMessage),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(

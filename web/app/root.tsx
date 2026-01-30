@@ -10,17 +10,17 @@ import {
   useLoaderData,
 } from "react-router";
 
-import type { Route } from "./+types/root";
-import "./app.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { Toaster } from "sonner";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { initClientI18n } from "~/lib/i18n";
+import { Toaster } from "sonner";
 import "~/lib/i18n"; // Initialize client i18n
-import { cn } from "./lib/utils";
+import { initClientI18n } from "~/lib/i18n";
 import { detectLanguageFromRequest } from "~/lib/i18n.server";
 import { useLanguage } from "~/lib/useLanguage";
+import type { Route } from "./+types/root";
+import "./app.css";
+import { cn } from "./lib/utils";
 
 // Loader runs on both server and client
 export async function loader({ request }: Route.LoaderArgs) {

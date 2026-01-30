@@ -89,6 +89,7 @@ func (q *Queries) GetCourseFull(ctx context.Context, u uuid.UUID, language strin
 					Language:    *l.LessonTranslationLanguage,
 					Name:        *l.LessonName,
 					Description: *l.LessonDescription,
+					Content:     *l.LessonContent,
 				},
 			},
 			Exercises: exercises,

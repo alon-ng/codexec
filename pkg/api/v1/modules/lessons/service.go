@@ -45,6 +45,7 @@ func (s *Service) Create(ctx context.Context, req CreateLessonRequest) (models.L
 		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,
+		Content:     req.Content,
 	})
 	if err != nil {
 		return models.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonTranslationCreationFailed)
@@ -89,6 +90,7 @@ func (s *Service) Update(ctx context.Context, req UpdateLessonRequest) (models.L
 		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,
+		Content:     req.Content,
 	})
 	if err != nil {
 		return models.LessonWithTranslation{}, e.NewAPIError(err, ErrLessonTranslationUpdateFailed)
@@ -172,6 +174,7 @@ func (s *Service) AddTranslation(ctx context.Context, req AddLessonTranslationRe
 		Language:    req.Language,
 		Name:        req.Name,
 		Description: req.Description,
+		Content:     req.Content,
 	})
 
 	if err != nil {

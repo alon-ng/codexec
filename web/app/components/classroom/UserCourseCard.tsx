@@ -1,4 +1,4 @@
-import type { MeUserCourseWithProgress } from "~/api/generated/model";
+import type { ModelsUserCourseWithProgress } from "~/api/generated/model";
 
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
@@ -9,7 +9,7 @@ import { Progress } from "../base/Progress";
 import { Skeleton } from "../ui/skeleton";
 
 export interface UserCourseCardProps {
-    course?: MeUserCourseWithProgress;
+    course?: ModelsUserCourseWithProgress;
 }
 
 export default function UserCourseCard({ course }: UserCourseCardProps) {

@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
 import { blurInVariants } from "~/utils/animations";
+import { prose } from '~/utils/prose';
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -180,7 +181,7 @@ export default function LandingPage() {
               </div>
               <div className="flex gap-2 w-full flex-row">
                 <img src={codyAvatar} className="size-9 bg-white rounded-full p-1 shadow-sm shrink-0 dark:bg-card" alt={t("landing.aiMentor.altText")} />
-                <div className="text-xs font-medium shadow-sm rounded-lg p-3 bg-background max-w-[80%] prose prose-sm prose-p:my-0 dark:prose-invert max-w-none">
+                <div className={cn("text-xs font-medium shadow-sm rounded-lg p-3 bg-background max-w-[80%]", prose)}>
                   <p>{t("landing.aiMentor.botMessage1")}</p>
                   <p className="mt-2">{t("landing.aiMentor.botMessage2")} <code className="bg-muted px-1 rounded">{t("landing.aiMentor.botCode1")}</code></p>
                   <p className="mt-1">{t("landing.aiMentor.botMessage3")} <code className="bg-muted px-1 rounded">{t("landing.aiMentor.botCode2")}</code></p>

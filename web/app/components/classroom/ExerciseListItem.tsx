@@ -1,15 +1,15 @@
-import { Link } from "react-router";
 import { CheckCircle2, Circle } from "lucide-react";
+import { Link } from "react-router";
+import type { ModelsExerciseWithTranslation, ModelsUserExerciseStatus } from "~/api/generated/model";
 import { cn } from "~/lib/utils";
-import type { ExercisesExerciseWithTranslation, MeUserExerciseStatus } from "~/api/generated/model";
 
 export interface ExerciseListItemProps {
-  exercise: MeUserExerciseStatus;
+  exercise: ModelsUserExerciseStatus;
   courseUuid: string;
   lessonUuid: string;
   exerciseIndex: number;
   isSelected: boolean;
-  exerciseData?: ExercisesExerciseWithTranslation;
+  exerciseData?: ModelsExerciseWithTranslation;
 }
 
 export default function ExerciseListItem({

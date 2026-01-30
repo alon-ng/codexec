@@ -7,6 +7,7 @@
  */
 
 export interface LessonsUpdateLessonRequest {
+  content?: string;
   description?: string;
   is_public?: boolean;
   language: string;

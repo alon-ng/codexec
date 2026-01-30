@@ -17,11 +17,12 @@ INSERT INTO "lesson_translations" (
   "lesson_uuid",
   "language",
   "name",
-  "description"
+  "description",
+  "content"
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5
 )
-RETURNING uuid, lesson_uuid, language, name, description
+RETURNING uuid, lesson_uuid, language, name, description, content
 `
 
 type CreateLessonTranslationParams struct {
@@ -29,6 +30,7 @@ type CreateLessonTranslationParams struct {
 	Language    string    `json:"language"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Content     string    `json:"content"`
 }
 
 func (q *Queries) CreateLessonTranslation(ctx context.Context, arg CreateLessonTranslationParams) (LessonTranslation, error) {
@@ -37,6 +39,7 @@ func (q *Queries) CreateLessonTranslation(ctx context.Context, arg CreateLessonT
 		arg.Language,
 		arg.Name,
 		arg.Description,
+		arg.Content,
 	)
 	var i LessonTranslation
 	err := row.Scan(
@@ -45,6 +48,7 @@ func (q *Queries) CreateLessonTranslation(ctx context.Context, arg CreateLessonT
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.Content,
 	)
 	return i, err
 }
@@ -62,7 +66,7 @@ func (q *Queries) DeleteLessonTranslation(ctx context.Context, argUuid uuid.UUID
 }
 
 const getLessonTranslation = `-- name: GetLessonTranslation :one
-SELECT lesson_translations.uuid, lesson_uuid, language, name, description, lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public FROM "lesson_translations"
+SELECT lesson_translations.uuid, lesson_uuid, language, name, description, content, lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public FROM "lesson_translations"
 JOIN "lessons" ON "lesson_translations"."lesson_uuid" = "lessons"."uuid"
 WHERE "lesson_translations"."uuid" = $1
 AND "lessons"."deleted_at" IS NULL
@@ -75,6 +79,7 @@ type GetLessonTranslationRow struct {
 	Language    string     `json:"language"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
+	Content     string     `json:"content"`
 	Uuid_2      uuid.UUID  `json:"uuid_2"`
 	CreatedAt   time.Time  `json:"created_at"`
 	ModifiedAt  time.Time  `json:"modified_at"`
@@ -93,6 +98,7 @@ func (q *Queries) GetLessonTranslation(ctx context.Context, argUuid uuid.UUID) (
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.Content,
 		&i.Uuid_2,
 		&i.CreatedAt,
 		&i.ModifiedAt,
@@ -107,11 +113,12 @@ func (q *Queries) GetLessonTranslation(ctx context.Context, argUuid uuid.UUID) (
 const updateLessonTranslation = `-- name: UpdateLessonTranslation :one
 UPDATE "lesson_translations"
 SET "name" = COALESCE($3, "name"),
-    "description" = COALESCE($4, "description")
+    "description" = COALESCE($4, "description"),
+    "content" = COALESCE($5, "content")
 FROM "lessons"
 WHERE "lesson_translations"."lesson_uuid" = "lessons"."uuid" AND "lesson_translations"."language" = $2
 AND "lessons"."uuid" = $1
-RETURNING lesson_translations.uuid, lesson_translations.lesson_uuid, lesson_translations.language, lesson_translations.name, lesson_translations.description
+RETURNING lesson_translations.uuid, lesson_translations.lesson_uuid, lesson_translations.language, lesson_translations.name, lesson_translations.description, lesson_translations.content
 `
 
 type UpdateLessonTranslationParams struct {
@@ -119,6 +126,7 @@ type UpdateLessonTranslationParams struct {
 	Language    string    `json:"language"`
 	Name        *string   `json:"name"`
 	Description *string   `json:"description"`
+	Content     *string   `json:"content"`
 }
 
 func (q *Queries) UpdateLessonTranslation(ctx context.Context, arg UpdateLessonTranslationParams) (LessonTranslation, error) {
@@ -127,6 +135,7 @@ func (q *Queries) UpdateLessonTranslation(ctx context.Context, arg UpdateLessonT
 		arg.Language,
 		arg.Name,
 		arg.Description,
+		arg.Content,
 	)
 	var i LessonTranslation
 	err := row.Scan(
@@ -135,6 +144,7 @@ func (q *Queries) UpdateLessonTranslation(ctx context.Context, arg UpdateLessonT
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.Content,
 	)
 	return i, err
 }

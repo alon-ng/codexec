@@ -7,6 +7,7 @@
  */
 
 export interface LessonsAddLessonTranslationRequest {
+  content: string;
   description: string;
   language: string;
   lesson_uuid: string;

@@ -12,12 +12,12 @@ import type { RequestHandlerOptions } from "msw";
 
 import { DbExerciseType } from ".././model";
 import type {
-  ExercisesExerciseTranslation,
-  ExercisesExerciseWithTranslation,
+  ModelsExerciseTranslation,
+  ModelsExerciseWithTranslation,
 } from ".././model";
 
 export const getGetExercisesResponseMock =
-  (): ExercisesExerciseWithTranslation[] =>
+  (): ModelsExerciseWithTranslation[] =>
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
@@ -87,8 +87,8 @@ export const getGetExercisesResponseMock =
     }));
 
 export const getPostExercisesAddTranslationResponseMock = (
-  overrideResponse: Partial<ExercisesExerciseTranslation> = {},
-): ExercisesExerciseTranslation => ({
+  overrideResponse: Partial<ModelsExerciseTranslation> = {},
+): ModelsExerciseTranslation => ({
   code_data: faker.helpers.arrayElement([
     { instructions: faker.string.alpha({ length: { min: 10, max: 20 } }) },
     undefined,
@@ -115,8 +115,8 @@ export const getPostExercisesAddTranslationResponseMock = (
 });
 
 export const getPostExercisesCreateResponseMock = (
-  overrideResponse: Partial<ExercisesExerciseWithTranslation> = {},
-): ExercisesExerciseWithTranslation => ({
+  overrideResponse: Partial<ModelsExerciseWithTranslation> = {},
+): ModelsExerciseWithTranslation => ({
   code_data: faker.helpers.arrayElement([
     {
       children: faker.helpers.arrayElement([
@@ -187,8 +187,8 @@ export const getPostExercisesRestoreResponseMock = (): string =>
   faker.word.sample();
 
 export const getPutExercisesUpdateResponseMock = (
-  overrideResponse: Partial<ExercisesExerciseWithTranslation> = {},
-): ExercisesExerciseWithTranslation => ({
+  overrideResponse: Partial<ModelsExerciseWithTranslation> = {},
+): ModelsExerciseWithTranslation => ({
   code_data: faker.helpers.arrayElement([
     {
       children: faker.helpers.arrayElement([
@@ -253,8 +253,8 @@ export const getPutExercisesUpdateResponseMock = (
 });
 
 export const getGetExercisesUuidResponseMock = (
-  overrideResponse: Partial<ExercisesExerciseWithTranslation> = {},
-): ExercisesExerciseWithTranslation => ({
+  overrideResponse: Partial<ModelsExerciseWithTranslation> = {},
+): ModelsExerciseWithTranslation => ({
   code_data: faker.helpers.arrayElement([
     {
       children: faker.helpers.arrayElement([
@@ -320,12 +320,12 @@ export const getGetExercisesUuidResponseMock = (
 
 export const getGetExercisesMockHandler = (
   overrideResponse?:
-    | ExercisesExerciseWithTranslation[]
+    | ModelsExerciseWithTranslation[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<ExercisesExerciseWithTranslation[]>
-        | ExercisesExerciseWithTranslation[]),
+        | Promise<ModelsExerciseWithTranslation[]>
+        | ModelsExerciseWithTranslation[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -350,12 +350,10 @@ export const getGetExercisesMockHandler = (
 
 export const getPostExercisesAddTranslationMockHandler = (
   overrideResponse?:
-    | ExercisesExerciseTranslation
+    | ModelsExerciseTranslation
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) =>
-        | Promise<ExercisesExerciseTranslation>
-        | ExercisesExerciseTranslation),
+      ) => Promise<ModelsExerciseTranslation> | ModelsExerciseTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -380,12 +378,12 @@ export const getPostExercisesAddTranslationMockHandler = (
 
 export const getPostExercisesCreateMockHandler = (
   overrideResponse?:
-    | ExercisesExerciseWithTranslation
+    | ModelsExerciseWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
       ) =>
-        | Promise<ExercisesExerciseWithTranslation>
-        | ExercisesExerciseWithTranslation),
+        | Promise<ModelsExerciseWithTranslation>
+        | ModelsExerciseWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -466,12 +464,12 @@ export const getPostExercisesRestoreMockHandler = (
 
 export const getPutExercisesUpdateMockHandler = (
   overrideResponse?:
-    | ExercisesExerciseWithTranslation
+    | ModelsExerciseWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.put>[1]>[0],
       ) =>
-        | Promise<ExercisesExerciseWithTranslation>
-        | ExercisesExerciseWithTranslation),
+        | Promise<ModelsExerciseWithTranslation>
+        | ModelsExerciseWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.put(
@@ -496,12 +494,12 @@ export const getPutExercisesUpdateMockHandler = (
 
 export const getGetExercisesUuidMockHandler = (
   overrideResponse?:
-    | ExercisesExerciseWithTranslation
+    | ModelsExerciseWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<ExercisesExerciseWithTranslation>
-        | ExercisesExerciseWithTranslation),
+        | Promise<ModelsExerciseWithTranslation>
+        | ModelsExerciseWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(

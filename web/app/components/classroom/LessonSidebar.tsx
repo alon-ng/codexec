@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { Accordion } from "~/components/ui/accordion";
-import { Button } from "~/components/base/Button";
-import { PanelLeftOpen, PanelLeftClose } from "lucide-react";
-import LessonAccordionItem from "./LessonAccordionItem";
-import type { MeUserCourseFull } from "~/api/generated/model";
-import type { CoursesCourseFull } from "~/api/generated/model";
-import { blurInVariants } from "~/utils/animations";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { ModelsCourseFull, ModelsUserCourseFull } from "~/api/generated/model";
+import { Button } from "~/components/base/Button";
+import { Accordion } from "~/components/ui/accordion";
 import { cn } from "~/lib/utils";
+import { blurInVariants } from "~/utils/animations";
+import LessonAccordionItem from "./LessonAccordionItem";
 
 export interface LessonSidebarProps {
-  userCourseData: MeUserCourseFull;
-  courseData: CoursesCourseFull;
+  userCourseData: ModelsUserCourseFull;
+  courseData: ModelsCourseFull;
   courseUuid: string;
   selectedLessonUuid?: string;
   selectedExerciseUuid?: string;

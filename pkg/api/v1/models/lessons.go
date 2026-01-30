@@ -23,6 +23,7 @@ type LessonTranslation struct {
 	Language    string    `json:"language" binding:"required" example:"en"`
 	Name        string    `json:"name" binding:"required" example:"Python Basics"`
 	Description string    `json:"description" binding:"required" example:"Learn Python fundamentals"`
+	Content     string    `json:"content" binding:"required" example:"<div>Lesson content HTML</div>"`
 }
 
 type LessonWithTranslation struct {
@@ -54,6 +55,7 @@ func ToLessonTranslation(d db.LessonTranslation) (LessonTranslation, error) {
 		Language:    d.Language,
 		Name:        d.Name,
 		Description: d.Description,
+		Content:     d.Content,
 	}, nil
 }
 

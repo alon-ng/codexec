@@ -1,12 +1,12 @@
-import { cn } from "~/lib/utils";
 import { Check, Lock, LockOpen } from "lucide-react";
-import type { CoursesCourseFull, LessonsLessonFull } from "~/api/generated/model";
-import { useLanguage } from "~/lib/useLanguage";
 import { motion } from "motion/react";
+import type { ModelsCourseFull, ModelsLessonFull } from "~/api/generated/model";
+import { useLanguage } from "~/lib/useLanguage";
+import { cn } from "~/lib/utils";
 import { blurInVariants } from "~/utils/animations";
 
 interface CoursePathProps {
-    course: CoursesCourseFull;
+    course: ModelsCourseFull;
 }
 
 const GLOBAL_ANIMATION_DELAY = 0.3;
@@ -61,7 +61,7 @@ function RowConnector({ isEvenRow, isRTL, animationDelay }: RowConnectorProps) {
 }
 
 interface LessonNodeProps {
-    lesson: LessonsLessonFull;
+    lesson: ModelsLessonFull;
     globalIndex: number;
     isCompleted: boolean;
     showLeftLine: boolean;
@@ -127,7 +127,7 @@ function LessonNode({
 }
 
 interface CourseRowProps {
-    rowLessons: LessonsLessonFull[];
+    rowLessons: ModelsLessonFull[];
     rowIndex: number;
     totalRows: number;
     isRTL: boolean;

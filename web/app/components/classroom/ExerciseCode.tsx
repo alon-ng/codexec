@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePutMeExercisesExerciseUuid } from "~/api/generated/me/me";
-import type { ExercisesExerciseCodeData, ExercisesExerciseWithTranslation, MeSaveUserExerciseSubmissionRequestSubmission, MeUserExercise } from "~/api/generated/model";
+import type { MeSaveUserExerciseSubmissionRequestSubmission, ModelsExerciseCodeData, ModelsExerciseWithTranslation, ModelsUserExercise } from "~/api/generated/model";
 import type { ExecuteResponse } from '~/api/types';
 import codyAvatar from "~/assets/cody-256.png";
 import errorSound from "~/assets/error.mp3";
@@ -18,15 +18,16 @@ import { useWebSocket } from "~/hooks/useWebSocket";
 import { blurInVariants } from "~/utils/animations";
 import LANGUAGE_MAP from "~/utils/codeLang";
 import { getCodeMirrorExtensions } from "~/utils/codeMirror";
+import { prose } from '~/utils/prose';
 
 export interface ExerciseCodeProps {
-  exercise: ExercisesExerciseWithTranslation;
+  exercise: ModelsExerciseWithTranslation;
   language: string;
-  userExercise: MeUserExercise;
+  userExercise: ModelsUserExercise;
   onExerciseComplete: (exerciseUuid: string, nextLessonUuid?: string, nextExerciseUuid?: string) => void;
 }
 
-function getCodeValue(submission: ExercisesExerciseCodeData | undefined): string {
+function getCodeValue(submission: ModelsExerciseCodeData | undefined): string {
   if (!submission?.content) {
     return "";
   }
@@ -34,7 +35,7 @@ function getCodeValue(submission: ExercisesExerciseCodeData | undefined): string
   return submission.content;
 }
 
-function getSubmissionFromCode(code: string, language: string): ExercisesExerciseCodeData {
+function getSubmissionFromCode(code: string, language: string): ModelsExerciseCodeData {
   const ext = LANGUAGE_MAP[language] || "txt";
   return {
     name: `main.${ext}`,
@@ -52,7 +53,7 @@ export default function ExerciseCode({
   const { mutate: saveMutation } = usePutMeExercisesExerciseUuid();
 
   const initialCode = useMemo(() => {
-    const userSubmission = userExercise.submission as unknown as ExercisesExerciseCodeData;
+    const userSubmission = userExercise.submission as unknown as ModelsExerciseCodeData;
     const hasUserSubmission = Boolean(userSubmission?.name && userSubmission?.content);
     return getCodeValue(hasUserSubmission ? userSubmission : exercise.code_data);
   }, [userExercise.submission, exercise.code_data]);
@@ -155,7 +156,7 @@ export default function ExerciseCode({
           <ExerciseHeader exercise={exercise} />
         </motion.div>
         <motion.div variants={blurInVariants(0.3)} initial="hidden" animate="visible">
-          <EditorContent className="prose prose-sm dark:prose-invert" editor={editor} />
+          <EditorContent className={prose} editor={editor} />
         </motion.div>
       </div>
       <div className="flex-1 h-full flex flex-col gap-2">

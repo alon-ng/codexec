@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePutMeExercisesExerciseUuid } from "~/api/generated/me/me";
-import type { ExercisesExerciseTranslationQuizDataQuestion, ExercisesExerciseWithTranslation, MeSaveUserExerciseSubmissionRequestSubmission, MeUserExercise } from "~/api/generated/model";
+import type { MeSaveUserExerciseSubmissionRequestSubmission, ModelsExerciseTranslationQuizDataQuestion, ModelsExerciseWithTranslation, ModelsUserExercise } from "~/api/generated/model";
 import type { ExecuteResponse, UserExerciseQuizData } from '~/api/types';
 import errorSound from "~/assets/error.mp3";
 import { Button } from "~/components/base/Button";
@@ -15,9 +15,9 @@ import { cn } from "~/lib/utils";
 import { blurInVariants } from "~/utils/animations";
 
 export interface ExerciseQuizProps {
-  exercise: ExercisesExerciseWithTranslation;
+  exercise: ModelsExerciseWithTranslation;
   language: string;
-  userExercise: MeUserExercise;
+  userExercise: ModelsUserExercise;
   onExerciseComplete: (exerciseUuid: string, nextLessonUuid?: string, nextExerciseUuid?: string) => void;
 }
 
@@ -160,7 +160,7 @@ export default function ExerciseQuiz({
 }
 
 export interface ExerciseQuizQuestionProps {
-  question: ExercisesExerciseTranslationQuizDataQuestion;
+  question: ModelsExerciseTranslationQuizDataQuestion;
   index: number;
   answerKey?: string;
   updateAnswerKey: (answerKey: string) => void;

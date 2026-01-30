@@ -22,16 +22,16 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  ChatChatMessage,
   ErrorsErrorResponse,
   GetMeCoursesParams,
   GetMeExercisesExerciseUuidChatParams,
   MeSaveUserExerciseSubmissionRequest,
   MeSendChatMessageRequest,
-  MeUserExercise,
-  ProgressUserCourseFull,
-  ProgressUserCourseWithProgress,
-  UsersUser,
+  ModelsChatMessage,
+  ModelsUser,
+  ModelsUserCourseFull,
+  ModelsUserCourseWithProgress,
+  ModelsUserExercise,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -46,7 +46,7 @@ export const getMe = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<UsersUser>(
+  return customInstance<ModelsUser>(
     { url: `/me`, method: "GET", signal },
     options,
   );
@@ -180,7 +180,7 @@ export const getMeCourses = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ProgressUserCourseWithProgress[]>(
+  return customInstance<ModelsUserCourseWithProgress[]>(
     { url: `/me/courses`, method: "GET", params, signal },
     options,
   );
@@ -323,7 +323,7 @@ export const getMeCoursesCourseUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ProgressUserCourseFull>(
+  return customInstance<ModelsUserCourseFull>(
     { url: `/me/courses/${courseUuid}`, method: "GET", signal },
     options,
   );
@@ -496,7 +496,7 @@ export const getMeExercisesExerciseUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<MeUserExercise>(
+  return customInstance<ModelsUserExercise>(
     { url: `/me/exercises/${exerciseUuid}`, method: "GET", signal },
     options,
   );
@@ -765,7 +765,7 @@ export const getMeExercisesExerciseUuidChat = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ChatChatMessage[]>(
+  return customInstance<ModelsChatMessage[]>(
     {
       url: `/me/exercises/${exerciseUuid}/chat`,
       method: "GET",
@@ -962,7 +962,7 @@ export const postMeExercisesExerciseUuidChat = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ChatChatMessage>(
+  return customInstance<ModelsChatMessage>(
     {
       url: `/me/exercises/${exerciseUuid}/chat`,
       method: "POST",

@@ -28,9 +28,9 @@ import type {
   LessonsAddLessonTranslationRequest,
   LessonsCreateLessonRequest,
   LessonsIDRequest,
-  LessonsLessonTranslation,
-  LessonsLessonWithTranslation,
   LessonsUpdateLessonRequest,
+  ModelsLessonTranslation,
+  ModelsLessonWithTranslation,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -46,7 +46,7 @@ export const getLessons = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<LessonsLessonWithTranslation[]>(
+  return customInstance<ModelsLessonWithTranslation[]>(
     { url: `/lessons`, method: "GET", params, signal },
     options,
   );
@@ -189,7 +189,7 @@ export const postLessonsAddTranslation = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<LessonsLessonTranslation>(
+  return customInstance<ModelsLessonTranslation>(
     {
       url: `/lessons/add-translation`,
       method: "POST",
@@ -282,7 +282,7 @@ export const postLessonsCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<LessonsLessonWithTranslation>(
+  return customInstance<ModelsLessonWithTranslation>(
     {
       url: `/lessons/create`,
       method: "POST",
@@ -550,7 +550,7 @@ export const putLessonsUpdate = (
   lessonsUpdateLessonRequest: LessonsUpdateLessonRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<LessonsLessonWithTranslation>(
+  return customInstance<ModelsLessonWithTranslation>(
     {
       url: `/lessons/update`,
       method: "PUT",
@@ -642,7 +642,7 @@ export const getLessonsUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<LessonsLessonWithTranslation>(
+  return customInstance<ModelsLessonWithTranslation>(
     { url: `/lessons/${uuid}`, method: "GET", params, signal },
     options,
   );

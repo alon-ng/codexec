@@ -1,12 +1,12 @@
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useGetMeExercisesExerciseUuid } from "~/api/generated/me/me";
-import type { ExercisesExerciseWithTranslation } from "~/api/generated/model";
+import type { ModelsExerciseWithTranslation } from "~/api/generated/model";
 import ExerciseCode from "./ExerciseCode";
 import ExerciseQuiz from "./ExerciseQuiz";
 
 export interface ExerciseContentProps {
-  exercise?: ExercisesExerciseWithTranslation;
+  exercise?: ModelsExerciseWithTranslation;
   exerciseUuid?: string;
   language: string;
   onExerciseComplete: (exerciseUuid: string, nextLessonUuid?: string, nextExerciseUuid?: string) => void;

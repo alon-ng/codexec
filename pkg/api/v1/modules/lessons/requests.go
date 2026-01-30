@@ -9,6 +9,7 @@ type CreateLessonRequest struct {
 	Language    string    `json:"language" binding:"required" example:"en"`
 	Name        string    `json:"name" binding:"required" example:"Python Basics"`
 	Description string    `json:"description" binding:"required" example:"Learn Python fundamentals"`
+	Content     string    `json:"content" binding:"required" example:"<div>Lesson content HTML</div>"`
 }
 
 type UpdateLessonRequest struct {
@@ -18,6 +19,7 @@ type UpdateLessonRequest struct {
 	IsPublic    *bool     `json:"is_public" example:"false"`
 	Name        *string   `json:"name" example:"Python Basics"`
 	Description *string   `json:"description" example:"Learn Python fundamentals"`
+	Content     *string   `json:"content" example:"<div>Lesson content HTML</div>"`
 }
 
 type ListLessonsRequest struct {
@@ -32,6 +34,7 @@ type AddLessonTranslationRequest struct {
 	Language    string    `json:"language" binding:"required" example:"es"`
 	Name        string    `json:"name" binding:"required" example:"Fundamentos de Python"`
 	Description string    `json:"description" binding:"required" example:"Aprende los fundamentos de Python"`
+	Content     string    `json:"content" binding:"required" example:"<div>Contenido de la lección HTML</div>"`
 }
 
 type IDRequest struct {

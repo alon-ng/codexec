@@ -11,11 +11,11 @@ import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type {
-  LessonsLessonTranslation,
-  LessonsLessonWithTranslation,
+  ModelsLessonTranslation,
+  ModelsLessonWithTranslation,
 } from ".././model";
 
-export const getGetLessonsResponseMock = (): LessonsLessonWithTranslation[] =>
+export const getGetLessonsResponseMock = (): ModelsLessonWithTranslation[] =>
   Array.from(
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
@@ -33,6 +33,7 @@ export const getGetLessonsResponseMock = (): LessonsLessonWithTranslation[] =>
     modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
     order_index: faker.number.int({ min: undefined, max: undefined }),
     translation: {
+      content: faker.string.alpha({ length: { min: 10, max: 20 } }),
       description: faker.string.alpha({ length: { min: 10, max: 20 } }),
       language: faker.string.alpha({ length: { min: 10, max: 20 } }),
       lesson_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -43,8 +44,9 @@ export const getGetLessonsResponseMock = (): LessonsLessonWithTranslation[] =>
   }));
 
 export const getPostLessonsAddTranslationResponseMock = (
-  overrideResponse: Partial<LessonsLessonTranslation> = {},
-): LessonsLessonTranslation => ({
+  overrideResponse: Partial<ModelsLessonTranslation> = {},
+): ModelsLessonTranslation => ({
+  content: faker.string.alpha({ length: { min: 10, max: 20 } }),
   description: faker.string.alpha({ length: { min: 10, max: 20 } }),
   language: faker.string.alpha({ length: { min: 10, max: 20 } }),
   lesson_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -54,8 +56,8 @@ export const getPostLessonsAddTranslationResponseMock = (
 });
 
 export const getPostLessonsCreateResponseMock = (
-  overrideResponse: Partial<LessonsLessonWithTranslation> = {},
-): LessonsLessonWithTranslation => ({
+  overrideResponse: Partial<ModelsLessonWithTranslation> = {},
+): ModelsLessonWithTranslation => ({
   course_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
@@ -66,6 +68,7 @@ export const getPostLessonsCreateResponseMock = (
   modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   order_index: faker.number.int({ min: undefined, max: undefined }),
   translation: {
+    content: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.string.alpha({ length: { min: 10, max: 20 } }),
     language: faker.string.alpha({ length: { min: 10, max: 20 } }),
     lesson_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -83,8 +86,8 @@ export const getPostLessonsRestoreResponseMock = (): string =>
   faker.word.sample();
 
 export const getPutLessonsUpdateResponseMock = (
-  overrideResponse: Partial<LessonsLessonWithTranslation> = {},
-): LessonsLessonWithTranslation => ({
+  overrideResponse: Partial<ModelsLessonWithTranslation> = {},
+): ModelsLessonWithTranslation => ({
   course_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
@@ -95,6 +98,7 @@ export const getPutLessonsUpdateResponseMock = (
   modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   order_index: faker.number.int({ min: undefined, max: undefined }),
   translation: {
+    content: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.string.alpha({ length: { min: 10, max: 20 } }),
     language: faker.string.alpha({ length: { min: 10, max: 20 } }),
     lesson_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -106,8 +110,8 @@ export const getPutLessonsUpdateResponseMock = (
 });
 
 export const getGetLessonsUuidResponseMock = (
-  overrideResponse: Partial<LessonsLessonWithTranslation> = {},
-): LessonsLessonWithTranslation => ({
+  overrideResponse: Partial<ModelsLessonWithTranslation> = {},
+): ModelsLessonWithTranslation => ({
   course_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
@@ -118,6 +122,7 @@ export const getGetLessonsUuidResponseMock = (
   modified_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   order_index: faker.number.int({ min: undefined, max: undefined }),
   translation: {
+    content: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.string.alpha({ length: { min: 10, max: 20 } }),
     language: faker.string.alpha({ length: { min: 10, max: 20 } }),
     lesson_uuid: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -130,12 +135,12 @@ export const getGetLessonsUuidResponseMock = (
 
 export const getGetLessonsMockHandler = (
   overrideResponse?:
-    | LessonsLessonWithTranslation[]
+    | ModelsLessonWithTranslation[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<LessonsLessonWithTranslation[]>
-        | LessonsLessonWithTranslation[]),
+        | Promise<ModelsLessonWithTranslation[]>
+        | ModelsLessonWithTranslation[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -160,10 +165,10 @@ export const getGetLessonsMockHandler = (
 
 export const getPostLessonsAddTranslationMockHandler = (
   overrideResponse?:
-    | LessonsLessonTranslation
+    | ModelsLessonTranslation
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<LessonsLessonTranslation> | LessonsLessonTranslation),
+      ) => Promise<ModelsLessonTranslation> | ModelsLessonTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -188,12 +193,10 @@ export const getPostLessonsAddTranslationMockHandler = (
 
 export const getPostLessonsCreateMockHandler = (
   overrideResponse?:
-    | LessonsLessonWithTranslation
+    | ModelsLessonWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) =>
-        | Promise<LessonsLessonWithTranslation>
-        | LessonsLessonWithTranslation),
+      ) => Promise<ModelsLessonWithTranslation> | ModelsLessonWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -274,12 +277,10 @@ export const getPostLessonsRestoreMockHandler = (
 
 export const getPutLessonsUpdateMockHandler = (
   overrideResponse?:
-    | LessonsLessonWithTranslation
+    | ModelsLessonWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.put>[1]>[0],
-      ) =>
-        | Promise<LessonsLessonWithTranslation>
-        | LessonsLessonWithTranslation),
+      ) => Promise<ModelsLessonWithTranslation> | ModelsLessonWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.put(
@@ -304,12 +305,10 @@ export const getPutLessonsUpdateMockHandler = (
 
 export const getGetLessonsUuidMockHandler = (
   overrideResponse?:
-    | LessonsLessonWithTranslation
+    | ModelsLessonWithTranslation
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) =>
-        | Promise<LessonsLessonWithTranslation>
-        | LessonsLessonWithTranslation),
+      ) => Promise<ModelsLessonWithTranslation> | ModelsLessonWithTranslation),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(

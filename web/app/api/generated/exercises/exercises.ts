@@ -25,12 +25,12 @@ import type {
   ErrorsErrorResponse,
   ExercisesAddExerciseTranslationRequest,
   ExercisesCreateExerciseRequest,
-  ExercisesExerciseTranslation,
-  ExercisesExerciseWithTranslation,
   ExercisesIDRequest,
   ExercisesUpdateExerciseRequest,
   GetExercisesParams,
   GetExercisesUuidParams,
+  ModelsExerciseTranslation,
+  ModelsExerciseWithTranslation,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -46,7 +46,7 @@ export const getExercises = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ExercisesExerciseWithTranslation[]>(
+  return customInstance<ModelsExerciseWithTranslation[]>(
     { url: `/exercises`, method: "GET", params, signal },
     options,
   );
@@ -189,7 +189,7 @@ export const postExercisesAddTranslation = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ExercisesExerciseTranslation>(
+  return customInstance<ModelsExerciseTranslation>(
     {
       url: `/exercises/add-translation`,
       method: "POST",
@@ -283,7 +283,7 @@ export const postExercisesCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ExercisesExerciseWithTranslation>(
+  return customInstance<ModelsExerciseWithTranslation>(
     {
       url: `/exercises/create`,
       method: "POST",
@@ -551,7 +551,7 @@ export const putExercisesUpdate = (
   exercisesUpdateExerciseRequest: ExercisesUpdateExerciseRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<ExercisesExerciseWithTranslation>(
+  return customInstance<ModelsExerciseWithTranslation>(
     {
       url: `/exercises/update`,
       method: "PUT",
@@ -643,7 +643,7 @@ export const getExercisesUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<ExercisesExerciseWithTranslation>(
+  return customInstance<ModelsExerciseWithTranslation>(
     { url: `/exercises/${uuid}`, method: "GET", params, signal },
     options,
   );

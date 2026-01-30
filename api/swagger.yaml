@@ -258,6 +258,9 @@ definitions:
     type: object
   lessons.AddLessonTranslationRequest:
     properties:
+      content:
+        example: <div>Contenido de la lección HTML</div>
+        type: string
       description:
         example: Aprende los fundamentos de Python
         type: string
@@ -270,6 +273,7 @@ definitions:
         example: Fundamentos de Python
         type: string
     required:
+    - content
     - description
     - language
     - lesson_uuid
@@ -277,6 +281,9 @@ definitions:
     type: object
   lessons.CreateLessonRequest:
     properties:
+      content:
+        example: <div>Lesson content HTML</div>
+        type: string
       course_uuid:
         type: string
       description:
@@ -295,6 +302,7 @@ definitions:
         example: 1
         type: integer
     required:
+    - content
     - course_uuid
     - description
     - language
@@ -310,6 +318,9 @@ definitions:
     type: object
   lessons.UpdateLessonRequest:
     properties:
+      content:
+        example: <div>Lesson content HTML</div>
+        type: string
       description:
         example: Learn Python fundamentals
         type: string
@@ -626,6 +637,9 @@ definitions:
     type: object
   models.LessonTranslation:
     properties:
+      content:
+        example: <div>Lesson content HTML</div>
+        type: string
       description:
         example: Learn Python fundamentals
         type: string
@@ -640,6 +654,7 @@ definitions:
       uuid:
         type: string
     required:
+    - content
     - description
     - language
     - lesson_uuid

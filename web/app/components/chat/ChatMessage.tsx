@@ -2,14 +2,15 @@ import { Markdown } from "@tiptap/markdown";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { UserRound } from "lucide-react";
-import type { ChatChatMessage } from "~/api/generated/model";
+import type { ModelsChatMessage } from "~/api/generated/model";
 import codyAvatar from "~/assets/cody-256.png";
 import ThreeDots from "~/assets/three-dots.svg?react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
+import { prose } from '~/utils/prose';
 
 export interface ChatMessageProps {
-    message?: ChatChatMessage;
+    message?: ModelsChatMessage;
     isLoadingCodeResponse?: boolean;
 }
 
@@ -51,7 +52,7 @@ export default function ChatMessage({ message, isLoadingCodeResponse }: ChatMess
             ) : (
                 <UserRound className="size-9 bg-white rounded-full p-1 shadow-sm shrink-0" />
             )}
-            <div className="text-xs font-medium shadow-sm rounded-lg p-2 bg-background overflow-hidden break-words whitespace-normal min-w-0 prose prose-sm prose-p:my-0 prose-h1:mt-2 prose-h2:mt-2 prose-h3:mt-2 prose-h4:mt-2 dark:prose-invert max-w-none">
+            <div className={cn("text-xs font-medium shadow-sm rounded-lg p-2 bg-background overflow-hidden break-words whitespace-normal min-w-0", prose)}>
                 <EditorContent editor={editor} />
             </div>
         </div>

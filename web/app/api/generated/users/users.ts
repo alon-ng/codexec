@@ -24,10 +24,10 @@ import type {
 import type {
   ErrorsErrorResponse,
   GetUsersParams,
+  ModelsUser,
   UsersCreateUserRequest,
   UsersIDRequest,
   UsersUpdateUserRequest,
-  UsersUser,
 } from ".././model";
 
 import { customInstance } from "../../../lib/axios";
@@ -43,7 +43,7 @@ export const getUsers = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<UsersUser[]>(
+  return customInstance<ModelsUser[]>(
     { url: `/users`, method: "GET", params, signal },
     options,
   );
@@ -186,7 +186,7 @@ export const postUsersCreate = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<UsersUser>(
+  return customInstance<ModelsUser>(
     {
       url: `/users/create`,
       method: "POST",
@@ -454,7 +454,7 @@ export const putUsersUpdate = (
   usersUpdateUserRequest: UsersUpdateUserRequest,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<UsersUser>(
+  return customInstance<ModelsUser>(
     {
       url: `/users/update`,
       method: "PUT",
@@ -545,7 +545,7 @@ export const getUsersUuid = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<UsersUser>(
+  return customInstance<ModelsUser>(
     { url: `/users/${uuid}`, method: "GET", signal },
     options,
   );

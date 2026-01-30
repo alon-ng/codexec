@@ -2602,12 +2602,17 @@
         "lessons.AddLessonTranslationRequest": {
             "type": "object",
             "required": [
+                "content",
                 "description",
                 "language",
                 "lesson_uuid",
                 "name"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eContenido de la lección HTML\u003c/div\u003e"
+                },
                 "description": {
                     "type": "string",
                     "example": "Aprende los fundamentos de Python"
@@ -2628,6 +2633,7 @@
         "lessons.CreateLessonRequest": {
             "type": "object",
             "required": [
+                "content",
                 "course_uuid",
                 "description",
                 "language",
@@ -2635,6 +2641,10 @@
                 "order_index"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eLesson content HTML\u003c/div\u003e"
+                },
                 "course_uuid": {
                     "type": "string"
                 },
@@ -2678,6 +2688,10 @@
                 "uuid"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eLesson content HTML\u003c/div\u003e"
+                },
                 "description": {
                     "type": "string",
                     "example": "Learn Python fundamentals"
@@ -3118,6 +3132,7 @@
         "models.LessonTranslation": {
             "type": "object",
             "required": [
+                "content",
                 "description",
                 "language",
                 "lesson_uuid",
@@ -3125,6 +3140,10 @@
                 "uuid"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eLesson content HTML\u003c/div\u003e"
+                },
                 "description": {
                     "type": "string",
                     "example": "Learn Python fundamentals"

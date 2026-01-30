@@ -1,7 +1,7 @@
-import type { ExercisesExerciseWithTranslation } from "~/api/generated/model";
+import type { ModelsExerciseWithTranslation } from "~/api/generated/model";
 
 export interface ExerciseHeaderProps {
-  exercise: ExercisesExerciseWithTranslation;
+  exercise: ModelsExerciseWithTranslation;
 }
 
 export default function ExerciseHeader({ exercise }: ExerciseHeaderProps) {

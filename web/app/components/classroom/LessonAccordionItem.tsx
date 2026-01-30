@@ -1,23 +1,23 @@
+import { BookOpenText, CheckCircle2, Circle } from "lucide-react";
+import { motion } from "motion/react";
+import { Link } from "react-router";
+import type { ModelsLessonFull, ModelsUserLessonStatus } from "~/api/generated/model";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
-import { CheckCircle2, Circle } from "lucide-react";
 import { cn } from "~/lib/utils";
-import ExerciseListItem from "./ExerciseListItem";
-import type { MeUserLessonStatus } from "~/api/generated/model";
-import type { LessonsLessonFull } from "~/api/generated/model";
 import { blurInVariants } from "~/utils/animations";
-import { motion } from "motion/react";
+import ExerciseListItem from "./ExerciseListItem";
 
 export interface LessonAccordionItemProps {
-  lesson: MeUserLessonStatus;
+  lesson: ModelsUserLessonStatus;
   lessonIndex: number;
   courseUuid: string;
   selectedLessonUuid?: string;
   selectedExerciseUuid?: string;
-  lessonData?: LessonsLessonFull;
+  lessonData?: ModelsLessonFull;
 }
 
 export default function LessonAccordionItem({
@@ -31,6 +31,7 @@ export default function LessonAccordionItem({
   const exercises = lesson.exercises || [];
   const isLessonCompleted = lesson.is_completed;
   const isSelected = lesson.lesson_uuid === selectedLessonUuid;
+  const isLessonPageSelected = lesson.lesson_uuid === selectedLessonUuid && !selectedExerciseUuid;
 
   const lessonName = lessonData?.translation?.name || `Lesson ${lessonIndex + 1}`;
 
@@ -59,6 +60,16 @@ export default function LessonAccordionItem({
         </AccordionTrigger>
         <AccordionContent>
           <div className="flex flex-col gap-1 ps-6">
+            <Link
+              to={`/classroom/${courseUuid}/${lesson.lesson_uuid}`}
+              className={cn(
+                "flex items-center gap-2 py-2 px-3 rounded-md hover:bg-accent transition-colors",
+                isLessonPageSelected && "bg-accent font-medium"
+              )}
+            >
+              <BookOpenText className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-sm">{lessonData?.translation.name || `Lesson ${lessonIndex + 1}`}</span>
+            </Link>
             {exercises.map((exercise, exIndex) => (
               <ExerciseListItem
                 key={exercise.exercise_uuid || exIndex}

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { useGetCoursesUuid } from "~/api/generated/courses/courses";
 import { useGetMeCoursesCourseUuid } from "~/api/generated/me/me";
-import type { MeUserExerciseStatus } from "~/api/generated/model";
+import type { ModelsUserExerciseStatus } from "~/api/generated/model";
 import courseCompleteImage from "~/assets/course-complete.png";
 import successSound from "~/assets/success.mp3";
 import PageHeader, { type BreadcrumbProps } from "~/components/PageHeader";
@@ -12,6 +12,7 @@ import { Button } from "~/components/base/Button";
 import ClassroomError from "~/components/classroom/ClassroomError";
 import ClassroomLoading from "~/components/classroom/ClassroomLoading";
 import ExerciseContent from "~/components/classroom/ExerciseContent";
+import LessonContent from "~/components/classroom/LessonContent";
 import LessonSidebar from "~/components/classroom/LessonSidebar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 
@@ -56,6 +57,12 @@ export default function Classroom() {
         return lesson?.exercises?.find((exercise) => exercise.uuid === exerciseUuid);
     }, [courseData, lessonUuid, exerciseUuid]);
 
+    // Look up selected lesson from courseData
+    const selectedLessonData = useMemo(() => {
+        if (!courseData || !lessonUuid) return undefined;
+        return courseData.lessons?.find((l) => l.uuid === lessonUuid);
+    }, [courseData, lessonUuid]);
+
     useEffect(() => {
         if (userCourseError || courseError) {
             toast.error(t("common.error"));
@@ -82,16 +89,18 @@ export default function Classroom() {
         }
 
         const findFirstIncompleteExercise = (
-            lessonExercises: MeUserExerciseStatus[] | undefined
+            lessonExercises: ModelsUserExerciseStatus[] | undefined
         ) => {
             if (!lessonExercises || lessonExercises.length === 0) return null;
 
-            const incomplete = lessonExercises.find((ex: MeUserExerciseStatus) => !ex.is_completed);
+            const incomplete = lessonExercises.find((ex: ModelsUserExerciseStatus) => !ex.is_completed);
             if (incomplete) return incomplete;
 
             return lessonExercises[lessonExercises.length - 1];
         };
 
+        // Only auto-navigate if no lesson or exercise is selected
+        // Don't auto-navigate if user explicitly selected a lesson (lessonUuid but no exerciseUuid)
         if (!lessonUuid && !exerciseUuid) {
             for (const lesson of lessons) {
                 if (!lesson.lesson_uuid) continue;
@@ -115,16 +124,8 @@ export default function Classroom() {
             }
         }
 
-        if (lessonUuid && !exerciseUuid) {
-            const lesson = lessons.find((l) => l.lesson_uuid === lessonUuid);
-            if (lesson) {
-                const targetExercise = findFirstIncompleteExercise(lesson.exercises);
-                if (targetExercise?.exercise_uuid) {
-                    navigate(`/classroom/${courseUuid}/${lessonUuid}/${targetExercise.exercise_uuid}`);
-                    return;
-                }
-            }
-        }
+        // Removed auto-navigation when lessonUuid is present but exerciseUuid is not
+        // This allows users to view lesson content without being redirected to an exercise
 
     }, [userCourseData, courseUuid, lessonUuid, exerciseUuid, navigate, isLoadingUserCourse, isLoadingCourse]);
 
@@ -207,12 +208,22 @@ export default function Classroom() {
                 />
 
                 <main className="flex-1 flex flex-col overflow-hidden">
-                    <ExerciseContent
-                        exercise={selectedExerciseData}
-                        exerciseUuid={exerciseUuid}
-                        language={courseData.subject}
-                        onExerciseComplete={onExerciseComplete}
-                    />
+                    {exerciseUuid ? (
+                        <ExerciseContent
+                            exercise={selectedExerciseData}
+                            exerciseUuid={exerciseUuid}
+                            language={courseData.subject}
+                            onExerciseComplete={onExerciseComplete}
+                        />
+                    ) : selectedLessonData ? (
+                        <LessonContent lesson={selectedLessonData} />
+                    ) : (
+                        <div className="flex flex-col h-full items-center justify-center">
+                            <p className="text-muted-foreground">
+                                {t("common.selectExercise") || "Select an exercise to begin"}
+                            </p>
+                        </div>
+                    )}
                 </main>
             </div>
             <Dialog open={showCourseCompletedDialog} onOpenChange={setShowCourseCompletedDialog}>

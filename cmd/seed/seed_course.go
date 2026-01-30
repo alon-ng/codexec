@@ -48,6 +48,7 @@ type Translation struct {
 	Name        string
 	Description string
 	Bullets     string
+	Content     string
 	CodeData    *json.RawMessage
 	QuizData    *json.RawMessage
 }
@@ -106,8 +107,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "Introduction to Python", Description: "Welcome to Python!"},
-					"he": {Name: "מבוא לפייתון", Description: "ברוכים הבאים לפייתון!"},
+					"en": {
+						Name:        "Introduction to Python",
+						Description: "Welcome to Python!",
+						Content:     "<div><h2>Welcome to Python!</h2><p>Python is a powerful and versatile programming language. In this lesson, you'll learn the basics of Python programming.</p><p>Let's start with some simple concepts:</p><ul><li>Python is easy to learn</li><li>Python is widely used</li><li>Python has a large community</li></ul></div>",
+					},
+					"he": {
+						Name:        "מבוא לפייתון",
+						Description: "ברוכים הבאים לפייתון!",
+						Content:     "<div><h2>ברוכים הבאים לפייתון!</h2><p>פייתון היא שפת תכנות חזקה ורב-תכליתית. בשיעור זה תלמדו את היסודות של תכנות בפייתון.</p><p>בואו נתחיל עם כמה מושגים פשוטים:</p><ul><li>פייתון קל ללמידה</li><li>פייתון נמצאת בשימוש נרחב</li><li>לפייתון קהילה גדולה</li></ul></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -157,8 +166,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "Variables and Data Types", Description: "Storing information."},
-					"he": {Name: "משתנים וסוגי נתונים", Description: "אחסון מידע."},
+					"en": {
+						Name:        "Variables and Data Types",
+						Description: "Storing information.",
+						Content:     "<div><h2>Variables and Data Types</h2><p>Variables are used to store data in Python. Python supports various data types including:</p><ul><li><strong>Integers</strong>: Whole numbers like 5, 10, -3</li><li><strong>Strings</strong>: Text data like 'Hello' or \"World\"</li><li><strong>Floats</strong>: Decimal numbers like 3.14, 2.5</li><li><strong>Booleans</strong>: True or False values</li></ul></div>",
+					},
+					"he": {
+						Name:        "משתנים וסוגי נתונים",
+						Description: "אחסון מידע.",
+						Content:     "<div><h2>משתנים וסוגי נתונים</h2><p>משתנים משמשים לאחסון נתונים בפייתון. פייתון תומכת בסוגי נתונים שונים כולל:</p><ul><li><strong>מספרים שלמים</strong>: מספרים שלמים כמו 5, 10, -3</li><li><strong>מחרוזות</strong>: נתוני טקסט כמו 'שלום' או \"עולם\"</li><li><strong>מספרים עשרוניים</strong>: מספרים עשרוניים כמו 3.14, 2.5</li><li><strong>בוליאנים</strong>: ערכי True או False</li></ul></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -188,8 +205,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "Control Flow", Description: "Making decisions."},
-					"he": {Name: "בקרת זרימה", Description: "קבלת החלטות."},
+					"en": {
+						Name:        "Control Flow",
+						Description: "Making decisions.",
+						Content:     "<div><h2>Control Flow</h2><p>Control flow statements allow your program to make decisions and execute code conditionally. The main control flow statements in Python are:</p><ul><li><strong>if</strong>: Execute code if a condition is true</li><li><strong>elif</strong>: Check another condition if the previous one was false</li><li><strong>else</strong>: Execute code if all conditions are false</li></ul></div>",
+					},
+					"he": {
+						Name:        "בקרת זרימה",
+						Description: "קבלת החלטות.",
+						Content:     "<div><h2>בקרת זרימה</h2><p>פקודות בקרת זרימה מאפשרות לתוכנית שלך לקבל החלטות ולבצע קוד בתנאים מסוימים. פקודות בקרת הזרימה העיקריות בפייתון הן:</p><ul><li><strong>if</strong>: בצע קוד אם תנאי הוא נכון</li><li><strong>elif</strong>: בדוק תנאי אחר אם הקודם היה שגוי</li><li><strong>else</strong>: בצע קוד אם כל התנאים שגויים</li></ul></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -215,8 +240,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "Loops", Description: "Repeating actions."},
-					"he": {Name: "לולאות", Description: "פעולות חוזרות."},
+					"en": {
+						Name:        "Loops",
+						Description: "Repeating actions.",
+						Content:     "<div><h2>Loops</h2><p>Loops allow you to repeat code multiple times. Python has two main types of loops:</p><ul><li><strong>for loops</strong>: Iterate over a sequence (like a list or string)</li><li><strong>while loops</strong>: Repeat code while a condition is true</li></ul><p>Loops are essential for processing collections of data efficiently.</p></div>",
+					},
+					"he": {
+						Name:        "לולאות",
+						Description: "פעולות חוזרות.",
+						Content:     "<div><h2>לולאות</h2><p>לולאות מאפשרות לך לחזור על קוד מספר פעמים. בפייתון יש שני סוגים עיקריים של לולאות:</p><ul><li><strong>לולאות for</strong>: חזור על רצף (כמו רשימה או מחרוזת)</li><li><strong>לולאות while</strong>: חזור על קוד כל עוד תנאי נכון</li></ul><p>לולאות חיוניות לעיבוד אוספי נתונים ביעילות.</p></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -242,8 +275,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "Functions", Description: "Reusable code blocks."},
-					"he": {Name: "פונקציות", Description: "בלוקי קוד לשימוש חוזר."},
+					"en": {
+						Name:        "Functions",
+						Description: "Reusable code blocks.",
+						Content:     "<div><h2>Functions</h2><p>Functions are reusable blocks of code that perform a specific task. They help organize your code and avoid repetition.</p><p>Key concepts:</p><ul><li><strong>Defining functions</strong>: Use the <code>def</code> keyword</li><li><strong>Parameters</strong>: Pass data to functions</li><li><strong>Return values</strong>: Functions can return results</li><li><strong>Reusability</strong>: Call functions multiple times</li></ul></div>",
+					},
+					"he": {
+						Name:        "פונקציות",
+						Description: "בלוקי קוד לשימוש חוזר.",
+						Content:     "<div><h2>פונקציות</h2><p>פונקציות הן בלוקי קוד לשימוש חוזר שמבצעים משימה ספציפית. הן עוזרות לארגן את הקוד ולהימנע מחזרה.</p><p>מושגים מרכזיים:</p><ul><li><strong>הגדרת פונקציות</strong>: השתמש במילת המפתח <code>def</code></li><li><strong>פרמטרים</strong>: העבר נתונים לפונקציות</li><li><strong>ערכי החזרה</strong>: פונקציות יכולות להחזיר תוצאות</li><li><strong>שימוש חוזר</strong>: קרא לפונקציות מספר פעמים</li></ul></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -269,8 +310,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "Lists and Dictionaries", Description: "Complex data structures."},
-					"he": {Name: "רשימות ומילונים", Description: "מבני נתונים מורכבים."},
+					"en": {
+						Name:        "Lists and Dictionaries",
+						Description: "Complex data structures.",
+						Content:     "<div><h2>Lists and Dictionaries</h2><p>Python provides powerful data structures for organizing data:</p><ul><li><strong>Lists</strong>: Ordered collections of items, mutable</li><li><strong>Dictionaries</strong>: Key-value pairs, very efficient for lookups</li></ul><p>These structures are fundamental for working with collections of data in Python.</p></div>",
+					},
+					"he": {
+						Name:        "רשימות ומילונים",
+						Description: "מבני נתונים מורכבים.",
+						Content:     "<div><h2>רשימות ומילונים</h2><p>פייתון מספקת מבני נתונים חזקים לארגון נתונים:</p><ul><li><strong>רשימות</strong>: אוספים מסודרים של פריטים, ניתנים לשינוי</li><li><strong>מילונים</strong>: זוגות מפתח-ערך, יעילים מאוד לחיפושים</li></ul><p>מבנים אלה הם בסיסיים לעבודה עם אוספי נתונים בפייתון.</p></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -296,8 +345,16 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 			{
 				IsPublic: true,
 				Translations: map[string]Translation{
-					"en": {Name: "File Handling", Description: "Working with files."},
-					"he": {Name: "טיפול בקבצים", Description: "עבודה עם קבצים."},
+					"en": {
+						Name:        "File Handling",
+						Description: "Working with files.",
+						Content:     "<div><h2>File Handling</h2><p>Python makes it easy to work with files. You can read from and write to files using built-in functions.</p><p>Key operations:</p><ul><li><strong>Opening files</strong>: Use the <code>open()</code> function</li><li><strong>Reading files</strong>: Read entire file or line by line</li><li><strong>Writing files</strong>: Write data to files</li><li><strong>Closing files</strong>: Always close files when done (or use <code>with</code> statement)</li></ul></div>",
+					},
+					"he": {
+						Name:        "טיפול בקבצים",
+						Description: "עבודה עם קבצים.",
+						Content:     "<div><h2>טיפול בקבצים</h2><p>פייתון מקלה על עבודה עם קבצים. אתה יכול לקרוא מקבצים ולכתוב לקבצים באמצעות פונקציות מובנות.</p><p>פעולות מרכזיות:</p><ul><li><strong>פתיחת קבצים</strong>: השתמש בפונקציה <code>open()</code></li><li><strong>קריאת קבצים</strong>: קרא את כל הקובץ או שורה אחר שורה</li><li><strong>כתיבה לקבצים</strong>: כתוב נתונים לקבצים</li><li><strong>סגירת קבצים</strong>: תמיד סגור קבצים כשסיימת (או השתמש בהצהרת <code>with</code>)</li></ul></div>",
+					},
 				},
 				Exercises: []ExerciseSeed{
 					{
@@ -364,6 +421,7 @@ func seedCourse(ctx context.Context, queries *db.Queries) db.Course {
 				Language:    lang,
 				Name:        trans.Name,
 				Description: trans.Description,
+				Content:     trans.Content,
 			})
 			if err != nil {
 				log.Fatalf("Failed to create lesson translation (%s): %v", lang, err)

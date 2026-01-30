@@ -129,6 +129,7 @@ type LessonTranslation struct {
 	Language    string    `json:"language"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Content     string    `json:"content"`
 }
 
 type User struct {

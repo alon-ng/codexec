@@ -80,7 +80,7 @@ func (q *Queries) DeleteLesson(ctx context.Context, argUuid uuid.UUID) error {
 }
 
 const getLesson = `-- name: GetLesson :one
-SELECT lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public, lesson_translations.uuid, lesson_uuid, language, name, description FROM "lessons"
+SELECT lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public, lesson_translations.uuid, lesson_uuid, language, name, description, content FROM "lessons"
 JOIN "lesson_translations" ON "lessons"."uuid" = "lesson_translations"."lesson_uuid" AND "lesson_translations"."language" = $2
 WHERE "lessons"."uuid" = $1 AND "lessons"."deleted_at" IS NULL 
 LIMIT 1
@@ -104,6 +104,7 @@ type GetLessonRow struct {
 	Language    string     `json:"language"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
+	Content     string     `json:"content"`
 }
 
 func (q *Queries) GetLesson(ctx context.Context, arg GetLessonParams) (GetLessonRow, error) {
@@ -122,6 +123,7 @@ func (q *Queries) GetLesson(ctx context.Context, arg GetLessonParams) (GetLesson
 		&i.Language,
 		&i.Name,
 		&i.Description,
+		&i.Content,
 	)
 	return i, err
 }
@@ -137,7 +139,7 @@ func (q *Queries) HardDeleteLesson(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const listLessons = `-- name: ListLessons :many
-SELECT lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public, lesson_translations.uuid, lesson_uuid, language, name, description FROM "lessons"
+SELECT lessons.uuid, created_at, modified_at, deleted_at, course_uuid, order_index, is_public, lesson_translations.uuid, lesson_uuid, language, name, description, content FROM "lessons"
 JOIN "lesson_translations" ON "lessons"."uuid" = "lesson_translations"."lesson_uuid" AND "lesson_translations"."language" = $3
 WHERE "lessons"."deleted_at" IS NULL
 AND   ($4::uuid IS NULL OR "course_uuid" = $4)
@@ -165,6 +167,7 @@ type ListLessonsRow struct {
 	Language    string     `json:"language"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
+	Content     string     `json:"content"`
 }
 
 func (q *Queries) ListLessons(ctx context.Context, arg ListLessonsParams) ([]ListLessonsRow, error) {
@@ -194,6 +197,7 @@ func (q *Queries) ListLessons(ctx context.Context, arg ListLessonsParams) ([]Lis
 			&i.Language,
 			&i.Name,
 			&i.Description,
+			&i.Content,
 		); err != nil {
 			return nil, err
 		}

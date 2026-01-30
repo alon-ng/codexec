@@ -10,16 +10,18 @@ INSERT INTO "lesson_translations" (
   "lesson_uuid",
   "language",
   "name",
-  "description"
+  "description",
+  "content"
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5
 )
 RETURNING *;
 
 -- name: UpdateLessonTranslation :one
 UPDATE "lesson_translations"
 SET "name" = COALESCE(sqlc.narg('name'), "name"),
-    "description" = COALESCE(sqlc.narg('description'), "description")
+    "description" = COALESCE(sqlc.narg('description'), "description"),
+    "content" = COALESCE(sqlc.narg('content'), "content")
 FROM "lessons"
 WHERE "lesson_translations"."lesson_uuid" = "lessons"."uuid" AND "lesson_translations"."language" = $2
 AND "lessons"."uuid" = $1

@@ -2605,12 +2605,17 @@ const docTemplate = `{
         "lessons.AddLessonTranslationRequest": {
             "type": "object",
             "required": [
+                "content",
                 "description",
                 "language",
                 "lesson_uuid",
                 "name"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eContenido de la lección HTML\u003c/div\u003e"
+                },
                 "description": {
                     "type": "string",
                     "example": "Aprende los fundamentos de Python"
@@ -2631,6 +2636,7 @@ const docTemplate = `{
         "lessons.CreateLessonRequest": {
             "type": "object",
             "required": [
+                "content",
                 "course_uuid",
                 "description",
                 "language",
@@ -2638,6 +2644,10 @@ const docTemplate = `{
                 "order_index"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eLesson content HTML\u003c/div\u003e"
+                },
                 "course_uuid": {
                     "type": "string"
                 },
@@ -2681,6 +2691,10 @@ const docTemplate = `{
                 "uuid"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eLesson content HTML\u003c/div\u003e"
+                },
                 "description": {
                     "type": "string",
                     "example": "Learn Python fundamentals"
@@ -3121,6 +3135,7 @@ const docTemplate = `{
         "models.LessonTranslation": {
             "type": "object",
             "required": [
+                "content",
                 "description",
                 "language",
                 "lesson_uuid",
@@ -3128,6 +3143,10 @@ const docTemplate = `{
                 "uuid"
             ],
             "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "\u003cdiv\u003eLesson content HTML\u003c/div\u003e"
+                },
                 "description": {
                     "type": "string",
                     "example": "Learn Python fundamentals"

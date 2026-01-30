@@ -27,6 +27,7 @@ func (l *GetLessonRow) ToLessonWithTranslation() LessonWithTranslation {
 			Language:    l.Language,
 			Name:        l.Name,
 			Description: l.Description,
+			Content:     l.Content,
 		},
 	}
 }
@@ -48,6 +49,7 @@ func (l *ListLessonsRow) ToLessonWithTranslation() LessonWithTranslation {
 			Language:    l.Language,
 			Name:        l.Name,
 			Description: l.Description,
+			Content:     l.Content,
 		},
 	}
 }

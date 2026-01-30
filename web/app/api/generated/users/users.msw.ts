@@ -10,9 +10,9 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { UsersUser } from ".././model";
+import type { ModelsUser } from ".././model";
 
-export const getGetUsersResponseMock = (): UsersUser[] =>
+export const getGetUsersResponseMock = (): ModelsUser[] =>
   Array.from(
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
@@ -43,8 +43,8 @@ export const getGetUsersResponseMock = (): UsersUser[] =>
   }));
 
 export const getPostUsersCreateResponseMock = (
-  overrideResponse: Partial<UsersUser> = {},
-): UsersUser => ({
+  overrideResponse: Partial<ModelsUser> = {},
+): ModelsUser => ({
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -78,8 +78,8 @@ export const getPostUsersRestoreResponseMock = (): string =>
   faker.word.sample();
 
 export const getPutUsersUpdateResponseMock = (
-  overrideResponse: Partial<UsersUser> = {},
-): UsersUser => ({
+  overrideResponse: Partial<ModelsUser> = {},
+): ModelsUser => ({
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -107,8 +107,8 @@ export const getPutUsersUpdateResponseMock = (
 });
 
 export const getGetUsersUuidResponseMock = (
-  overrideResponse: Partial<UsersUser> = {},
-): UsersUser => ({
+  overrideResponse: Partial<ModelsUser> = {},
+): ModelsUser => ({
   created_at: faker.string.alpha({ length: { min: 10, max: 20 } }),
   deleted_at: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -137,10 +137,10 @@ export const getGetUsersUuidResponseMock = (
 
 export const getGetUsersMockHandler = (
   overrideResponse?:
-    | UsersUser[]
+    | ModelsUser[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<UsersUser[]> | UsersUser[]),
+      ) => Promise<ModelsUser[]> | ModelsUser[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -165,10 +165,10 @@ export const getGetUsersMockHandler = (
 
 export const getPostUsersCreateMockHandler = (
   overrideResponse?:
-    | UsersUser
+    | ModelsUser
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<UsersUser> | UsersUser),
+      ) => Promise<ModelsUser> | ModelsUser),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -249,10 +249,10 @@ export const getPostUsersRestoreMockHandler = (
 
 export const getPutUsersUpdateMockHandler = (
   overrideResponse?:
-    | UsersUser
+    | ModelsUser
     | ((
         info: Parameters<Parameters<typeof http.put>[1]>[0],
-      ) => Promise<UsersUser> | UsersUser),
+      ) => Promise<ModelsUser> | ModelsUser),
   options?: RequestHandlerOptions,
 ) => {
   return http.put(
@@ -277,10 +277,10 @@ export const getPutUsersUpdateMockHandler = (
 
 export const getGetUsersUuidMockHandler = (
   overrideResponse?:
-    | UsersUser
+    | ModelsUser
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<UsersUser> | UsersUser),
+      ) => Promise<ModelsUser> | ModelsUser),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(

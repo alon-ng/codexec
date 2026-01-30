@@ -126,6 +126,9 @@ importers:
       '@tailwindcss/vite':
         specifier: 4.1.18
         version: 4.1.18(vite@7.3.0(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.97.1)(sass@1.97.1)(terser@5.46.0)(yaml@2.8.2))
+      '@tiptap/extension-list-item':
+        specifier: ^3.18.0
+        version: 3.18.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))
       '@tiptap/markdown':
         specifier: ^3.17.1
         version: 3.17.1(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0)
@@ -2013,10 +2016,10 @@ packages:
       '@tiptap/core': ^3.16.0
       '@tiptap/pm': ^3.16.0
 
-  '@tiptap/extension-list-item@3.16.0':
-    resolution: {integrity: sha512-kshssUZEPoosPWbJNQEFJnVV3iPwsDU9l/RCdHJB5SE+aNWJyUk5hQ/YwngEHjV7rS+RnAuhbrcB5swgyzROuA==}
+  '@tiptap/extension-list-item@3.18.0':
+    resolution: {integrity: sha512-auTSt+NXoUnT0xofzFa+FnXsrW1TPdT1OB3U1OqQCIWkumZqL45A8OK9kpvyQsWj/xJ8fy1iZwFlKXPtxjLd2w==}
     peerDependencies:
-      '@tiptap/extension-list': ^3.16.0
+      '@tiptap/extension-list': ^3.18.0
 
   '@tiptap/extension-list-keymap@3.16.0':
     resolution: {integrity: sha512-AU3J9W6uo835ZdxiGmrYx1KUymzvfkU4d278X0OBAfujORXkbDNlo9er8pOrOpgXNxgtnlH32lWR4bWyKdUgwA==}
@@ -6384,7 +6387,7 @@ snapshots:
       '@tiptap/pm': 3.16.0
       linkifyjs: 4.3.2
 
-  '@tiptap/extension-list-item@3.16.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))':
+  '@tiptap/extension-list-item@3.18.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))':
     dependencies:
       '@tiptap/extension-list': 3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0)
 
@@ -6483,7 +6486,7 @@ snapshots:
       '@tiptap/extension-italic': 3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))
       '@tiptap/extension-link': 3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0)
       '@tiptap/extension-list': 3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0)
-      '@tiptap/extension-list-item': 3.16.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))
+      '@tiptap/extension-list-item': 3.18.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))
       '@tiptap/extension-list-keymap': 3.16.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))
       '@tiptap/extension-ordered-list': 3.16.0(@tiptap/extension-list@3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))(@tiptap/pm@3.16.0))
       '@tiptap/extension-paragraph': 3.16.0(@tiptap/core@3.16.0(@tiptap/pm@3.16.0))

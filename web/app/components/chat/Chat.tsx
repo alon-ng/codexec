@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useGetMeExercisesExerciseUuidChat, usePostMeExercisesExerciseUuidChat } from '~/api/generated/me/me';
-import type { ChatChatMessage } from '~/api/generated/model';
+import type { ModelsChatMessage } from '~/api/generated/model';
 import { Button } from '~/components/base/Button';
 import ChatMessages from '~/components/chat/ChatMessages';
 import { Textarea } from '~/components/ui/textarea';
@@ -19,7 +19,7 @@ export interface ChatProps {
 export default function Chat({ exerciseUuid, exerciseInstructions, exerciseCode }: ChatProps) {
     const { t } = useTranslation();
     const [message, setMessage] = useState<string>("");
-    const [messages, setMessages] = useState<ChatChatMessage[]>([]);
+    const [messages, setMessages] = useState<ModelsChatMessage[]>([]);
     const { mutate, isPending } = usePostMeExercisesExerciseUuidChat({
         mutation: {
             onSuccess: (m) => {

@@ -1,0 +1,1 @@
+export const prose = "prose prose-sm dark:prose-invert prose-p:my-2 prose-h1:mt-2 prose-h2:mt-2 prose-h3:mt-2 prose-h4:mt-2";

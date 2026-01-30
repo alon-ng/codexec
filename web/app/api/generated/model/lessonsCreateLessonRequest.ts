@@ -7,6 +7,7 @@
  */
 
 export interface LessonsCreateLessonRequest {
+  content: string;
   course_uuid: string;
   description: string;
   is_public?: boolean;

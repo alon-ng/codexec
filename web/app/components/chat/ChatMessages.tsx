@@ -1,16 +1,16 @@
 import { useTranslation } from "react-i18next";
-import type { ChatChatMessage } from "~/api/generated/model";
+import type { ModelsChatMessage } from "~/api/generated/model";
 import ChatMessage from "./ChatMessage";
 
 export interface ChatMessagesProps {
     isLoading: boolean;
     isLoadingResponse: boolean;
-    messages: ChatChatMessage[];
+    messages: ModelsChatMessage[];
 }
 
 export default function ChatMessages({ isLoading, messages, isLoadingResponse }: ChatMessagesProps) {
     const { t } = useTranslation();
-    const greetingMessage: ChatChatMessage = {
+    const greetingMessage: ModelsChatMessage = {
         uuid: "00000000-0000-0000-0000-000000000000",
         ts: new Date().toISOString(),
         role: "assistant",

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ExercisesExerciseCodeData } from '~/api/generated/model';
+import type { ModelsExerciseCodeData } from '~/api/generated/model';
 import type { ExecuteResponse, UserExerciseQuizData } from '~/api/types';
 
 
@@ -74,7 +74,7 @@ export const useWebSocket = (onSubmissionResponse?: (result: ExecuteResponse) =>
     };
   }, []);
 
-  const submit = useCallback((exerciseUuid: string, submission: ExercisesExerciseCodeData | UserExerciseQuizData) => {
+  const submit = useCallback((exerciseUuid: string, submission: ModelsExerciseCodeData | UserExerciseQuizData) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify({ "exercise_uuid": exerciseUuid, "submission": submission }));
     } else {

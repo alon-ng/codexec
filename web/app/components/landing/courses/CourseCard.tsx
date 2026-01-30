@@ -1,15 +1,15 @@
-import type { CoursesCourseWithTranslation } from "~/api/generated/model";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import { useTranslation } from "react-i18next";
-import { courseIcons } from "~/utils/course";
-import { Button } from "~/components/base/Button";
-import { Skeleton } from "~/components/ui/skeleton";
 import { ChevronsRightIcon, ShoppingCartIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+import type { ModelsCourseWithTranslation } from "~/api/generated/model";
 import Blob from "~/assets/blob.svg?react";
+import { Button } from "~/components/base/Button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
+import { courseIcons } from "~/utils/course";
 
 export interface CourseCardProps {
-    course?: CoursesCourseWithTranslation;
+    course?: ModelsCourseWithTranslation;
 }
 
 export default function CourseCard({ course }: CourseCardProps) {

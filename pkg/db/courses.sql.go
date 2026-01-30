@@ -303,6 +303,7 @@ SELECT  courses.uuid                        AS "course_uuid",
         lesson_translations.language        AS "lesson_translation_language",
         lesson_translations.name            AS "lesson_name", 
         lesson_translations.description     AS "lesson_description", 
+        lesson_translations.content         AS "lesson_content",
         exercises.uuid                      AS "exercise_uuid", 
         exercises.created_at                AS "exercise_created_at", 
         exercises.modified_at               AS "exercise_modified_at", 
@@ -360,6 +361,7 @@ type getCourseFullRow struct {
 	LessonTranslationLanguage   *string          `json:"lesson_translation_language"`
 	LessonName                  *string          `json:"lesson_name"`
 	LessonDescription           *string          `json:"lesson_description"`
+	LessonContent               *string          `json:"lesson_content"`
 	ExerciseUuid                *uuid.UUID       `json:"exercise_uuid"`
 	ExerciseCreatedAt           *time.Time       `json:"exercise_created_at"`
 	ExerciseModifiedAt          *time.Time       `json:"exercise_modified_at"`
@@ -413,6 +415,7 @@ func (q *Queries) getCourseFull(ctx context.Context, arg getCourseFullParams) ([
 			&i.LessonTranslationLanguage,
 			&i.LessonName,
 			&i.LessonDescription,
+			&i.LessonContent,
 			&i.ExerciseUuid,
 			&i.ExerciseCreatedAt,
 			&i.ExerciseModifiedAt,

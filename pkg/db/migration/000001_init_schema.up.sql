@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS "lesson_translations" (
     "language"      VARCHAR(2)      NOT NULL,
     "name"          VARCHAR(255)    NOT NULL,
     "description"   TEXT            NOT NULL,
+    "content"       TEXT            NOT NULL,
     CONSTRAINT fk_lesson_translations_lesson FOREIGN KEY ("lesson_uuid") REFERENCES "lessons"("uuid") ON DELETE CASCADE
 );
 

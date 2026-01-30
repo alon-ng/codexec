@@ -41,6 +41,7 @@ func createRandomLesson(t *testing.T, course *db.CourseWithTranslation) db.Lesso
 		Language:    "en",
 		Name:        fmt.Sprintf("Test Lesson %d", rnd),
 		Description: fmt.Sprintf("Test Description %d", rnd),
+		Content:     fmt.Sprintf("<div>Test Content %d</div>", rnd),
 	}
 	lessonTranslation, err := testQueries.CreateLessonTranslation(context.Background(), translationParams)
 	require.NoError(t, err)
@@ -50,6 +51,7 @@ func createRandomLesson(t *testing.T, course *db.CourseWithTranslation) db.Lesso
 	require.Equal(t, translationParams.Language, lessonTranslation.Language)
 	require.Equal(t, translationParams.Name, lessonTranslation.Name)
 	require.Equal(t, translationParams.Description, lessonTranslation.Description)
+	require.Equal(t, translationParams.Content, lessonTranslation.Content)
 
 	return db.LessonWithTranslation{
 		Lesson:      lesson,
@@ -87,6 +89,7 @@ func assertLessonListEqual(t *testing.T, expectedLesson db.LessonWithTranslation
 		Language:    gotLesson.Language,
 		Name:        gotLesson.Name,
 		Description: gotLesson.Description,
+		Content:     gotLesson.Content,
 	}
 	assertLessonEqual(t, expectedLesson, getLessonRow)
 }
@@ -101,6 +104,7 @@ func assertLessonEqual(t *testing.T, expectedLesson db.LessonWithTranslation, go
 
 	require.Equal(t, expectedLesson.Translation.Name, gotLesson.Name)
 	require.Equal(t, expectedLesson.Translation.Description, gotLesson.Description)
+	require.Equal(t, expectedLesson.Translation.Content, gotLesson.Content)
 	require.Equal(t, expectedLesson.Translation.Language, gotLesson.Language)
 	require.Equal(t, expectedLesson.Translation.LessonUuid, gotLesson.LessonUuid)
 
@@ -151,11 +155,13 @@ func TestUpdateLesson(t *testing.T) {
 	language := "en"
 	name := fmt.Sprintf("Updated Test Lesson %d", rnd)
 	description := fmt.Sprintf("Updated Test Description %d", rnd)
+	content := fmt.Sprintf("<div>Updated Test Content %d</div>", rnd)
 	updateTranslationParams := db.UpdateLessonTranslationParams{
 		Uuid:        lesson.Uuid,
 		Language:    language,
 		Name:        &name,
 		Description: &description,
+		Content:     &content,
 	}
 	updateTranslation, err := testQueries.UpdateLessonTranslation(context.Background(), updateTranslationParams)
 	require.NoError(t, err)
@@ -164,6 +170,7 @@ func TestUpdateLesson(t *testing.T) {
 	require.Equal(t, updateTranslationParams.Language, updateTranslation.Language)
 	require.Equal(t, *updateTranslationParams.Name, updateTranslation.Name)
 	require.Equal(t, *updateTranslationParams.Description, updateTranslation.Description)
+	require.Equal(t, *updateTranslationParams.Content, updateTranslation.Content)
 }
 
 func TestDeleteLesson(t *testing.T) {
@@ -330,6 +337,7 @@ func TestCreateLessonTranslationWithConflict(t *testing.T) {
 		Language:    "en",
 		Name:        "Test Lesson",
 		Description: "Test Description",
+		Content:     "<div>Test Content</div>",
 	})
 	require.True(t, db.IsDuplicateKeyErrorWithConstraint(err, "uq_lesson_translations_lesson_language"))
 }
@@ -348,6 +356,7 @@ func TestGetLessonRowToLessonWithTranslation(t *testing.T) {
 	require.Equal(t, lesson.Uuid, lessonWithTranslation.Uuid)
 	require.Equal(t, lesson.Translation.Name, lessonWithTranslation.Translation.Name)
 	require.Equal(t, lesson.Translation.Description, lessonWithTranslation.Translation.Description)
+	require.Equal(t, lesson.Translation.Content, lessonWithTranslation.Translation.Content)
 }
 
 func TestListLessonsRowToLessonWithTranslation(t *testing.T) {
@@ -376,6 +385,7 @@ func TestListLessonsRowToLessonWithTranslation(t *testing.T) {
 	require.Equal(t, lesson.Uuid, lessonWithTranslation.Uuid)
 	require.Equal(t, lesson.Translation.Name, lessonWithTranslation.Translation.Name)
 	require.Equal(t, lesson.Translation.Description, lessonWithTranslation.Translation.Description)
+	require.Equal(t, lesson.Translation.Content, lessonWithTranslation.Translation.Content)
 }
 
 func TestDeleteLessonTranslation(t *testing.T) {
@@ -405,5 +415,6 @@ func TestGetLessonTranslation(t *testing.T) {
 	require.Equal(t, lesson.Translation.Language, translation.Language)
 	require.Equal(t, lesson.Translation.Name, translation.Name)
 	require.Equal(t, lesson.Translation.Description, translation.Description)
+	require.Equal(t, lesson.Translation.Content, translation.Content)
 	require.Equal(t, lesson.Uuid, translation.Uuid_2)
 }
